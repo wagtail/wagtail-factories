@@ -2,7 +2,7 @@
 exclude *
 recursive-exclude * *
 
-graft src/django_rangepaginator
+graft src/wagtail_factories
 graft sandbox
 
 include README.rst
