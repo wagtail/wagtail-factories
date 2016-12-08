@@ -1,12 +1,13 @@
 import factory
 from django.utils.text import slugify
-from wagtail.wagtailcore.models import Collection, Page
+from wagtail.wagtailcore.models import Collection, Page, Site
 from wagtail.wagtailimages.models import get_image_model
 
 __all__ = [
     'CollectionFactory',
     'ImageFactory',
     'PageFactory',
+    'SiteFactory',
 ]
 
 
@@ -43,3 +44,14 @@ class ImageFactory(factory.DjangoModelFactory):
 
     collection = factory.SubFactory(CollectionFactory)
     file = factory.django.ImageField()
+
+
+class SiteFactory(factory.DjangoModelFactory):
+    hostname = 'localhost'
+    port = factory.Sequence(lambda n: 81 + n)
+    site_name = 'Test site'
+    root_page = factory.SubFactory(PageFactory)
+    is_default_site = False
+
+    class Meta:
+        model = Site

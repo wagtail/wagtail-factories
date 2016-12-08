@@ -2,7 +2,7 @@ import pytest
 
 import wagtail_factories
 from tests.testapp.factories import MyTestPageFactory
-from wagtail.wagtailcore.models import Page
+from wagtail.wagtailcore.models import Page, Site
 
 
 @pytest.mark.django_db
@@ -64,3 +64,20 @@ def test_custom_page_streamfield_data():
     assert page.body.stream_data == [
         ('char_array', ['bla-1', 'bla-2'])
     ]
+
+
+@pytest.mark.django_db
+def test_site_no_args_or_kwargs():
+    site = wagtail_factories.SiteFactory()
+    assert site.root_page.depth == 1
+
+
+@pytest.mark.django_db
+def test_site_multiple_no_args_or_kwargs():
+    Site.objects.all().delete()
+
+    wagtail_factories.SiteFactory()
+    wagtail_factories.SiteFactory()
+    wagtail_factories.SiteFactory()
+    wagtail_factories.SiteFactory()
+    assert Site.objects.count() == 4
