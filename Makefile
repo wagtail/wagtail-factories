@@ -13,6 +13,10 @@ retest:
 coverage:
 	py.test --cov=wagtail_factories --cov-report=term-missing --cov-report=html
 
+lint:
+	flake8 src/ tests/
+	isort --recursive --check-only --diff src tests
+
 docs:
 	$(MAKE) -C docs html
 
