@@ -21,7 +21,8 @@ tests_require = [
 ]
 
 with open('README.rst') as fh:
-    long_description = fh.read()
+    long_description = re.sub(
+        '^.. start-no-pypi.*^.. end-no-pypi', '', fh.read(), flags=re.M | re.S)
 
 setup(
     name='wagtail_factories',
