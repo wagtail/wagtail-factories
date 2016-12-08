@@ -37,12 +37,15 @@ class PageFactory(MP_NodeFactory):
         model = Page
 
 
-class ImageFactory(factory.DjangoModelFactory):
+class CollectionMemberFactory(factory.DjangoModelFactory):
+    collection = factory.SubFactory(CollectionFactory)
+
+
+class ImageFactory(CollectionMemberFactory):
 
     class Meta:
         model = get_image_model()
 
-    collection = factory.SubFactory(CollectionFactory)
     file = factory.django.ImageField()
 
 
