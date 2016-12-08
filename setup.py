@@ -33,7 +33,7 @@ setup(
     long_description=long_description,
     author="Michael van Tellingen",
     author_email="michaelvantellingen@gmail.com",
-    url='https://www.github.com/mvantellingen/wagtail-factories/',
+    url='https://github.com/mvantellingen/wagtail-factories/',
     install_requires=install_requires,
     tests_require=tests_require,
     extras_require={
