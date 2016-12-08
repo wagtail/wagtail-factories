@@ -19,4 +19,4 @@ install:
   - pip install -e .[test]
 
 script:
-  - py.test --cov=wagtail_factories --cov-report=term-missing
+  - py.test
