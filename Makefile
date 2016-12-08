@@ -8,7 +8,7 @@ test:
 	py.test --reuse-db 
 
 retest:
-	py.test -vvv --lf
+	py.test --reuse-db --lf
 
 coverage:
 	py.test --cov=wagtail_factories --cov-report=term-missing --cov-report=html
