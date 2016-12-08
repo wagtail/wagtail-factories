@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.sqlite3
+.coverage
+
+# Build
+build/
+dist/
+*.egg-info/
+*.egg
+.cache
+.tox
+htmlcov
