@@ -1,2 +1,4 @@
-# wagtail-factories
+wagtail-factories
+=================
+
 Factory boy classes for wagtail
