@@ -1,0 +1,22 @@
+---
+sudo: false
+language: python
+
+env:
+  matrix:
+    - DJANGO=Django==1.8 WAGTAIL=Wagtail==1.7
+    - DJANGO=Django==1.9 WAGTAIL=Wagtail==1.7
+    - DJANGO=Django==1.10 WAGTAIL=Wagtail==1.7
+
+
+python:
+  - '2.7'
+  - '3.4'
+  - '3.5'
+
+install:
+  - pip install --pre $WAGTAIL $DJANGO
+  - pip install -e .[test]
+
+script:
+  - py.test --cov=wagtail_factories --cov-report=term-missing
