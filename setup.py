@@ -10,6 +10,10 @@ docs_require = [
 ]
 
 tests_require = [
+    'pytest-django==3.1.2',
+    'pytest-pythonpath==0.7.1',
+    'psycopg2',
+
     'isort==4.2.5',
     'flake8==3.0.3',
     'flake8-blind-except==0.1.1',

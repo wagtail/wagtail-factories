@@ -5,7 +5,7 @@ install:
 	pip install -e .[docs,test]
 
 test:
-	py.test
+	py.test --reuse-db 
 
 retest:
 	py.test -vvv --lf
