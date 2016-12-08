@@ -2,6 +2,8 @@
 wagtail-factories
 =================
 
+Factory boy classes for Wagtail CMS
+
 .. start-no-pypi
 
 Status
@@ -19,5 +21,3 @@ Status
 
 .. end-no-pypi
 
-
-Factory boy classes for wagtail
