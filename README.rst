@@ -36,7 +36,7 @@ Usage
 
 
     def test_my_page():
-        root_page = wagtail_factories.PageFactory()
+        root_page = wagtail_factories.PageFactory(parent=None)
         my_page = MyTestPageFactory(parent=root_page)
 
 See https://github.com/mvantellingen/wagtail-factories/blob/master/tests/test_factories.py for more examples
