@@ -21,3 +21,22 @@ Status
 
 .. end-no-pypi
 
+Usage
+=====
+.. code-block:: django
+
+
+    import wagtail_factories
+    from . import models
+
+
+    class MyTestPageFactory(wagtail_factories.PageFactory):
+        class Meta:
+            model = models.MyTestPage
+
+
+    def test_my_page():
+        root_page = wagtail_factories.PageFactory()
+        my_page = MyTestPageFactory(parent=root_page)
+
+See https://github.com/mvantellingen/wagtail-factories/blob/master/tests/test_factories.py for more examples
