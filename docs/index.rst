@@ -57,7 +57,7 @@ Usage
 
 
     def test_my_page():
-        root_page = wagtail_factories.PageFactory()
+        root_page = wagtail_factories.PageFactory(parent=None)
         my_page = MyTestPageFactory(
             parent=root_page,
             body__0__carousel__items__0__label='Slide 1',
