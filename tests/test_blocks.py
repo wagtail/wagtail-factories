@@ -1,6 +1,8 @@
 from collections import OrderedDict
 
 import pytest
+from wagtail.wagtailcore.blocks import StructValue
+from wagtail.wagtailimages.models import Image
 
 import wagtail_factories
 from tests.testapp.factories import MyBlockFactory, MyTestPageWithStreamFieldFactory
@@ -12,30 +14,33 @@ def test_list_block_factory():
         items__0__label='label-1',
         items__0__value=1,
         items__1__label='label-2',
-        items__1__value=2)
+        items__1__value=2,
+        image__image=None)
 
-    assert value == OrderedDict([
+    assert value == StructValue(None, [
         ('title', 'my title'),
         ('item', OrderedDict([
             ('label', 'my-label'),
             ('value', 100),
         ])),
         ('items', [
-            OrderedDict([
+            StructValue(None, [
                 ('label', 'label-1'),
                 ('value', 1),
             ]),
-            OrderedDict([
+            StructValue(None, [
                 ('label', 'label-2'),
                 ('value', 2),
             ]),
-        ])
+        ]),
+        ('image', None),
     ])
 
 
 @pytest.mark.django_db
 def test_block_factory():
-    value = MyBlockFactory()
+    value = MyBlockFactory(
+        image__image__title='blub')
 
     assert value == OrderedDict([
         ('title', 'my title'),
@@ -43,15 +48,19 @@ def test_block_factory():
             ('label', 'my-label'),
             ('value', 100),
         ])),
-        ('items', [])
+        ('items', []),
+        ('image', Image.objects.first()),
     ])
+
+    assert value['image'].title == 'blub'
 
 
 @pytest.mark.django_db
 def test_block_factory_subkwarg():
     value = MyBlockFactory(
         item__label='my-label',
-        item__value=20)
+        item__value=20,
+        image__image=None)
 
     assert value == OrderedDict([
         ('title', 'my title'),
@@ -59,12 +68,15 @@ def test_block_factory_subkwarg():
             ('label', 'my-label'),
             ('value', 20),
         ])),
-        ('items', [])
+        ('items', []),
+        ('image', None),
     ])
 
 
 @pytest.mark.django_db
 def test_custom_page_streamfield_data_complex():
+    assert Image.objects.count() == 0
+
     root_page = wagtail_factories.PageFactory(parent=None)
     page = MyTestPageWithStreamFieldFactory(
         parent=root_page,
@@ -73,17 +85,33 @@ def test_custom_page_streamfield_data_complex():
         body__2__int_array__0=100,
         body__1__struct__title='My Title',
         body__1__struct__item__value=100,
+        body__1__struct__image__image=None,
+        body__3__image__image__title='Blub',
     )
+    assert Image.objects.count() == 1
+    image = Image.objects.first()
 
     assert page.body.stream_data == [
         ('char_array', ['foo', 'bar']),
-        ('struct', OrderedDict([
+        ('struct', StructValue(None, [
             ('title', 'My Title'),
-            ('item', OrderedDict([
+            ('item', StructValue(None, [
                 ('label', 'my-label'),
                 ('value', 100),
             ])),
-            ('items', [])
+            ('items', []),
+            ('image', None),
         ])),
-        ('int_array', [100])
+        ('int_array', [100]),
+        ('image', image),
     ]
+    content = str(page.body)
+    assert 'block-image' in content
+
+
+@pytest.mark.django_db
+def test_image_chooser_block():
+    value = wagtail_factories.ImageChooserBlockFactory()
+    image = Image.objects.last()
+
+    assert value == image

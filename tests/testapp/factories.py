@@ -17,6 +17,7 @@ class MyBlockFactory(wagtail_factories.StructBlockFactory):
     title = "my title"
     item = factory.SubFactory(MyBlockItemFactory)
     items = wagtail_factories.ListBlockFactory(MyBlockItemFactory)
+    image = factory.SubFactory(wagtail_factories.ImageChooserBlockFactory)
 
     class Meta:
         model = models.MyBlock
@@ -35,7 +36,8 @@ class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
             wagtail_factories.CharBlockFactory),
         'int_array': wagtail_factories.ListBlockFactory(
             wagtail_factories.IntegerBlockFactory),
-        'struct': MyBlockFactory
+        'struct': MyBlockFactory,
+        'image': wagtail_factories.ImageChooserBlockFactory
     })
 
     class Meta:

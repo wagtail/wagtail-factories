@@ -62,6 +62,7 @@ class ImageFactory(CollectionMemberFactory):
     class Meta:
         model = get_image_model()
 
+    title = 'An image'
     file = factory.django.ImageField()
 
 

@@ -3,6 +3,9 @@ from collections import defaultdict
 import factory
 from factory.declarations import ParameteredAttribute
 from wagtail.wagtailcore import blocks
+from wagtail.wagtailimages.blocks import ImageChooserBlock
+
+from wagtail_factories.factories import ImageFactory
 
 __all__ = [
     'CharBlockFactory',
@@ -10,6 +13,7 @@ __all__ = [
     'StreamFieldFactory',
     'ListBlockFactory',
     'StructBlockFactory',
+    'ImageChooserBlockFactory',
 ]
 
 
@@ -80,12 +84,12 @@ class BlockFactory(factory.Factory):
         abstract = True
 
     @classmethod
-    def _build(cls, model_class, *args, **kwargs):
-        return model_class().clean(kwargs['value'])
+    def _build(cls, model_class, value):
+        return model_class().clean(value)
 
     @classmethod
-    def _create(cls, model_class, *args, **kwargs):
-        return model_class().clean(kwargs['value'])
+    def _create(cls, model_class, value):
+        return model_class().clean(value)
 
 
 class CharBlockFactory(BlockFactory):
@@ -96,6 +100,26 @@ class CharBlockFactory(BlockFactory):
 class IntegerBlockFactory(BlockFactory):
     class Meta:
         model = blocks.IntegerBlock
+
+
+class ChooserBlockFactory(BlockFactory):
+    pass
+
+
+class ImageChooserBlockFactory(ChooserBlockFactory):
+
+    image = factory.SubFactory(ImageFactory)
+
+    class Meta:
+        model = ImageChooserBlock
+
+    @classmethod
+    def _build(cls, model_class, image):
+        return model_class().clean(image.pk)
+
+    @classmethod
+    def _create(cls, model_class, image):
+        return image
 
 
 class StructBlockFactory(factory.Factory):
@@ -109,4 +133,11 @@ class StructBlockFactory(factory.Factory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        return model_class().to_python(kwargs)
+        block = model_class()
+        return blocks.StructValue(block, [
+            (
+                name,
+                (kwargs[name] if name in kwargs else child_block.get_default())
+            )
+            for name, child_block in block.child_blocks.items()
+        ])
