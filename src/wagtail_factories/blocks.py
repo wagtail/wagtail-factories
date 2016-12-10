@@ -47,15 +47,15 @@ class StreamFieldFactory(ParameteredAttribute):
                     raise ValueError(
                         "No factory defined for block `%s`" % block_name)
 
-                if callable(block_factory):
-                    value = block_factory(**block_params)
-                else:
-                    value = block_factory.evaluate(index, obj, create, block_params)
+                value = block_factory(**block_params)
                 retval.append((block_name, value))
         return retval
 
 
 class ListBlockFactory(factory.SubFactory):
+    def __call__(self, **kwargs):
+        return self.generate(None, None, True, kwargs)
+
     def generate(self, sequence, obj, create, params):
         subfactory = self.get_factory()
 
