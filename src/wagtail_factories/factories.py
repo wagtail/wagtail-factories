@@ -1,6 +1,6 @@
 import factory
-from factory.utils import extract_dict
 from django.utils.text import slugify
+from factory.utils import extract_dict
 from wagtail.wagtailcore.models import Collection, Page, Site
 from wagtail.wagtailimages.models import get_image_model
 
