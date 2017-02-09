@@ -15,6 +15,11 @@ __all__ = [
 class MP_NodeFactory(factory.DjangoModelFactory):
 
     @classmethod
+    def _build(cls, model_class, *args, **kwargs):
+        kwargs.pop('parent', None)
+        return model_class(**kwargs)
+
+    @classmethod
     def _create(cls, model_class, *args, **kwargs):
         parent_passed = 'parent' in kwargs
         parent = kwargs.pop('parent', None)

@@ -115,7 +115,7 @@ class ImageChooserBlockFactory(ChooserBlockFactory):
 
     @classmethod
     def _build(cls, model_class, image):
-        return model_class().clean(image.pk)
+        return image
 
     @classmethod
     def _create(cls, model_class, image):
@@ -129,10 +129,6 @@ class StructBlockFactory(factory.Factory):
 
     @classmethod
     def _build(cls, model_class, *args, **kwargs):
-        return model_class().to_python(kwargs)
-
-    @classmethod
-    def _create(cls, model_class, *args, **kwargs):
         block = model_class()
         return blocks.StructValue(block, [
             (
@@ -141,3 +137,7 @@ class StructBlockFactory(factory.Factory):
             )
             for name, child_block in block.child_blocks.items()
         ])
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        return cls._build(model_class, *args, **kwargs)

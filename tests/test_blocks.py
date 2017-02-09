@@ -55,6 +55,24 @@ def test_block_factory():
     assert value['image'].title == 'blub'
 
 
+def test_block_factory_build():
+    value = MyBlockFactory.build(
+        image__image__title='blub')
+
+    image = value.pop('image')
+    assert image.title == 'blub'
+
+    assert value == OrderedDict([
+        ('title', 'my title'),
+        ('item', OrderedDict([
+            ('label', 'my-label'),
+            ('value', 100),
+        ])),
+        ('items', []),
+    ])
+
+
+
 @pytest.mark.django_db
 def test_block_factory_subkwarg():
     value = MyBlockFactory(

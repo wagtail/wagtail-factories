@@ -13,6 +13,14 @@ def test_page_no_args_or_kwargs():
 
 
 @pytest.mark.django_db
+def test_page_build_no_args_or_kwargs():
+    page = wagtail_factories.PageFactory.build(parent=None)
+    assert page.title == 'Test page'
+    assert page.slug == 'test-page'
+
+
+
+@pytest.mark.django_db
 def test_page_multiple_roots():
     # Make sure the default root pages are removed created by wagtail
     # migrations
