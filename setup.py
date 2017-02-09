@@ -3,8 +3,8 @@ import re
 from setuptools import find_packages, setup
 
 install_requires = [
-    'factory-boy==2.7.0',
-    'wagtail',
+    'factory-boy>=2.7.0',
+    'wagtail>=1.8',
 ]
 
 docs_require = [
@@ -12,12 +12,14 @@ docs_require = [
 ]
 
 tests_require = [
+    'pytest==3.0.6',
     'pytest-django==3.1.2',
     'pytest-pythonpath==0.7.1',
     'psycopg2',
+    'coverage',
 
     'isort==4.2.5',
-    'flake8==3.0.3',
+    'flake8==3.3.0',
     'flake8-blind-except==0.1.1',
     'flake8-debugger==1.4.0',
 ]

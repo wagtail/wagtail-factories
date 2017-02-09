@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 *.sqlite3
 .coverage
+.coverage.*
 
 # Build
 build/
