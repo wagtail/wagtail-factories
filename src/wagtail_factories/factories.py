@@ -2,7 +2,7 @@ import factory
 from django.utils.text import slugify
 from factory.utils import extract_dict
 from wagtail.wagtailcore.models import Collection, Page, Site
-from wagtail.wagtailimages.models import get_image_model
+from wagtail.wagtailimages import get_image_model
 
 __all__ = [
     'CollectionFactory',
