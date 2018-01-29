@@ -27,7 +27,7 @@ class StreamFieldFactory(ParameteredAttribute):
         super(StreamFieldFactory, self).__init__(**kwargs)
         self.factories = factories
 
-    def generate(self, sequence, obj, create, params):
+    def generate(self, step, params):
 
         result = defaultdict(lambda: defaultdict(lambda: defaultdict()))
 
@@ -58,9 +58,9 @@ class StreamFieldFactory(ParameteredAttribute):
 
 class ListBlockFactory(factory.SubFactory):
     def __call__(self, **kwargs):
-        return self.generate(None, None, True, kwargs)
+        return self.generate(None, kwargs)
 
-    def generate(self, sequence, obj, create, params):
+    def generate(self, step, params):
         subfactory = self.get_factory()
 
         result = defaultdict(dict)
