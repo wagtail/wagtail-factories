@@ -16,31 +16,33 @@ class MP_NodeFactory(factory.DjangoModelFactory):
 
     @classmethod
     def _build(cls, model_class, *args, **kwargs):
-        kwargs.pop('parent', None)
         return model_class(**kwargs)
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        parent_passed = 'parent' in kwargs
-        parent = kwargs.pop('parent', None)
-        parent_kwargs = extract_dict('parent', kwargs)
+        instance = model_class(**kwargs)
+        instance._parent_factory = cls
+        return instance
 
-        if parent and parent_kwargs:
-            raise ValueError('Cant pass a parent instance and attributes')
+    @factory.post_generation
+    def parent(self, create, extracted_parent, **parent_kwargs):
+        if create:
+            if extracted_parent and parent_kwargs:
+                raise ValueError('Cant pass a parent instance and attributes')
 
-        if parent_kwargs:
-            parent = cls(**parent_kwargs)
+            if parent_kwargs:
+                parent = self._parent_factory(**parent_kwargs)
+            else:
+                # Assume root node if no parent passed
+                parent = extracted_parent
 
-        if not parent and not parent_passed:
-            raise ValueError(
-                "`parent` is a required kwarg. If you want to create a root " +
-                "object then pass `parent=None`")
+            if parent:
+                parent.add_child(instance=self)
+            else:
+                type(self).add_root(instance=self)
 
-        if parent:
-            instance = model_class(**kwargs)
-            return parent.add_child(instance=instance)
-        else:
-            return model_class.add_root(**kwargs)
+            # tidy up after ourselves
+            del self._parent_factory
 
 
 class CollectionFactory(MP_NodeFactory):

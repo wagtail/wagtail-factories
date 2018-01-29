@@ -19,6 +19,12 @@ def test_page_build_no_args_or_kwargs():
     assert page.slug == 'test-page'
 
 
+@pytest.mark.django_db
+def test_page_build_no_parent():
+    page = wagtail_factories.PageFactory.build()
+    assert page.title == 'Test page'
+    assert page.slug == 'test-page'
+
 
 @pytest.mark.django_db
 def test_page_multiple_roots():
