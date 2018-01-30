@@ -16,7 +16,7 @@ tests_require = [
     'pytest-django==3.1.2',
     'pytest-cov==2.4.0',
     'pytest-pythonpath==0.7.1',
-    'psycopg2==2.6.2',
+    'psycopg2>=2.3.1',
     'coverage==4.3.4',
 
     'isort==4.2.5',
