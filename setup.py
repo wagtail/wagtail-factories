@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 install_requires = [
     'factory-boy>=2.7.0,<2.8',
-    'Faker>=0.7.0,
+    'Faker>=0.7.0',
     'wagtail>=1.8',
 ]
 
