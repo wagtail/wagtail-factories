@@ -6,56 +6,47 @@ language: python
 matrix:
   include:
     - python: 2.7
-      env: TOXENV=py27-django18-wagtail111
-    - python: 2.7
       env: TOXENV=py27-django18-wagtail112
     - python: 2.7
       env: TOXENV=py27-django18-wagtail113
-    - python: 2.7
-      env: TOXENV=py27-django111-wagtail111
     - python: 2.7
       env: TOXENV=py27-django111-wagtail112
     - python: 2.7
       env: TOXENV=py27-django111-wagtail113
 
     - python: 3.4
-      env: TOXENV=py34-django18-wagtail111
-    - python: 3.4
       env: TOXENV=py34-django18-wagtail112
     - python: 3.4
       env: TOXENV=py34-django18-wagtail113
     - python: 3.4
-      env: TOXENV=py34-django111-wagtail111
-    - python: 3.4
       env: TOXENV=py34-django111-wagtail112
     - python: 3.4
       env: TOXENV=py34-django111-wagtail113
+    - python: 3.4
+      env: TOXENV=py34-django200-wagtail200
 
-    - python: 3.5
-      env: TOXENV=py35-django18-wagtail111
+
     - python: 3.5
       env: TOXENV=py35-django18-wagtail112
     - python: 3.5
       env: TOXENV=py35-django18-wagtail113
     - python: 3.5
-      env: TOXENV=py35-django111-wagtail111
-    - python: 3.5
       env: TOXENV=py35-django111-wagtail112
     - python: 3.5
       env: TOXENV=py35-django111-wagtail113
+    - python: 3.5
+      env: TOXENV=py35-django200-wagtail200
 
-    - python: 3.6
-      env: TOXENV=py36-django18-wagtail111
     - python: 3.6
       env: TOXENV=py36-django18-wagtail112
     - python: 3.6
       env: TOXENV=py36-django18-wagtail113
     - python: 3.6
-      env: TOXENV=py36-django111-wagtail111
-    - python: 3.6
       env: TOXENV=py36-django111-wagtail112
     - python: 3.6
       env: TOXENV=py36-django111-wagtail113
+    - python: 3.6
+      env: TOXENV=py36-django200-wagtail200
 
   allow_failures:
     - python: 3.5
