@@ -3,9 +3,9 @@ import re
 from setuptools import find_packages, setup
 
 install_requires = [
-    'factory-boy>=2.7.0,<2.8',
-    'Faker>=0.7.0',
-    'wagtail>=1.8',
+    'factory-boy>=2.10,<2.11',
+    'Faker>=0.8.0',
+    'wagtail>=1.12',
 ]
 
 docs_require = [
