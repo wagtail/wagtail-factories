@@ -3,9 +3,12 @@
 from __future__ import unicode_literals
 
 import django.db.models.deletion
-import wagtail.wagtailcore.blocks
-import wagtail.wagtailcore.fields
 from django.db import migrations, models
+
+try:
+    from wagtail.wagtailcore import blocks, fields
+except ImportError:
+    from wagtail.core import blocks, fields
 
 
 class Migration(migrations.Migration):
@@ -21,7 +24,7 @@ class Migration(migrations.Migration):
             name='MyTestPage',
             fields=[
                 ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.Page')),
-                ('body', wagtail.wagtailcore.fields.StreamField((('char_array', wagtail.wagtailcore.blocks.ListBlock(wagtail.wagtailcore.blocks.CharBlock())),))),
+                ('body', fields.StreamField((('char_array', blocks.ListBlock(blocks.CharBlock())),))),
             ],
             options={
                 'abstract': False,

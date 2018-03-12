@@ -1,8 +1,12 @@
 from collections import OrderedDict
 
 import pytest
-from wagtail.wagtailcore.blocks import StructValue
-from wagtail.wagtailimages.models import Image
+try:
+    from wagtail.wagtailcore.blocks import StructValue
+    from wagtail.wagtailimages.models import Image
+except ImportError:
+    from wagtail.core.blocks import StructValue
+    from wagtail.images.models import Image
 
 import wagtail_factories
 from tests.testapp.factories import MyBlockFactory, MyTestPageWithStreamFieldFactory
