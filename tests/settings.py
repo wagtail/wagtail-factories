@@ -1,4 +1,4 @@
-import wagtail
+from wagtail import VERSION as WAGTAIL_VERSION
 
 
 MIDDLEWARE_CLASSES = []
@@ -37,7 +37,7 @@ INSTALLED_APPS = [
 ]
 
 
-if float(wagtail.__version__) < 2:
+if WAGTAIL_VERSION < (2, 0):
     INSTALLED_APPS = [
         'wagtail.contrib.wagtailstyleguide',
         'wagtail.contrib.wagtailsitemaps',
