@@ -1,8 +1,13 @@
 import factory
 from django.utils.text import slugify
 from factory.utils import extract_dict
-from wagtail.wagtailcore.models import Collection, Page, Site
-from wagtail.wagtailimages import get_image_model
+
+try:
+    from wagtail.wagtailcore.models import Collection, Page, Site
+    from wagtail.wagtailimages import get_image_model
+except ImportError:
+    from wagtail.core.models import Collection, Page, Site
+    from wagtail.images import get_image_model
 
 __all__ = [
     'CollectionFactory',

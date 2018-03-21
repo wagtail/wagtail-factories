@@ -1,7 +1,13 @@
-from wagtail.wagtailcore import blocks
-from wagtail.wagtailcore.fields import StreamField
-from wagtail.wagtailcore.models import Page
-from wagtail.wagtailimages.blocks import ImageChooserBlock
+try:
+    from wagtail.wagtailcore import blocks
+    from wagtail.wagtailcore.fields import StreamField
+    from wagtail.wagtailcore.models import Page
+    from wagtail.wagtailimages.blocks import ImageChooserBlock
+except ImportError:
+    from wagtail.core import blocks
+    from wagtail.core.fields import StreamField
+    from wagtail.core.models import Page
+    from wagtail.images.blocks import ImageChooserBlock
 
 
 class MyBlockItem(blocks.StructBlock):

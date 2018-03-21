@@ -3,8 +3,10 @@ import re
 from setuptools import find_packages, setup
 
 install_requires = [
-    'factory-boy>=2.7.0',
-    'wagtail>=1.8',
+    'factory-boy>=2.7.0,<2.8',
+    'fake-factory==0.7.4',
+    'Faker>=0.7.0',
+    'wagtail>=1.12',
 ]
 
 docs_require = [
@@ -16,7 +18,7 @@ tests_require = [
     'pytest-django==3.1.2',
     'pytest-cov==2.4.0',
     'pytest-pythonpath==0.7.1',
-    'psycopg2==2.6.2',
+    'psycopg2>=2.3.1',
     'coverage==4.3.4',
 
     'isort==4.2.5',

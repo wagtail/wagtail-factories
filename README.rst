@@ -82,4 +82,4 @@ Documentation is still in progress, but see the `tests`_ for more examples.
             body__0__carousel__items__1__label='Slide 2',
             body__0__carousel__items__1__image__image__title='Image Slide 2',
             body__0__carousel__items__2__label='Slide 3',
-            body__0__carousel__items__2__image__image__title='Image Slide 3')ctories.py for more examples
+            body__0__carousel__items__2__image__image__title='Image Slide 3')
