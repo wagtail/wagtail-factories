@@ -1,3 +1,20 @@
+1.1.0
+=====
+ - Upgrade dependecy for factory boy (>= 2.8)
+
+1.0.0
+=====
+ - Add support for Wagtail 2.0 and drop support for all wagtail versions 
+   before 1.12
+
+0.3.0 
+=====
+ - Fix import for wagtailimages.get_model()
+
+0.2.0
+=====
+ - Add support for ImageChooserBlock
+
 0.0.1
 =====
  - Creation
