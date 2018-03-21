@@ -21,6 +21,7 @@ docs:
 	$(MAKE) -C docs html
 
 release:
+	pip install twine
 	rm -rf dist/*
 	python setup.py sdist bdist_wheel
 	twine upload dist/*

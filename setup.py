@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 install_requires = [
     'factory-boy>=2.8.0',
-    'wagtail>=1.8',
+    'wagtail>=1.12',
 ]
 
 docs_require = [
@@ -31,7 +31,7 @@ with open('README.rst') as fh:
 
 setup(
     name='wagtail_factories',
-    version='0.2.0',
+    version='1.0.0',
     description='Factory boy classes for wagtail',
     long_description=long_description,
     author="Michael van Tellingen",
@@ -49,14 +49,14 @@ setup(
     include_package_data=True,
     license='MIT',
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
