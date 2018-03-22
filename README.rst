@@ -47,7 +47,7 @@ Documentation is still in progress, but see the `tests`_ for more examples.
 
     class MyCarouselItemFactory(wagtail_factories.StructBlockFactory):
         label = 'my-label'
-        image = factory.SubFactory((
+        image = factory.SubFactory(
             wagtail_factories.ImageChooserBlockFactory)
 
         class Meta:
