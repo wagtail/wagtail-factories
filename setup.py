@@ -5,6 +5,7 @@ from setuptools import find_packages, setup
 install_requires = [
     'factory-boy>=2.8.0',
     'wagtail>=1.12',
+    'flatdict>=3.0.1',
 ]
 
 docs_require = [
