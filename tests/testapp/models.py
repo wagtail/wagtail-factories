@@ -22,10 +22,16 @@ class MyBlock(blocks.StructBlock):
     image = ImageChooserBlock()
 
 
+class MyStreamBlock(blocks.StreamBlock):
+    title = blocks.CharBlock(max_length=100)
+    subtitle = blocks.CharBlock()
+
+
 class MyTestPage(Page):
     body = StreamField([
         ('char_array', blocks.ListBlock(blocks.CharBlock())),
         ('int_array', blocks.ListBlock(blocks.IntegerBlock())),
         ('struct', MyBlock()),
         ('image', ImageChooserBlock()),
+        ('stream', MyStreamBlock()),
     ])
