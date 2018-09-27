@@ -19,6 +19,8 @@ __all__ = [
     'ListBlockFactory',
     'StructBlockFactory',
     'ImageChooserBlockFactory',
+    'StreamBlockFactory',
+    'StreamBlockSubFactory',
 ]
 
 
@@ -58,6 +60,7 @@ class StreamFieldFactory(ParameteredAttribute):
 
                 value = block_factory(**block_params)
                 retval.append((block_name, value))
+        print("\nRETVAL\n", retval)
         return retval
 
 
@@ -81,7 +84,44 @@ class ListBlockFactory(factory.SubFactory):
         for index, index_params in sorted(result.items()):
             item = subfactory(**index_params)
             retval.append(item)
+
         return retval
+
+
+class StreamBlockSubFactory(factory.SubFactory):
+
+    class Meta:
+        model = blocks.StreamBlock
+
+    def __call__(self, **kwargs):
+        return self.generate(None, kwargs)
+
+    def generate(self, step, params):
+        subfactory = self.get_factory()
+        result = defaultdict(dict)
+        for key, value in params.items():
+            index, block_name = key.split('__', 1)
+            result[int(index)] = (block_name, value)
+
+        _retval = []
+        for index, (block_name, value) in sorted(result.items()):
+            value = subfactory(block_name=block_name, value=value)
+            _retval.append((block_name, value))
+
+        return blocks.StreamValue(subfactory._meta.model(), _retval)
+
+
+class StreamBlockFactory(factory.Factory):
+
+    @classmethod
+    def _build(cls, model_class, block_name, value, *args, **kwargs):
+        block = model_class()
+        child_block = block.child_blocks[block_name]
+        return child_block.to_python(value)
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        return cls._build(model_class, *args, **kwargs)
 
 
 class BlockFactory(factory.Factory):

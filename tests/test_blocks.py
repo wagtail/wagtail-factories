@@ -109,6 +109,8 @@ def test_custom_page_streamfield_data_complex():
         body__1__struct__item__value=100,
         body__1__struct__image__image=None,
         body__3__image__image__title='Blub',
+        body__4__stream__0__title="Stream title",
+        body__4__stream__1__subtitle="Stream subtitle",
     )
     assert Image.objects.count() == 1
     image = Image.objects.first()
