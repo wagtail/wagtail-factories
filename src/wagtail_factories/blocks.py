@@ -60,7 +60,6 @@ class StreamFieldFactory(ParameteredAttribute):
 
                 value = block_factory(**block_params)
                 retval.append((block_name, value))
-        print("\nRETVAL\n", retval)
         return retval
 
 
@@ -103,12 +102,12 @@ class StreamBlockSubFactory(factory.SubFactory):
             index, block_name = key.split('__', 1)
             result[int(index)] = (block_name, value)
 
-        _retval = []
+        retval = []
         for index, (block_name, value) in sorted(result.items()):
             value = subfactory(block_name=block_name, value=value)
-            _retval.append((block_name, value))
+            retval.append((block_name, value))
 
-        return blocks.StreamValue(subfactory._meta.model(), _retval)
+        return blocks.StreamValue(subfactory._meta.model(), retval)
 
 
 class StreamBlockFactory(factory.Factory):
