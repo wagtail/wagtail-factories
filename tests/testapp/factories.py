@@ -33,9 +33,16 @@ class MyStreamBlockFactory(wagtail_factories.StreamBlockFactory):
 
     title = "Char block"
     subtitle = "Another char block"
+    item = factory.SubFactory(MyBlockItemFactory)
 
     class Meta:
         model = models.MyStreamBlock
+
+
+class MyCharBlockFactory(wagtail_factories.CharBlockFactory):
+
+    class Meta:
+        model = models.MyCharBlock
 
 
 class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
@@ -45,6 +52,7 @@ class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
             wagtail_factories.CharBlockFactory),
         'int_array': wagtail_factories.ListBlockFactory(
             wagtail_factories.IntegerBlockFactory),
+        'char': MyCharBlockFactory,
         'struct': MyBlockFactory,
         'image': wagtail_factories.ImageChooserBlockFactory,
         'stream': wagtail_factories.StreamBlockSubFactory(

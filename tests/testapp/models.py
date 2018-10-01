@@ -25,6 +25,11 @@ class MyBlock(blocks.StructBlock):
 class MyStreamBlock(blocks.StreamBlock):
     title = blocks.CharBlock(max_length=100)
     subtitle = blocks.CharBlock()
+    item = MyBlockItem()
+
+
+class MyCharBlock(blocks.CharBlock):
+    pass
 
 
 class MyTestPage(Page):
@@ -34,4 +39,5 @@ class MyTestPage(Page):
         ('struct', MyBlock()),
         ('image', ImageChooserBlock()),
         ('stream', MyStreamBlock()),
+        ('char', MyCharBlock()),
     ])
