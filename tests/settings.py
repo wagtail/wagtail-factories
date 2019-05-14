@@ -1,3 +1,5 @@
+import os
+
 from wagtail import VERSION as WAGTAIL_VERSION
 
 
@@ -17,7 +19,10 @@ SECRET_KEY = 'Gx8sMKAtnA69TR9lyAlLuSnozUv3kxdscHkpwEjatZRVQQ0laMY69KL4XPxvr3KY'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'wagtail_factories',
+        'NAME': os.environ.get('TEST_DB_NAME', 'wagtail_factories'),
+        'USER': os.environ.get('TEST_DB_USER', 'postgres'),
+        'HOST': os.environ.get('TEST_DB_HOST', 'localhost'),
+        'PORT': os.environ.get('TEST_DB_PORT', '5432'),
     },
 }
 
