@@ -1,6 +1,5 @@
 import factory
 from django.utils.text import slugify
-from factory.utils import extract_dict
 
 try:
     from wagtail.wagtailcore.models import Collection, Page, Site
