@@ -12,7 +12,7 @@ CACHES = {
     }
 }
 
-ROOT_URLCONF = 'wagtail.tests.urls'
+ROOT_URLCONF = 'tests.urls'
 
 SECRET_KEY = 'Gx8sMKAtnA69TR9lyAlLuSnozUv3kxdscHkpwEjatZRVQQ0laMY69KL4XPxvr3KY'
 
