@@ -5,7 +5,7 @@ except ImportError:
     from wagtail.core.models import Page, Site
 
 import wagtail_factories
-from tests.testapp.factories import MyTestPageFactory
+from tests.testapp.factories import MyTestPageFactory, MyTestPageGetOrCreateFactory
 
 
 @pytest.mark.django_db
@@ -63,11 +63,18 @@ def test_page_multiple_nested():
 
 @pytest.mark.django_db
 def test_page_multiple_nested_structure_at_once():
+    Page.objects.all().delete()
+
     page = wagtail_factories.PageFactory(
         slug='page-1-2-3',
+        title="Page 1.2.3",
         parent__slug='page-1-2',
+        parent__title='Page 1.2',
         parent__parent__slug='page-1',
+        parent__parent__title='Page 1',
         parent__parent__parent=None)
+
+    assert Page.objects.count() == 3, Page.objects.all()
 
     assert page.slug == 'page-1-2-3'
     assert page.get_parent().slug == 'page-1-2'
@@ -128,3 +135,22 @@ def test_image_add_to_collection():
         collection__parent=root_collection,
         collection__name='new')
     assert image.collection.name == 'new'
+
+
+@pytest.mark.django_db
+def test_get_or_create():
+    root_page = wagtail_factories.PageFactory(parent=None)
+    page_1 = MyTestPageGetOrCreateFactory(slug="foobar")
+    page_2 = MyTestPageGetOrCreateFactory(slug="foobar")
+
+    assert page_1.pk == page_2.pk
+
+
+
+@pytest.mark.django_db
+def test_get_or_create():
+    root_page = wagtail_factories.PageFactory(parent=None)
+    page_1 = MyTestPageGetOrCreateFactory(slug="foobar", parent=root_page)
+    page_2 = MyTestPageGetOrCreateFactory(slug="foobar", parent=root_page)
+
+    assert page_1.pk == page_2.pk

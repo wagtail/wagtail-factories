@@ -1,5 +1,8 @@
+import logging
 import factory
 from django.utils.text import slugify
+from factory import errors, utils
+from factory.declarations import ParameteredAttribute
 
 try:
     from wagtail.wagtailcore.models import Collection, Page, Site
@@ -15,38 +18,87 @@ __all__ = [
     'SiteFactory',
 ]
 
+logger = logging.getLogger(__file__)
+
+
+class ParentNodeFactory(ParameteredAttribute):
+
+    EXTEND_CONTAINERS = True
+    FORCE_SEQUENCE = False
+    UNROLL_CONTEXT_BEFORE_EVALUATION = False
+
+    def generate(self, step, params):
+        if not params:
+            return None
+
+        subfactory = step.builder.factory_meta.factory
+        logger.debug(
+            "ParentNodeFactory: Instantiating %s.%s(%s), create=%r",
+            subfactory.__module__, subfactory.__name__,
+            utils.log_pprint(kwargs=params),
+            step,
+        )
+        force_sequence = step.sequence if self.FORCE_SEQUENCE else None
+        return step.recurse(subfactory, params, force_sequence=force_sequence)
+
 
 class MP_NodeFactory(factory.DjangoModelFactory):
 
+    parent = ParentNodeFactory()
+
     @classmethod
     def _build(cls, model_class, *args, **kwargs):
+        kwargs.pop('parent')
         return model_class(**kwargs)
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        instance = model_class(**kwargs)
-        instance._parent_factory = cls
+        parent = kwargs.pop('parent')
+
+        if cls._meta.django_get_or_create:
+            instance = cls._get_or_create(model_class, *args, parent=parent, **kwargs)
+        else:
+            instance = cls._create_instance(model_class, parent, kwargs)
+            assert instance.pk
         return instance
 
-    @factory.post_generation
-    def parent(self, create, extracted_parent, **parent_kwargs):
-        if create:
-            if extracted_parent and parent_kwargs:
-                raise ValueError('Cant pass a parent instance and attributes')
+    @classmethod
+    def _create_instance(cls, model_class, parent, kwargs):
+        instance = model_class(**kwargs)
+        if parent:
+            parent.add_child(instance=instance)
+        else:
+            model_class.add_root(instance=instance)
+        return instance
 
-            if parent_kwargs:
-                parent = self._parent_factory(**parent_kwargs)
-            else:
-                # Assume root node if no parent passed
-                parent = extracted_parent
+    @classmethod
+    def _get_or_create(cls, model_class, *args, **kwargs):
+        """Create an instance of the model through objects.get_or_create."""
+        manager = cls._get_manager(model_class)
+        assert 'defaults' not in cls._meta.django_get_or_create, (
+            "'defaults' is a reserved keyword for get_or_create "
+            "(in %s._meta.django_get_or_create=%r)"
+            % (cls, cls._meta.django_get_or_create))
 
-            if parent:
-                parent.add_child(instance=self)
-            else:
-                type(self).add_root(instance=self)
+        lookup_fields = {}
+        for field in cls._meta.django_get_or_create:
+            if field not in kwargs:
+                raise errors.FactoryError(
+                    "django_get_or_create - "
+                    "Unable to find initialization value for '%s' in factory %s" %
+                    (field, cls.__name__))
+            lookup_fields[field] = kwargs[field]
 
-            # tidy up after ourselves
-            del self._parent_factory
+        parent = lookup_fields.pop('parent', None)
+        kwargs.pop('parent', None)
+
+        if parent:
+            try:
+                return manager.child_of(parent).get(**lookup_fields)
+            except model_class.DoesNotExist as e:
+                return cls._create_instance(model_class, parent, kwargs)
+        else:
+            return super()._get_or_create(model_class, *args, **kwargs)
 
 
 class CollectionFactory(MP_NodeFactory):

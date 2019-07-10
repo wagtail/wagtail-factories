@@ -29,6 +29,13 @@ class MyTestPageFactory(wagtail_factories.PageFactory):
         model = models.MyTestPage
 
 
+class MyTestPageGetOrCreateFactory(wagtail_factories.PageFactory):
+
+    class Meta:
+        model = models.MyTestPage
+        django_get_or_create = ["slug", "parent"]
+
+
 class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
 
     body = wagtail_factories.StreamFieldFactory({

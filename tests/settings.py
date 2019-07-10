@@ -59,6 +59,8 @@ if WAGTAIL_VERSION < (2, 0):
         'wagtail.wagtailadmin',
         'wagtail.api.v2',
         'wagtail.wagtailcore',
+
+        'wagtail.tests.testapp',
     ] + INSTALLED_APPS
 else:
     INSTALLED_APPS = [
@@ -82,6 +84,8 @@ else:
         'wagtail.admin',
         'wagtail.api.v2',
         'wagtail.core',
+
+        'wagtail.tests.testapp',
     ] + INSTALLED_APPS
 
 
