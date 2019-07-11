@@ -1,4 +1,5 @@
 import logging
+
 import factory
 from django.utils.text import slugify
 from factory import errors, utils
@@ -95,7 +96,7 @@ class MP_NodeFactory(factory.DjangoModelFactory):
         if parent:
             try:
                 return manager.child_of(parent).get(**lookup_fields)
-            except model_class.DoesNotExist as e:
+            except model_class.DoesNotExist:
                 return cls._create_instance(model_class, parent, kwargs)
         else:
             return super()._get_or_create(model_class, *args, **kwargs)

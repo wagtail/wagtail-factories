@@ -136,16 +136,14 @@ def test_image_add_to_collection():
 
 @pytest.mark.django_db
 def test_get_or_create():
-    root_page = wagtail_factories.PageFactory(parent=None)
     page_1 = MyTestPageGetOrCreateFactory(slug="foobar")
     page_2 = MyTestPageGetOrCreateFactory(slug="foobar")
 
     assert page_1.pk == page_2.pk
 
 
-
 @pytest.mark.django_db
-def test_get_or_create():
+def test_get_or_create_with_root():
     root_page = wagtail_factories.PageFactory(parent=None)
     page_1 = MyTestPageGetOrCreateFactory(slug="foobar", parent=root_page)
     page_2 = MyTestPageGetOrCreateFactory(slug="foobar", parent=root_page)

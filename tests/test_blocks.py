@@ -72,7 +72,6 @@ def test_block_factory_build():
     ])
 
 
-
 @pytest.mark.django_db
 def test_block_factory_subkwarg():
     value = MyBlockFactory(
