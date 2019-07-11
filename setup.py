@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 install_requires = [
     'factory-boy>=2.8.0',
-    'wagtail>=1.12',
+    'wagtail>=2.0',
 ]
 
 docs_require = [
@@ -12,17 +12,17 @@ docs_require = [
 ]
 
 tests_require = [
-    'pytest==3.0.6',
-    'pytest-django==3.1.2',
-    'pytest-cov==2.4.0',
-    'pytest-pythonpath==0.7.1',
+    'pytest==5.0.1',
+    'pytest-django==3.5.1',
+    'pytest-cov==2.7.1',
+    'pytest-pythonpath==0.7.3',
     'psycopg2>=2.3.1',
-    'coverage==4.3.4',
+    'coverage==4.5.3',
 
-    'isort==4.2.5',
-    'flake8==3.3.0',
+    'isort==4.3.21',
+    'flake8==3.7.8',
     'flake8-blind-except==0.1.1',
-    'flake8-debugger==1.4.0',
+    'flake8-debugger==3.1.0',
 ]
 
 with open('README.rst') as fh:
@@ -51,8 +51,6 @@ setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
