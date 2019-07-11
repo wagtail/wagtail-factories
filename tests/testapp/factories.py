@@ -6,7 +6,7 @@ from . import models
 
 
 class MyBlockItemFactory(wagtail_factories.StructBlockFactory):
-    label = 'my-label'
+    label = "my-label"
     value = 100
 
     class Meta:
@@ -24,13 +24,11 @@ class MyBlockFactory(wagtail_factories.StructBlockFactory):
 
 
 class MyTestPageFactory(wagtail_factories.PageFactory):
-
     class Meta:
         model = models.MyTestPage
 
 
 class MyTestPageGetOrCreateFactory(wagtail_factories.PageFactory):
-
     class Meta:
         model = models.MyTestPage
         django_get_or_create = ["slug", "parent"]
@@ -38,14 +36,18 @@ class MyTestPageGetOrCreateFactory(wagtail_factories.PageFactory):
 
 class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
 
-    body = wagtail_factories.StreamFieldFactory({
-        'char_array': wagtail_factories.ListBlockFactory(
-            wagtail_factories.CharBlockFactory),
-        'int_array': wagtail_factories.ListBlockFactory(
-            wagtail_factories.IntegerBlockFactory),
-        'struct': MyBlockFactory,
-        'image': wagtail_factories.ImageChooserBlockFactory
-    })
+    body = wagtail_factories.StreamFieldFactory(
+        {
+            "char_array": wagtail_factories.ListBlockFactory(
+                wagtail_factories.CharBlockFactory
+            ),
+            "int_array": wagtail_factories.ListBlockFactory(
+                wagtail_factories.IntegerBlockFactory
+            ),
+            "struct": MyBlockFactory,
+            "image": wagtail_factories.ImageChooserBlockFactory,
+        }
+    )
 
     class Meta:
         model = models.MyTestPage

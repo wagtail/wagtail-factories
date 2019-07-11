@@ -8,12 +8,12 @@ from wagtail.images.blocks import ImageChooserBlock
 from wagtail_factories.factories import ImageFactory
 
 __all__ = [
-    'CharBlockFactory',
-    'IntegerBlockFactory',
-    'StreamFieldFactory',
-    'ListBlockFactory',
-    'StructBlockFactory',
-    'ImageChooserBlockFactory',
+    "CharBlockFactory",
+    "IntegerBlockFactory",
+    "StreamFieldFactory",
+    "ListBlockFactory",
+    "StructBlockFactory",
+    "ImageChooserBlockFactory",
 ]
 
 
@@ -23,6 +23,7 @@ class StreamFieldFactory(ParameteredAttribute):
             <streamfield>__<index>__<block_name>__<key>='foo',
 
     """
+
     def __init__(self, factories, **kwargs):
         super(StreamFieldFactory, self).__init__(**kwargs)
         self.factories = factories
@@ -33,7 +34,7 @@ class StreamFieldFactory(ParameteredAttribute):
 
         for key, value in params.items():
             try:
-                index, block_name, param = key.split('__', 2)
+                index, block_name, param = key.split("__", 2)
             except ValueError:
                 continue
             if not index.isdigit():
@@ -48,8 +49,7 @@ class StreamFieldFactory(ParameteredAttribute):
                 try:
                     block_factory = self.factories[block_name]
                 except KeyError:
-                    raise ValueError(
-                        "No factory defined for block `%s`" % block_name)
+                    raise ValueError("No factory defined for block `%s`" % block_name)
 
                 value = block_factory(**block_params)
                 retval.append((block_name, value))
@@ -66,9 +66,9 @@ class ListBlockFactory(factory.SubFactory):
         result = defaultdict(dict)
         for key, value in params.items():
             if key.isdigit():
-                result[int(key)]['value'] = value
+                result[int(key)]["value"] = value
             else:
-                prefix, label = key.split('__', 2)
+                prefix, label = key.split("__", 2)
                 if prefix and prefix.isdigit():
                     result[int(prefix)][label] = value
 
@@ -123,20 +123,19 @@ class ImageChooserBlockFactory(ChooserBlockFactory):
 
 
 class StructBlockFactory(factory.Factory):
-
     class Meta:
         model = blocks.StructBlock
 
     @classmethod
     def _build(cls, model_class, *args, **kwargs):
         block = model_class()
-        return blocks.StructValue(block, [
-            (
-                name,
-                (kwargs[name] if name in kwargs else child_block.get_default())
-            )
-            for name, child_block in block.child_blocks.items()
-        ])
+        return blocks.StructValue(
+            block,
+            [
+                (name, (kwargs[name] if name in kwargs else child_block.get_default()))
+                for name, child_block in block.child_blocks.items()
+            ],
+        )
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):

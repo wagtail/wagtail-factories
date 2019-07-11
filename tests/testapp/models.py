@@ -17,9 +17,11 @@ class MyBlock(blocks.StructBlock):
 
 
 class MyTestPage(Page):
-    body = StreamField([
-        ('char_array', blocks.ListBlock(blocks.CharBlock())),
-        ('int_array', blocks.ListBlock(blocks.IntegerBlock())),
-        ('struct', MyBlock()),
-        ('image', ImageChooserBlock()),
-    ])
+    body = StreamField(
+        [
+            ("char_array", blocks.ListBlock(blocks.CharBlock())),
+            ("int_array", blocks.ListBlock(blocks.IntegerBlock())),
+            ("struct", MyBlock()),
+            ("image", ImageChooserBlock()),
+        ]
+    )

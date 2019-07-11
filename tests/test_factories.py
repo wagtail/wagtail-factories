@@ -8,22 +8,22 @@ from tests.testapp.factories import MyTestPageFactory, MyTestPageGetOrCreateFact
 @pytest.mark.django_db
 def test_page_no_args_or_kwargs():
     page = wagtail_factories.PageFactory(parent=None)
-    assert page.title == 'Test page'
-    assert page.slug == 'test-page'
+    assert page.title == "Test page"
+    assert page.slug == "test-page"
 
 
 @pytest.mark.django_db
 def test_page_build_no_args_or_kwargs():
     page = wagtail_factories.PageFactory.build(parent=None)
-    assert page.title == 'Test page'
-    assert page.slug == 'test-page'
+    assert page.title == "Test page"
+    assert page.slug == "test-page"
 
 
 @pytest.mark.django_db
 def test_page_build_no_parent():
     page = wagtail_factories.PageFactory.build()
-    assert page.title == 'Test page'
-    assert page.slug == 'test-page'
+    assert page.title == "Test page"
+    assert page.slug == "test-page"
 
 
 @pytest.mark.django_db
@@ -42,16 +42,16 @@ def test_page_multiple_roots():
 @pytest.mark.django_db
 def test_page_multiple_nested():
     root = wagtail_factories.PageFactory(parent=None)
-    page_1 = wagtail_factories.PageFactory(parent=root, slug='page-1')
-    wagtail_factories.PageFactory(parent=page_1, slug='page-1-1')
-    wagtail_factories.PageFactory(parent=page_1, slug='page-1-2')
-    wagtail_factories.PageFactory(parent=page_1, slug='page-1-3')
+    page_1 = wagtail_factories.PageFactory(parent=root, slug="page-1")
+    wagtail_factories.PageFactory(parent=page_1, slug="page-1-1")
+    wagtail_factories.PageFactory(parent=page_1, slug="page-1-2")
+    wagtail_factories.PageFactory(parent=page_1, slug="page-1-3")
 
-    page_2 = wagtail_factories.PageFactory(parent=root, slug='page-2')
-    wagtail_factories.PageFactory(parent=page_2, slug='page-2-1')
-    wagtail_factories.PageFactory(parent=page_2, slug='page-2-2')
-    wagtail_factories.PageFactory(parent=page_2, slug='page-2-3')
-    wagtail_factories.PageFactory(parent=page_2, slug='page-2-4')
+    page_2 = wagtail_factories.PageFactory(parent=root, slug="page-2")
+    wagtail_factories.PageFactory(parent=page_2, slug="page-2-1")
+    wagtail_factories.PageFactory(parent=page_2, slug="page-2-2")
+    wagtail_factories.PageFactory(parent=page_2, slug="page-2-3")
+    wagtail_factories.PageFactory(parent=page_2, slug="page-2-4")
 
     assert len(root.get_children()) == 2
     assert len(page_1.get_children()) == 3
@@ -63,19 +63,20 @@ def test_page_multiple_nested_structure_at_once():
     Page.objects.all().delete()
 
     page = wagtail_factories.PageFactory(
-        slug='page-1-2-3',
+        slug="page-1-2-3",
         title="Page 1.2.3",
-        parent__slug='page-1-2',
-        parent__title='Page 1.2',
-        parent__parent__slug='page-1',
-        parent__parent__title='Page 1',
-        parent__parent__parent=None)
+        parent__slug="page-1-2",
+        parent__title="Page 1.2",
+        parent__parent__slug="page-1",
+        parent__parent__title="Page 1",
+        parent__parent__parent=None,
+    )
 
     assert Page.objects.count() == 3, Page.objects.all()
 
-    assert page.slug == 'page-1-2-3'
-    assert page.get_parent().slug == 'page-1-2'
-    assert page.get_parent().get_parent().slug == 'page-1'
+    assert page.slug == "page-1-2-3"
+    assert page.get_parent().slug == "page-1-2"
+    assert page.get_parent().get_parent().slug == "page-1"
     assert page.get_parent().get_parent().get_parent() is None
 
 
@@ -117,7 +118,7 @@ def test_site_multiple_no_args_or_kwargs():
 @pytest.mark.django_db
 def test_image_no_args_or_kwargs():
     image = wagtail_factories.ImageFactory()
-    assert image.collection.name == 'Test collection'
+    assert image.collection.name == "Test collection"
 
 
 @pytest.mark.django_db
@@ -125,15 +126,20 @@ def test_image_add_to_collection():
     root_collection = wagtail_factories.CollectionFactory(parent=None)
 
     image = wagtail_factories.ImageFactory(
-        collection__parent=root_collection,
-        collection__name='new')
-    assert image.collection.name == 'new'
+        collection__parent=root_collection, collection__name="new"
+    )
+    assert image.collection.name == "new"
 
 
 @pytest.mark.django_db
 def test_get_or_create():
-    page_1 = MyTestPageGetOrCreateFactory(slug="foobar")
-    page_2 = MyTestPageGetOrCreateFactory(slug="foobar")
+    root_page = wagtail_factories.PageFactory(parent=None)
+    page_1 = MyTestPageGetOrCreateFactory(
+        slug="foobar", parent__slug="root", parent__parent=root_page
+    )
+    page_2 = MyTestPageGetOrCreateFactory(
+        slug="foobar", parent__slug="root", parent__parent=root_page
+    )
 
     assert page_1.pk == page_2.pk
 

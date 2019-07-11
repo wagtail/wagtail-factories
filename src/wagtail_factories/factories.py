@@ -12,12 +12,7 @@ except ImportError:
     from wagtail.core.models import Collection, Page, Site
     from wagtail.images import get_image_model
 
-__all__ = [
-    'CollectionFactory',
-    'ImageFactory',
-    'PageFactory',
-    'SiteFactory',
-]
+__all__ = ["CollectionFactory", "ImageFactory", "PageFactory", "SiteFactory"]
 
 logger = logging.getLogger(__file__)
 
@@ -35,7 +30,8 @@ class ParentNodeFactory(ParameteredAttribute):
         subfactory = step.builder.factory_meta.factory
         logger.debug(
             "ParentNodeFactory: Instantiating %s.%s(%s), create=%r",
-            subfactory.__module__, subfactory.__name__,
+            subfactory.__module__,
+            subfactory.__name__,
             utils.log_pprint(kwargs=params),
             step,
         )
@@ -49,12 +45,12 @@ class MP_NodeFactory(factory.DjangoModelFactory):
 
     @classmethod
     def _build(cls, model_class, *args, **kwargs):
-        kwargs.pop('parent')
+        kwargs.pop("parent")
         return model_class(**kwargs)
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        parent = kwargs.pop('parent')
+        parent = kwargs.pop("parent")
 
         if cls._meta.django_get_or_create:
             instance = cls._get_or_create(model_class, *args, parent=parent, **kwargs)
@@ -76,22 +72,24 @@ class MP_NodeFactory(factory.DjangoModelFactory):
     def _get_or_create(cls, model_class, *args, **kwargs):
         """Create an instance of the model through objects.get_or_create."""
         manager = cls._get_manager(model_class)
-        assert 'defaults' not in cls._meta.django_get_or_create, (
+        assert "defaults" not in cls._meta.django_get_or_create, (
             "'defaults' is a reserved keyword for get_or_create "
             "(in %s._meta.django_get_or_create=%r)"
-            % (cls, cls._meta.django_get_or_create))
+            % (cls, cls._meta.django_get_or_create)
+        )
 
         lookup_fields = {}
         for field in cls._meta.django_get_or_create:
             if field not in kwargs:
                 raise errors.FactoryError(
                     "django_get_or_create - "
-                    "Unable to find initialization value for '%s' in factory %s" %
-                    (field, cls.__name__))
+                    "Unable to find initialization value for '%s' in factory %s"
+                    % (field, cls.__name__)
+                )
             lookup_fields[field] = kwargs[field]
 
-        parent = lookup_fields.pop('parent', None)
-        kwargs.pop('parent', None)
+        parent = lookup_fields.pop("parent", None)
+        kwargs.pop("parent", None)
 
         if parent:
             try:
@@ -103,14 +101,14 @@ class MP_NodeFactory(factory.DjangoModelFactory):
 
 
 class CollectionFactory(MP_NodeFactory):
-    name = 'Test collection'
+    name = "Test collection"
 
     class Meta:
         model = Collection
 
 
 class PageFactory(MP_NodeFactory):
-    title = 'Test page'
+    title = "Test page"
     slug = factory.LazyAttribute(lambda obj: slugify(obj.title))
 
     class Meta:
@@ -122,18 +120,17 @@ class CollectionMemberFactory(factory.DjangoModelFactory):
 
 
 class ImageFactory(CollectionMemberFactory):
-
     class Meta:
         model = get_image_model()
 
-    title = 'An image'
+    title = "An image"
     file = factory.django.ImageField()
 
 
 class SiteFactory(factory.DjangoModelFactory):
-    hostname = 'localhost'
+    hostname = "localhost"
     port = factory.Sequence(lambda n: 81 + n)
-    site_name = 'Test site'
+    site_name = "Test site"
     root_page = factory.SubFactory(PageFactory, parent=None)
     is_default_site = False
 

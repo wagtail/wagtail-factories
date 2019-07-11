@@ -15,20 +15,31 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('wagtailcore', '0030_index_on_pagerevision_created_at'),
-    ]
+    dependencies = [("wagtailcore", "0030_index_on_pagerevision_created_at")]
 
     operations = [
         migrations.CreateModel(
-            name='MyTestPage',
+            name="MyTestPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.Page')),
-                ('body', fields.StreamField((('char_array', blocks.ListBlock(blocks.CharBlock())),))),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.Page",
+                    ),
+                ),
+                (
+                    "body",
+                    fields.StreamField(
+                        (("char_array", blocks.ListBlock(blocks.CharBlock())),)
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
-            bases=('wagtailcore.page',),
-        ),
+            options={"abstract": False},
+            bases=("wagtailcore.page",),
+        )
     ]
