@@ -1,8 +1,5 @@
 import pytest
-try:
-    from wagtail.wagtailcore.models import Page, Site
-except ImportError:
-    from wagtail.core.models import Page, Site
+from wagtail.core.models import Page, Site
 
 import wagtail_factories
 from tests.testapp.factories import MyTestPageFactory, MyTestPageGetOrCreateFactory
