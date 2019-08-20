@@ -22,35 +22,45 @@ class StreamFieldFactory(ParameteredAttribute):
         Syntax:
             <streamfield>__<index>__<block_name>__<key>='foo',
 
+        Syntax to generate blocks with default values
+            <streamfield>__<index>=<block_name>
+
     """
 
     def __init__(self, factories, **kwargs):
         super(StreamFieldFactory, self).__init__(**kwargs)
         self.factories = factories
 
+    def get_factory_for_block(self, block_name):
+        try:
+            return self.factories[block_name]
+        except KeyError:
+            raise ValueError("No factory defined for block `%s`" % block_name)
+
     def generate(self, step, params):
 
         result = defaultdict(lambda: defaultdict(lambda: defaultdict()))
 
         for key, value in params.items():
-            try:
-                index, block_name, param = key.split("__", 2)
-            except ValueError:
-                continue
-            if not index.isdigit():
-                continue
+            if key.isdigit():
+                index, block_name = int(key), value
+                block_factory = self.get_factory_for_block(block_name)
+                result[index][block_name] = {}
+            else:
+                try:
+                    index, block_name, param = key.split("__", 2)
+                except ValueError:
+                    continue
+                if not index.isdigit():
+                    continue
 
-            index = int(index)
-            result[index][block_name][param] = value
+                index = int(index)
+                result[index][block_name][param] = value
 
         retval = []
         for index, block_items in sorted(result.items()):
             for block_name, block_params in block_items.items():
-                try:
-                    block_factory = self.factories[block_name]
-                except KeyError:
-                    raise ValueError("No factory defined for block `%s`" % block_name)
-
+                block_factory = self.get_factory_for_block(block_name)
                 value = block_factory(**block_params)
                 retval.append((block_name, value))
         return retval
