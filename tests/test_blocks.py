@@ -123,6 +123,23 @@ def test_custom_page_streamfield_data_complex():
 
 
 @pytest.mark.django_db
+def test_custom_page_streamfield_default_blocks():
+    assert Image.objects.count() == 0
+
+    page = MyTestPageWithStreamFieldFactory(body__0="image", body__1="image")
+    assert Image.objects.count() == 2
+
+    image1, image2 = Image.objects.all()
+
+    assert page.body.stream_data == [
+        ("image", image1), ("image", image2),
+    ]
+
+    content = str(page.body)
+    assert content.count("block-image") == 2
+
+
+@pytest.mark.django_db
 def test_image_chooser_block():
     value = wagtail_factories.ImageChooserBlockFactory()
     image = Image.objects.last()
