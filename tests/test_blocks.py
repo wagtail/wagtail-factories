@@ -126,6 +126,11 @@ def test_custom_page_streamfield_data_complex():
 def test_custom_page_streamfield_default_blocks():
     assert Image.objects.count() == 0
 
+    with pytest.raises(ValueError) as excinfo:
+        MyTestPageWithStreamFieldFactory(body__0="unknown")
+
+    assert "No factory defined for block `unknown`" in str(excinfo.value)
+
     page = MyTestPageWithStreamFieldFactory(body__0="image", body__1="image")
     assert Image.objects.count() == 2
 
