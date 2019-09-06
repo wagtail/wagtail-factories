@@ -8,12 +8,13 @@ from factory.declarations import ParameteredAttribute
 try:
     from wagtail.wagtailcore.models import Collection, Page, Site
     from wagtail.wagtailimages import get_image_model
+    from wagtail.wagtaildocs import get_document_model
 except ImportError:
     from wagtail.core.models import Collection, Page, Site
     from wagtail.images import get_image_model
+    from wagtail.documents.models import get_document_model
 
-__all__ = ["CollectionFactory", "ImageFactory", "PageFactory", "SiteFactory"]
-
+__all__ = ["CollectionFactory", "ImageFactory", "PageFactory", "SiteFactory", "DocumentFactory"]
 logger = logging.getLogger(__file__)
 
 
@@ -136,3 +137,10 @@ class SiteFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Site
+
+
+class DocumentFactory(CollectionMemberFactory):
+    class Meta:
+        model = get_document_model()
+    title = "An document"
+    file = factory.django.FileField()

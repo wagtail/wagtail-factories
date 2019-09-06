@@ -151,3 +151,12 @@ def test_get_or_create_with_root():
     page_2 = MyTestPageGetOrCreateFactory(slug="foobar", parent=root_page)
 
     assert page_1.pk == page_2.pk
+
+
+@pytest.mark.django_db
+def test_document_add_to_collection():
+    root_collection = wagtail_factories.CollectionFactory(parent=None)
+    document = wagtail_factories.DocumentFactory(
+        collection__parent=root_collection, collection__name="new"
+    )
+    assert document.collection.name == "new"
