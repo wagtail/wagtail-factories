@@ -27,9 +27,10 @@ class StreamFieldFactory(ParameteredAttribute):
 
     """
 
-    def __init__(self, factories, **kwargs):
+    def __init__(self, factories, default_params={}, **kwargs):
         super(StreamFieldFactory, self).__init__(**kwargs)
         self.factories = factories
+        self.default_params = default_params
 
     def get_factory_for_block(self, block_name):
         try:
@@ -40,6 +41,7 @@ class StreamFieldFactory(ParameteredAttribute):
     def generate(self, step, params):
 
         result = defaultdict(lambda: defaultdict(lambda: defaultdict()))
+        params = params or self.default_params
 
         for key, value in params.items():
             if key.isdigit():
