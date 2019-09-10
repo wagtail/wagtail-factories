@@ -145,6 +145,36 @@ def test_custom_page_streamfield_default_blocks():
 
 
 @pytest.mark.django_db
+def test_custom_page_streamfield_with_default_params():
+    assert Image.objects.count() == 0
+
+    # The streamfield factory has default parameters defined which will
+    # be created when no parameters are given
+    page = MyTestPageWithStreamFieldFactory()
+
+    assert Image.objects.count() == 1
+
+    assert page.body.stream_data == [
+        ("image", Image.objects.first()),
+        ('char_array', ['my', 'array'])
+    ]
+
+
+@pytest.mark.django_db
+def test_custom_page_streamfield_override_default_params():
+    assert Image.objects.count() == 0
+
+    page = MyTestPageWithStreamFieldFactory(
+        body__0__char_array__0="foo",
+        body__0__char_array__1="bar"
+    )
+
+    # the defaults parameters are not used
+    assert Image.objects.count() == 0
+    assert page.body.stream_data == [('char_array', ['foo', 'bar'])]
+
+
+@pytest.mark.django_db
 def test_image_chooser_block():
     value = wagtail_factories.ImageChooserBlockFactory()
     image = Image.objects.last()

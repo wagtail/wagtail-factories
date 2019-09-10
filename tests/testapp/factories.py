@@ -46,6 +46,11 @@ class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
             ),
             "struct": MyBlockFactory,
             "image": wagtail_factories.ImageChooserBlockFactory,
+        },
+        default_params={
+            "0": "image",
+            "1__char_array__0": "my",
+            "1__char_array__1": "array",
         }
     )
 
