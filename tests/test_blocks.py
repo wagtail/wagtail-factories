@@ -94,30 +94,32 @@ def test_custom_page_streamfield_data_complex():
         body__1__struct__item__value=100,
         body__1__struct__image__image=None,
         body__3__image__image__title="Blub",
+        body__4__richtext__value="<p>This is some <strong>richtext</strong></p>",
     )
     assert Image.objects.count() == 1
     image = Image.objects.first()
 
-    assert page.body.stream_data == [
-        ("char_array", ["foo", "bar"]),
-        (
-            "struct",
-            StructValue(
-                None,
-                [
-                    ("title", "My Title"),
-                    (
-                        "item",
-                        StructValue(None, [("label", "my-label"), ("value", 100)]),
-                    ),
-                    ("items", []),
-                    ("image", None),
-                ],
-            ),
+    assert page.body.stream_data[0] == ("char_array", ["foo", "bar"])
+    assert page.body.stream_data[1] == (
+        "struct",
+        StructValue(
+            None,
+            [
+                ("title", "My Title"),
+                (
+                    "item",
+                    StructValue(None, [("label", "my-label"), ("value", 100)]),
+                ),
+                ("items", []),
+                ("image", None),
+            ],
         ),
-        ("int_array", [100]),
-        ("image", image),
-    ]
+    )
+    assert page.body.stream_data[2] == ("int_array", [100])
+    assert page.body.stream_data[3] == ("image", image)
+    assert page.body.stream_data[4][0] == "richtext"
+    assert page.body.stream_data[4][1].source == "<p>This is some <strong>richtext</strong></p>"
+
     content = str(page.body)
     assert "block-image" in content
 
