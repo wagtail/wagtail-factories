@@ -9,31 +9,18 @@ addons:
 # LOL!
 matrix:
   include:
-    - python: 3.5
-      env: TOXENV=py35-django111-wagtail230
-    - python: 3.5
-      env: TOXENV=py35-django210-wagtail230
-    - python: 3.5
-      env: TOXENV=py35-django220-wagtail250
-
     - python: 3.6
-      env: TOXENV=py36-django111-wagtail230
+      env: TOXENV=py36-django111-wagtail23
     - python: 3.6
-      env: TOXENV=py36-django210-wagtail230
-    - python: 3.6
-      env: TOXENV=py36-django220-wagtail250
-
+      env: TOXENV=py36-django22-wagtail26
     - python: 3.7
-      env: TOXENV=py37-django111-wagtail230
+      env: TOXENV=py37-django111-wagtail23
     - python: 3.7
-      env: TOXENV=py37-django210-wagtail230
-    - python: 3.7
-      env: TOXENV=py37-django220-wagtail250
+      env: TOXENV=py37-django22-wagtail26
 
   allow_failures:
     - python: 3.6
       env: TOXENV=lint
-
 
 install:
   - pip install tox codecov
