@@ -6,6 +6,11 @@ from factory import errors, utils
 from factory.declarations import ParameteredAttribute
 
 try:
+    from factory.django import DjangoModelFactory
+except ImportError:
+    from factory import DjangoModelFactory
+
+try:
     from wagtail.wagtailcore.models import Collection, Page, Site
     from wagtail.wagtailimages import get_image_model
     from wagtail.wagtaildocs import get_document_model
@@ -40,7 +45,7 @@ class ParentNodeFactory(ParameteredAttribute):
         return step.recurse(subfactory, params, force_sequence=force_sequence)
 
 
-class MP_NodeFactory(factory.DjangoModelFactory):
+class MP_NodeFactory(DjangoModelFactory):
 
     parent = ParentNodeFactory()
 
@@ -116,7 +121,7 @@ class PageFactory(MP_NodeFactory):
         model = Page
 
 
-class CollectionMemberFactory(factory.DjangoModelFactory):
+class CollectionMemberFactory(DjangoModelFactory):
     collection = factory.SubFactory(CollectionFactory, parent=None)
 
 
@@ -128,7 +133,7 @@ class ImageFactory(CollectionMemberFactory):
     file = factory.django.ImageField()
 
 
-class SiteFactory(factory.DjangoModelFactory):
+class SiteFactory(DjangoModelFactory):
     hostname = "localhost"
     port = factory.Sequence(lambda n: 81 + n)
     site_name = "Test site"
