@@ -1,3 +1,7 @@
+2.0.1
+=====
+ - Updating to support Factory Boy 3.0
+
 2.0.0
 =====
  - Removed support for Python 2.7, 3.3 and 3.4
@@ -11,10 +15,10 @@
 
 1.0.0
 =====
- - Add support for Wagtail 2.0 and drop support for all wagtail versions 
+ - Add support for Wagtail 2.0 and drop support for all wagtail versions
    before 1.12
 
-0.3.0 
+0.3.0
 =====
  - Fix import for wagtailimages.get_model()
 

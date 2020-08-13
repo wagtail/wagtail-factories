@@ -1,6 +1,7 @@
 import logging
 
 import factory
+from factory.django import DjangoModelFactory
 from django.utils.text import slugify
 from factory import errors, utils
 from factory.declarations import ParameteredAttribute
@@ -40,7 +41,7 @@ class ParentNodeFactory(ParameteredAttribute):
         return step.recurse(subfactory, params, force_sequence=force_sequence)
 
 
-class MP_NodeFactory(factory.DjangoModelFactory):
+class MP_NodeFactory(DjangoModelFactory):
 
     parent = ParentNodeFactory()
 
@@ -116,7 +117,7 @@ class PageFactory(MP_NodeFactory):
         model = Page
 
 
-class CollectionMemberFactory(factory.DjangoModelFactory):
+class CollectionMemberFactory(DjangoModelFactory):
     collection = factory.SubFactory(CollectionFactory, parent=None)
 
 
@@ -128,7 +129,7 @@ class ImageFactory(CollectionMemberFactory):
     file = factory.django.ImageField()
 
 
-class SiteFactory(factory.DjangoModelFactory):
+class SiteFactory(DjangoModelFactory):
     hostname = "localhost"
     port = factory.Sequence(lambda n: 81 + n)
     site_name = "Test site"
