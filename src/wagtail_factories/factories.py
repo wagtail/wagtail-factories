@@ -1,7 +1,10 @@
 import logging
 
 import factory
-from factory.django import DjangoModelFactory
+try:
+    from factory.django import DjangoModelFactory
+except ImportError:
+    from factory import DjangoModelFactory
 from django.utils.text import slugify
 from factory import errors, utils
 from factory.declarations import ParameteredAttribute
