@@ -9,13 +9,6 @@ addons:
 # LOL!
 matrix:
   include:
-    - python: 3.5
-      env: TOXENV=py35-django111-wagtail230
-    - python: 3.5
-      env: TOXENV=py35-django210-wagtail230
-    - python: 3.5
-      env: TOXENV=py35-django220-wagtail250
-
     - python: 3.6
       env: TOXENV=py36-django111-wagtail230
     - python: 3.6
