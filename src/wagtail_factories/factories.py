@@ -4,19 +4,18 @@ import factory
 from django.utils.text import slugify
 from factory import errors, utils
 from factory.declarations import ParameteredAttribute
+from wagtail import VERSION as WAGTAIL_VERSION
+from wagtail.core.models import Collection, Page, Site
+from wagtail.images import get_image_model
 
 try:
     from factory.django import DjangoModelFactory
 except ImportError:
     from factory import DjangoModelFactory
 
-try:
-    from wagtail.wagtailcore.models import Collection, Page, Site
-    from wagtail.wagtailimages import get_image_model
-    from wagtail.wagtaildocs import get_document_model
-except ImportError:
-    from wagtail.core.models import Collection, Page, Site
-    from wagtail.images import get_image_model
+if WAGTAIL_VERSION >= (2, 8):
+    from wagtail.documents import get_document_model
+else:
     from wagtail.documents.models import get_document_model
 
 __all__ = ["CollectionFactory", "ImageFactory", "PageFactory", "SiteFactory", "DocumentFactory"]
