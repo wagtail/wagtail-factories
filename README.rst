@@ -12,8 +12,8 @@ Status
 .. image:: https://readthedocs.org/projects/wagtail-factories/badge/?version=latest
     :target: https://readthedocs.org/projects/wagtail-factories/
    
-.. image:: https://travis-ci.org/mvantellingen/wagtail-factories.svg?branch=master
-    :target: https://travis-ci.org/mvantellingen/wagtail-factories
+.. image:: https://travis-ci.org/wagtail/wagtail-factories.svg?branch=master
+    :target: https://travis-ci.org/wagtail/wagtail-factories
 
 
 .. image:: https://img.shields.io/pypi/v/wagtail-factories.svg
@@ -37,7 +37,7 @@ Usage
 
 Documentation is still in progress, but see the `tests`_ for more examples.
 
-.. _tests: https://github.com/mvantellingen/wagtail-factories/tree/master/tests
+.. _tests: https://github.com/wagtail/wagtail-factories/tree/master/tests
 
 .. code-block:: python
 

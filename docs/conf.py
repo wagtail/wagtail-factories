@@ -128,7 +128,7 @@ html_theme = 'alabaster'
 #
 # html_theme_options = {}
 html_theme_options = {
-    'github_user': 'mvantellingen',
+    'github_user': 'wagtail',
     'github_banner': True,
     'github_repo': 'wagtail-factories',
     'travis_button': True,

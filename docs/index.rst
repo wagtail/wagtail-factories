@@ -7,7 +7,7 @@ This Django app provides Factory Boy factories for the Wagtail CMS.
 Documentation is still in progress, but see the `tests`_ for more examples.
 
 
-.. _tests: https://github.com/mvantellingen/wagtail-factories/tree/master/tests
+.. _tests: https://github.com/wagtail/wagtail-factories/tree/master/tests
 
 
 Installation
