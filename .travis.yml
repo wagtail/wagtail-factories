@@ -1,44 +1,47 @@
 ---
 dist: xenial
-sudo: false
+os: linux
 language: python
 
 addons:
-  postgresql: "9.4"
+  postgresql: "10"
 
 # LOL!
-matrix:
+jobs:
   include:
     - python: 3.6
-      env: TOXENV=py36-django111-wagtail23
+      env: TOXENV=py36-django22-wagtail27
     - python: 3.6
-      env: TOXENV=py36-django111-wagtail26
+      env: TOXENV=py36-django30-wagtail27
     - python: 3.6
-      env: TOXENV=py36-django22-wagtail23
+      env: TOXENV=py36-django31-wagtail27
     - python: 3.6
-      env: TOXENV=py36-django22-wagtail26
-
+      env: TOXENV=py36-django22-wagtail210
+    - python: 3.6
+      env: TOXENV=py36-django30-wagtail210
+    - python: 3.6
+      env: TOXENV=py36-django31-wagtail210
     - python: 3.7
-      env: TOXENV=py37-django111-wagtail23
+      env: TOXENV=py37-django22-wagtail27
     - python: 3.7
-      env: TOXENV=py37-django111-wagtail26
+      env: TOXENV=py37-django30-wagtail27
     - python: 3.7
-      env: TOXENV=py37-django22-wagtail23
+      env: TOXENV=py37-django31-wagtail27
     - python: 3.7
-      env: TOXENV=py37-django22-wagtail26
-
+      env: TOXENV=py37-django22-wagtail210
+    - python: 3.7
+      env: TOXENV=py37-django30-wagtail210
+    - python: 3.7
+      env: TOXENV=py37-django31-wagtail210
   allow_failures:
     - python: 3.6
       env: TOXENV=lint
 
-
 install:
   - pip install tox codecov
 
-
 script:
   - tox
-
 
 after_success:
   - tox -e coverage-report

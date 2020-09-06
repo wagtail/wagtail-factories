@@ -12,13 +12,12 @@ docs_require = [
 ]
 
 tests_require = [
-    'pytest==5.0.1',
-    'pytest-django==3.5.1',
+    'pytest==6.0.1',
+    'pytest-django==3.9.0',
     'pytest-cov==2.7.1',
     'pytest-pythonpath==0.7.3',
     'psycopg2>=2.3.1',
     'coverage==4.5.3',
-
     'isort==4.3.21',
     'flake8==3.7.8',
     'flake8-blind-except==0.1.1',
