@@ -10,32 +10,43 @@ jobs:
       max-parallel: 4
       matrix:
         tox_env:
-          - py36-django111-wagtail23
-          - py36-django111-wagtail26
-          - py36-django22-wagtail23
-          - py36-django22-wagtail26
-          - py37-django111-wagtail23
-          - py37-django111-wagtail26
-          - py37-django22-wagtail23
-          - py37-django22-wagtail26
+          - py36-django22-wagtail27
+          - py36-django30-wagtail27
+          - py36-django31-wagtail27
+          - py36-django22-wagtail210
+          - py36-django30-wagtail210
+          - py36-django31-wagtail210
+          - py37-django22-wagtail27
+          - py37-django30-wagtail27
+          - py37-django31-wagtail27
+          - py37-django22-wagtail210
+          - py37-django30-wagtail210
+          - py37-django31-wagtail210
         include:
           - python-version: "3.6"
-            tox_env: py36-django111-wagtail23
+            tox_env: py36-django22-wagtail27
           - python-version: "3.6"
-            tox_env: py36-django111-wagtail26
+            tox_env: py36-django30-wagtail27
           - python-version: "3.6"
-            tox_env: py36-django22-wagtail23
+            tox_env: py36-django31-wagtail27
           - python-version: "3.6"
-            tox_env: py36-django22-wagtail26
+            tox_env: py36-django22-wagtail210
+          - python-version: "3.6"
+            tox_env: py36-django30-wagtail210
+          - python-version: "3.6"
+            tox_env: py36-django31-wagtail210
           - python-version: "3.7"
-            tox_env: py37-django111-wagtail23
+            tox_env: py37-django22-wagtail27
           - python-version: "3.7"
-            tox_env: py37-django111-wagtail26
+            tox_env: py37-django30-wagtail27
           - python-version: "3.7"
-            tox_env: py37-django22-wagtail23
+            tox_env: py37-django31-wagtail27
           - python-version: "3.7"
-            tox_env: py37-django22-wagtail26
-
+            tox_env: py37-django22-wagtail210
+          - python-version: "3.7"
+            tox_env: py37-django30-wagtail210
+          - python-version: "3.7"
+            tox_env: py37-django31-wagtail210
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
