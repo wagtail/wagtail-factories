@@ -10,7 +10,9 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: secret
+          POSTGRES_USER: wagtail_factories
+          POSTGRES_DB: wagtail_factories
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -59,5 +61,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip tox
     - name: Test with tox
+      env:
+        TEST_DB_NAME: wagtail_factories
+        TEST_DB_USER: wagtail_factories
+        TEST_DB_PASSWORD: secret
       run: |
         tox -e ${{ matrix.tox_env }}

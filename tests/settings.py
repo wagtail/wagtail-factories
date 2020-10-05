@@ -20,6 +20,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": os.environ.get("TEST_DB_NAME", "wagtail_factories"),
         "USER": os.environ.get("TEST_DB_USER", None),
+        "PASSWORD": os.environ.get("TEST_DB_PASSWORD", None),
         "HOST": os.environ.get("TEST_DB_HOST", "localhost"),
         "PORT": os.environ.get("TEST_DB_PORT", "5432"),
     }
