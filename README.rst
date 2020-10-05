@@ -11,11 +11,10 @@ Status
 
 .. image:: https://readthedocs.org/projects/wagtail-factories/badge/?version=latest
     :target: https://readthedocs.org/projects/wagtail-factories/
-   
+    
 .. image:: https://github.com/wagtail/wagtail-factories/workflows/Python%20Tests/badge.svg
     :target: hhttps://github.com/wagtail/wagtail-factories/actions
-
-
+    
 .. image:: https://img.shields.io/pypi/v/wagtail-factories.svg
     :target: https://pypi.python.org/pypi/wagtail-factories/
 
