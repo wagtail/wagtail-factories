@@ -19,11 +19,11 @@ __all__ = [
 
 class StreamFieldFactory(ParameteredAttribute):
     """
-        Syntax:
-            <streamfield>__<index>__<block_name>__<key>='foo',
+    Syntax:
+        <streamfield>__<index>__<block_name>__<key>='foo',
 
-        Syntax to generate blocks with default factory values:
-            <streamfield>__<index>=<block_name>
+    Syntax to generate blocks with default factory values:
+        <streamfield>__<index>=<block_name>
 
     """
 

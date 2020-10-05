@@ -137,7 +137,8 @@ def test_custom_page_streamfield_default_blocks():
     image1, image2 = Image.objects.all()
 
     assert page.body.stream_data == [
-        ("image", image1), ("image", image2),
+        ("image", image1),
+        ("image", image2),
     ]
 
     content = str(page.body)

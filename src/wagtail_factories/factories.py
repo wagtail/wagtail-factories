@@ -18,7 +18,13 @@ if WAGTAIL_VERSION >= (2, 8):
 else:
     from wagtail.documents.models import get_document_model
 
-__all__ = ["CollectionFactory", "ImageFactory", "PageFactory", "SiteFactory", "DocumentFactory"]
+__all__ = [
+    "CollectionFactory",
+    "ImageFactory",
+    "PageFactory",
+    "SiteFactory",
+    "DocumentFactory",
+]
 logger = logging.getLogger(__file__)
 
 
@@ -146,5 +152,6 @@ class SiteFactory(DjangoModelFactory):
 class DocumentFactory(CollectionMemberFactory):
     class Meta:
         model = get_document_model()
+
     title = "An document"
     file = factory.django.FileField()
