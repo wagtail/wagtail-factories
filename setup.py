@@ -31,7 +31,7 @@ with open("README.rst") as fh:
 
 setup(
     name="wagtail_factories",
-    version="2.0.0",
+    version="2.0.1",
     description="Factory boy classes for wagtail",
     long_description=long_description,
     author="Michael van Tellingen",
