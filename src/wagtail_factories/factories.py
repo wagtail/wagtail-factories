@@ -153,5 +153,5 @@ class DocumentFactory(CollectionMemberFactory):
     class Meta:
         model = get_document_model()
 
-    title = "An document"
+    title = "A document"
     file = factory.django.FileField()
