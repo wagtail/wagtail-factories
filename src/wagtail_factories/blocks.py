@@ -14,6 +14,7 @@ __all__ = [
     "ListBlockFactory",
     "StructBlockFactory",
     "ImageChooserBlockFactory",
+    "RichTextBlockFactory",
 ]
 
 
@@ -150,3 +151,17 @@ class StructBlockFactory(factory.Factory):
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         return cls._build(model_class, *args, **kwargs)
+
+
+class RichTextBlockFactory(factory.Factory):
+    @classmethod
+    def _build(cls, model_class, value=""):
+        block = model_class()
+        return block.to_python(value)
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        return cls._build(model_class, *args, **kwargs)
+
+    class Meta:
+        model = blocks.RichTextBlock
