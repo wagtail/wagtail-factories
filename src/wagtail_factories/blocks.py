@@ -14,6 +14,8 @@ __all__ = [
     "ListBlockFactory",
     "StructBlockFactory",
     "ImageChooserBlockFactory",
+    "StreamBlockFactory",
+    "StreamBlockSubFactory",
 ]
 
 
@@ -150,3 +152,56 @@ class StructBlockFactory(factory.Factory):
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         return cls._build(model_class, *args, **kwargs)
+
+
+class StreamBlockSubFactory(factory.SubFactory):
+    def __call__(self, **kwargs):
+        return self.generate(None, kwargs)
+
+    def generate(self, step, params):
+        subfactory = self.get_factory()
+        result = defaultdict(lambda: defaultdict(lambda: defaultdict()))
+
+        for key, value in params.items():
+            if key.isdigit():
+                index = int(key)
+                block_name = value
+                result[index][block_name] = {}
+            else:
+                try:
+                    index, key_remainder = key.split("__", 1)
+                except ValueError:
+                    continue
+
+                if "__" not in key_remainder:
+                    block_name = key_remainder
+                else:
+                    block_name, _ = key_remainder.split("__", 1)
+
+                index = int(index)
+                result[index][block_name][key_remainder] = value
+
+        stream_blocks = []
+        for index, block_items in sorted(result.items()):
+            for block_name, block_params in block_items.items():
+                all_blocks = subfactory(**block_params)
+                value = all_blocks[block_name]
+                stream_blocks.append((block_name, value))
+
+        return blocks.StreamValue(subfactory._meta.model(), stream_blocks)
+
+
+class StreamBlockFactory(factory.Factory):
+    class Meta:
+        model = blocks.StreamBlock
+
+    @classmethod
+    def _build(cls, model_class, *args, **kwargs):
+        return cls._create(model_class, *args, **kwargs)
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        blocks = {}
+        for block_type, value in kwargs.items():
+            blocks[block_type] = value
+        return blocks
