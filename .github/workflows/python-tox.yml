@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -24,57 +23,15 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        tox_env:
-          # Test 2.2 (LTS), 3.1 (Latest) releases for Python 3.6, 3.7
-          - py36-django22-wagtail27
-          - py36-django31-wagtail27
-          - py36-django22-wagtail210
-          - py36-django31-wagtail210
-          - py37-django22-wagtail27
-          - py37-django31-wagtail27
-          - py37-django22-wagtail210
-          - py37-django31-wagtail210
-
-          # Test all versions for Python 3.8
-          - py38-django22-wagtail27
-          - py38-django30-wagtail27
-          - py38-django31-wagtail27
-          - py38-django22-wagtail210
-          - py38-django30-wagtail210
-          - py38-django31-wagtail210
-
-
-        include:
-          - python-version: "3.6"
-            tox_env: py36-django22-wagtail27
-          - python-version: "3.6"
-            tox_env: py36-django31-wagtail27
-          - python-version: "3.6"
-            tox_env: py36-django22-wagtail210
-          - python-version: "3.6"
-            tox_env: py36-django31-wagtail210
-
-          - python-version: "3.7"
-            tox_env: py37-django22-wagtail27
-          - python-version: "3.7"
-            tox_env: py37-django31-wagtail27
-          - python-version: "3.7"
-            tox_env: py37-django22-wagtail210
-          - python-version: "3.7"
-            tox_env: py37-django31-wagtail210
-
-          - python-version: "3.8"
-            tox_env: py38-django22-wagtail27
-          - python-version: "3.8"
-            tox_env: py38-django30-wagtail27
-          - python-version: "3.8"
-            tox_env: py38-django31-wagtail27
-          - python-version: "3.8"
-            tox_env: py38-django22-wagtail210
-          - python-version: "3.8"
-            tox_env: py38-django30-wagtail210
-          - python-version: "3.8"
-            tox_env: py38-django31-wagtail210
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        django: [22, 30, 31]
+        wagtail: [27, 211]
+        factoryboy: [212, 32]
+        exclude:
+          - wagtail: 27
+            django: 30
+          - wagtail: 27
+            django: 31
 
     steps:
     - uses: actions/checkout@v1
@@ -90,5 +47,6 @@ jobs:
         TEST_DB_NAME: wagtail_factories
         TEST_DB_USER: wagtail_factories
         TEST_DB_PASSWORD: secret
+        TOX_ENV: py${{ matrix.python-version}}-django${{ matrix.django }}-wagtail${{ matrix.wagtail }}-factoryboy${{ matrix.factoryboy }}
       run: |
-        tox -e ${{ matrix.tox_env }}
+        tox -e $TOX_ENV
