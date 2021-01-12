@@ -23,11 +23,13 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.6, 3.7, 3.8]
-        django: [22, 31]
-        wagtail: [27, 210]
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        django: [22, 30, 31]
+        wagtail: [27, 211]
         factoryboy: [212, 32]
         exclude:
+          - wagtail: 27
+            django: 30
           - wagtail: 27
             django: 31
 
