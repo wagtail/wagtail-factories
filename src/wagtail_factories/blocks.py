@@ -18,12 +18,6 @@ __all__ = [
 ]
 
 
-FACTORY_BOY_VERSION = factory.__version__.split(".")
-FACTORY_BOY_VERSION = FACTORY_BOY_VERSION[:3]
-FACTORY_BOY_VERSION = [int(x) for x in FACTORY_BOY_VERSION]
-FACTORY_BOY_VERSION = tuple(FACTORY_BOY_VERSION)
-
-
 class StreamFieldFactory(ParameteredAttribute):
     """
     Syntax:
@@ -72,50 +66,33 @@ class StreamFieldFactory(ParameteredAttribute):
                 retval.append((block_name, value))
         return retval
 
-if FACTORY_BOY_VERSION >= (3, 2):
-    class ListBlockFactory(factory.SubFactory):
-        def __call__(self, **kwargs):
-            return self.evaluate(None, None, kwargs)
 
-        def evaluate(self, instance, step, params):
-            subfactory = self.get_factory()
+class ListBlockFactory(factory.SubFactory):
+    def __call__(self, **kwargs):
+        return self.evaluate(None, None, kwargs)
 
-            result = defaultdict(dict)
-            for key, value in params.items():
-                if key.isdigit():
-                    result[int(key)]["value"] = value
-                else:
-                    prefix, label = key.split("__", 2)
-                    if prefix and prefix.isdigit():
-                        result[int(prefix)][label] = value
+    def evaluate(self, instance, step, extra):
+        subfactory = self.get_factory()
 
-            retval = []
-            for index, index_params in sorted(result.items()):
-                item = subfactory(**index_params)
-                retval.append(item)
-            return retval
-else:
-    class ListBlockFactory(factory.SubFactory):
-        def __call__(self, **kwargs):
-            return self.generate(None, kwargs)
+        result = defaultdict(dict)
+        for key, value in extra.items():
+            if key.isdigit():
+                result[int(key)]["value"] = value
+            else:
+                prefix, label = key.split("__", 2)
+                if prefix and prefix.isdigit():
+                    result[int(prefix)][label] = value
 
-        def generate(self, step, params):
-            subfactory = self.get_factory()
+        retval = []
+        for index, index_params in sorted(result.items()):
+            item = subfactory(**index_params)
+            retval.append(item)
+        return retval
 
-            result = defaultdict(dict)
-            for key, value in params.items():
-                if key.isdigit():
-                    result[int(key)]["value"] = value
-                else:
-                    prefix, label = key.split("__", 2)
-                    if prefix and prefix.isdigit():
-                        result[int(prefix)][label] = value
-
-            retval = []
-            for index, index_params in sorted(result.items()):
-                item = subfactory(**index_params)
-                retval.append(item)
-            return retval
+    def generate(self, step, params):
+        # This method was used in factory-boy <3.2 instead of evaluate(), it
+        # could be removed when we stop to support this older version.
+        return self.evaluate(None, step, params)
 
 
 class BlockFactory(factory.Factory):
