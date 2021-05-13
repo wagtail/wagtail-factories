@@ -23,7 +23,11 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version:
+          - {version: 3.6, tox: 36}
+          - {version: 3.7, tox: 37}
+          - {version: 3.8, tox: 38}
+          - {version: 3.9, tox: 39}
         django: [22, 30, 31]
         wagtail: [27, 211]
         factoryboy: [212, 32]
@@ -38,7 +42,7 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ matrix.python-version.version }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip tox
@@ -47,6 +51,6 @@ jobs:
         TEST_DB_NAME: wagtail_factories
         TEST_DB_USER: wagtail_factories
         TEST_DB_PASSWORD: secret
-        TOX_ENV: py${{ matrix.python-version}}-django${{ matrix.django }}-wagtail${{ matrix.wagtail }}-factoryboy${{ matrix.factoryboy }}
+        TOX_ENV: "py${{ matrix.python-version.tox }}-django${{ matrix.django }}-wagtail${{ matrix.wagtail }}-factoryboy${{ matrix.factoryboy }}"
       run: |
         tox -e $TOX_ENV
