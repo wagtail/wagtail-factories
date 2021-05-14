@@ -98,26 +98,29 @@ def test_custom_page_streamfield_data_complex():
     assert Image.objects.count() == 1
     image = Image.objects.first()
 
-    assert page.body.stream_data == [
-        ("char_array", ["foo", "bar"]),
-        (
-            "struct",
-            StructValue(
-                None,
-                [
-                    ("title", "My Title"),
-                    (
-                        "item",
-                        StructValue(None, [("label", "my-label"), ("value", 100)]),
-                    ),
-                    ("items", []),
-                    ("image", None),
-                ],
-            ),
-        ),
-        ("int_array", [100]),
-        ("image", image),
-    ]
+    assert page.body[0].block_type == "char_array"
+    assert page.body[0].value == ["foo", "bar"]
+
+    assert page.body[1].block_type == "struct"
+    assert page.body[1].value == StructValue(
+        None,
+        [
+            ("title", "My Title"),
+            (
+                "item",
+                StructValue(None, [("label", "my-label"), ("value", 100)]),
+                ),
+            ("items", []),
+            ("image", None),
+        ],
+    )
+
+    assert page.body[2].block_type == "int_array"
+    assert page.body[2].value == [100]
+
+    assert page.body[3].block_type == "image"
+    assert page.body[3].value == image
+    
     content = str(page.body)
     assert "block-image" in content
 
@@ -136,10 +139,10 @@ def test_custom_page_streamfield_default_blocks():
 
     image1, image2 = Image.objects.all()
 
-    assert page.body.stream_data == [
-        ("image", image1),
-        ("image", image2),
-    ]
+    assert page.body[0].block_type == "image"
+    assert page.body[0].value == image1
+    assert page.body[1].block_type == "image"
+    assert page.body[1].value == image2
 
     content = str(page.body)
     assert content.count("block-image") == 2

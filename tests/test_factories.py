@@ -85,7 +85,7 @@ def test_custom_page_streamfield():
     root_page = wagtail_factories.PageFactory(parent=None)
     page = MyTestPageFactory(parent=root_page)
 
-    assert page.body.stream_data == []
+    assert len(page.body) == 0
 
 
 @pytest.mark.django_db
@@ -95,7 +95,8 @@ def test_custom_page_streamfield_data():
         parent=root_page, body=[("char_array", ["bla-1", "bla-2"])]
     )
 
-    assert page.body.stream_data == [("char_array", ["bla-1", "bla-2"])]
+    assert page.body[0].block_type == "char_array"
+    assert page.body[0].value == ["bla-1", "bla-2"]
 
 
 @pytest.mark.django_db
