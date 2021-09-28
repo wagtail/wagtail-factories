@@ -29,11 +29,13 @@ jobs:
           - {version: 3.8, tox: 38}
           - {version: 3.9, tox: 39}
         django: [22, 31, 32]
-        wagtail: [211, 213]
+        wagtail: [211, 213, 214]
         factoryboy: [212, 32]
         exclude:
           - wagtail: 211
             django: 32
+          - wagtail: 214
+            django: 22
 
     steps:
     - uses: actions/checkout@v1
