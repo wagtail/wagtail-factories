@@ -89,11 +89,6 @@ class ListBlockFactory(factory.SubFactory):
             retval.append(item)
         return retval
 
-    def generate(self, step, params):
-        # This method was used in factory-boy <3.2 instead of evaluate(), it
-        # could be removed when we stop to support this older version.
-        return self.evaluate(None, step, params)
-
 
 class BlockFactory(factory.Factory):
     class Meta:

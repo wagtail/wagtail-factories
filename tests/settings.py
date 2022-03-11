@@ -1,9 +1,5 @@
 import os
 
-from wagtail import VERSION as WAGTAIL_VERSION
-
-MIDDLEWARE_CLASSES = []
-
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
@@ -27,65 +23,36 @@ DATABASES = {
 }
 
 INSTALLED_APPS = [
+    "tests.testapp",
+    "wagtail.embeds",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.sites",
+    "wagtail.admin",
+    "wagtail.core",
+    "wagtail.contrib.redirects",
     "taggit",
-    "rest_framework",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
-    "django.contrib.messages",
     "django.contrib.sessions",
-    "django.contrib.sites",
+    "django.contrib.messages",
     "django.contrib.staticfiles",
-    "tests.testapp",
+    "django.contrib.sitemaps",
 ]
 
-
-if WAGTAIL_VERSION < (2, 0):
-    INSTALLED_APPS = [
-        "wagtail.contrib.wagtailstyleguide",
-        "wagtail.contrib.wagtailsitemaps",
-        "wagtail.contrib.wagtailroutablepage",
-        "wagtail.contrib.wagtailfrontendcache",
-        "wagtail.contrib.wagtailapi",
-        "wagtail.contrib.wagtailsearchpromotions",
-        "wagtail.contrib.settings",
-        "wagtail.contrib.modeladmin",
-        "wagtail.contrib.table_block",
-        "wagtail.wagtailforms",
-        "wagtail.wagtailsearch",
-        "wagtail.wagtailembeds",
-        "wagtail.wagtailimages",
-        "wagtail.wagtailsites",
-        "wagtail.wagtailusers",
-        "wagtail.wagtailsnippets",
-        "wagtail.wagtaildocs",
-        "wagtail.wagtailadmin",
-        "wagtail.api.v2",
-        "wagtail.wagtailcore",
-    ] + INSTALLED_APPS
-else:
-    INSTALLED_APPS = [
-        "wagtail.contrib.styleguide",
-        "wagtail.contrib.sitemaps",
-        "wagtail.contrib.routable_page",
-        "wagtail.contrib.frontend_cache",
-        "wagtail.contrib.search_promotions",
-        "wagtail.contrib.settings",
-        "wagtail.contrib.modeladmin",
-        "wagtail.contrib.table_block",
-        "wagtail.contrib.forms",
-        "wagtail.search",
-        "wagtail.embeds",
-        "wagtail.images",
-        "wagtail.sites",
-        "wagtail.users",
-        "wagtail.snippets",
-        "wagtail.documents",
-        "wagtail.admin",
-        "wagtail.api.v2",
-        "wagtail.core",
-    ] + INSTALLED_APPS
-
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
+]
 
 TEMPLATES = [
     {
@@ -102,3 +69,9 @@ TEMPLATES = [
         },
     }
 ]
+
+WAGTAILSEARCH_BACKENDS = {
+    'default': {
+        'BACKEND': 'wagtail.search.backends.database',
+    }
+}

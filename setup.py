@@ -3,8 +3,8 @@ import re
 from setuptools import find_packages, setup
 
 install_requires = [
-    "factory-boy>=2.12.0",
-    "wagtail>=2.11",
+    "factory-boy>=3.2",
+    "wagtail>=2.15",
 ]
 
 docs_require = [
@@ -54,16 +54,15 @@ setup(
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Django",
-        "Framework :: Django :: 2.2",
-        "Framework :: Django :: 3.1",
         "Framework :: Django :: 3.2",
+        "Framework :: Django :: 4.0",
         "Framework :: Wagtail",
     ],
     zip_safe=False,
