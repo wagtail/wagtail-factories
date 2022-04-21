@@ -79,7 +79,7 @@ class ListBlockFactory(factory.SubFactory):
             if key.isdigit():
                 result[int(key)]["value"] = value
             else:
-                prefix, label = key.split("__", 2)
+                prefix, label = key.split("__", 1)
                 if prefix and prefix.isdigit():
                     result[int(prefix)][label] = value
 
