@@ -6,8 +6,9 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 try:
-    from wagtail.wagtailcore import blocks, fields
+    from wagtail import blocks, fields
 except ImportError:
+    # Wagtail<3.0
     from wagtail.core import blocks, fields
 
 

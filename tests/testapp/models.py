@@ -1,6 +1,20 @@
-from wagtail.core import blocks
-from wagtail.core.fields import StreamField
-from wagtail.core.models import Page
+try:
+    from wagtail import blocks
+except ImportError:
+    # Wagtail<3.0
+    from wagtail.core import blocks
+
+try:
+    from wagtail.fields import StreamField
+except ImportError:
+    # Wagtail<3.0
+    from wagtail.core.fields import StreamField
+
+try:
+    from wagtail.models import Page
+except ImportError:
+    # Wagtail<3.0
+    from wagtail.core.models import Page
 from wagtail.images.blocks import ImageChooserBlock
 
 

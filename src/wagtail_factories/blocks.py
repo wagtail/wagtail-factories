@@ -2,11 +2,15 @@ from collections import defaultdict
 
 import factory
 from factory.declarations import ParameteredAttribute
-from wagtail.core import blocks
 from wagtail.images.blocks import ImageChooserBlock
 
-from wagtail_factories.factories import ImageFactory
+try:
+    from wagtail import blocks
+except ImportError:
+    # Wagtail<3.0
+    from wagtail.core import blocks
 
+from wagtail_factories.factories import ImageFactory
 
 __all__ = [
     "CharBlockFactory",
@@ -88,11 +92,6 @@ class ListBlockFactory(factory.SubFactory):
             item = subfactory(**index_params)
             retval.append(item)
         return retval
-
-    def generate(self, step, params):
-        # This method was used in factory-boy <3.2 instead of evaluate(), it
-        # could be removed when we stop to support this older version.
-        return self.evaluate(None, step, params)
 
 
 class BlockFactory(factory.Factory):

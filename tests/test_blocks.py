@@ -1,11 +1,16 @@
 from collections import OrderedDict
 
 import pytest
-from wagtail.core.blocks import StructValue
 from wagtail.images.models import Image
 
 import wagtail_factories
 from tests.testapp.factories import MyBlockFactory, MyTestPageWithStreamFieldFactory
+
+try:
+    from wagtail.blocks import StructValue
+except ImportError:
+    # Wagtail<3.0
+    from wagtail.core.blocks import StructValue
 
 
 @pytest.mark.django_db

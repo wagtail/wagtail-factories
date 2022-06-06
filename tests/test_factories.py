@@ -1,8 +1,13 @@
 import pytest
-from wagtail.core.models import Page, Site
 
 import wagtail_factories
 from tests.testapp.factories import MyTestPageFactory, MyTestPageGetOrCreateFactory
+
+try:
+    from wagtail.models import Page, Site
+except ImportError:
+    # Wagtail<3.0
+    from wagtail.core.models import Page, Site
 
 
 @pytest.mark.django_db
