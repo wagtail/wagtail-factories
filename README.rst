@@ -37,7 +37,7 @@ Usage
 
 Documentation is still in progress, but see the `tests`_ for more examples.
 
-.. _tests: https://github.com/wagtail/wagtail-factories/tree/master/tests
+.. _tests: https://github.com/wagtail/wagtail-factories/tree/main/tests
 
 .. code-block:: python
 
