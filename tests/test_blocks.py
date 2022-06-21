@@ -195,8 +195,8 @@ def test_page_with_deeply_nested_stream_block():
     page = PageWithStreamBlockInStructBlockFactory(
         parent=root_page,
         body__0__struct_block__inner_stream__0__struct_block__title="foo",
-        body__0__struct_block__inner_stream__0__char_block="foo",
     )
+    assert page.body[0].value["inner_stream"][0].value["title"] == "foo"
 
 
 @pytest.mark.django_db
@@ -204,6 +204,6 @@ def test_page_with_deeply_nested_stream_block_in_list_block():
     root_page = wagtail_factories.PageFactory(parent=None)
     page = PageWithStreamBlockInListBlockFactory(
         parent=root_page,
-        body__0__list_block__0__struct_block__title="foo",
-        body__0__list_block__0__char_block="bar",
+        body__0__list_block__0__0__struct_block__title="foo",
     )
+    assert page.body[0].value[0][0].value["title"] == "foo"

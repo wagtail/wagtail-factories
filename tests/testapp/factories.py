@@ -79,6 +79,9 @@ class StructBlockWithStreamBlockFactory(wagtail_factories.StructBlockFactory):
 class DeeplyNestedStreamBlockInListBlockFactory(wagtail_factories.StreamBlockFactory):
     list_block = wagtail_factories.ListBlockFactory(MyStreamBlockFactory)
 
+    class Meta:
+        model = models.DeeplyNestedStreamBlockInListBlock
+
 
 class DeeplyNestedStreamBlockFactory(wagtail_factories.StreamBlockFactory):
     struct_block = factory.SubFactory(StructBlockWithStreamBlockFactory)
