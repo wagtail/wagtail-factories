@@ -15,11 +15,70 @@ from wagtail_factories.factories import ImageFactory
 __all__ = [
     "CharBlockFactory",
     "IntegerBlockFactory",
+    "StreamBlockFactory",
     "StreamFieldFactory",
     "ListBlockFactory",
     "StructBlockFactory",
     "ImageChooserBlockFactory",
 ]
+
+
+class CompoundBlockFactoryMixin:
+    @classmethod
+    def _get_block_factory(cls, block_name):
+        """
+        Look up the factory associated with block_name in the compound block's
+        declaration.
+        """
+        try:
+            return cls._meta.declarations[block_name]
+        except KeyError:
+            raise ValueError("No factory defined for block `%s`" % block_name)
+
+    @classmethod
+    def _get_indexed_declaration_mappings(cls, params):
+        # One level deep
+        mappings = defaultdict(lambda: defaultdict(lambda: defaultdict()))
+
+        for key, value in params.items():
+            if key.isdigit():
+                index, block_name = int(key), value
+                mappings[index][block_name] = {}
+            else:
+                try:
+                    index, block_name, param = key.split("__", 2)
+                except ValueError:
+                    continue
+                if not index.isdigit():
+                    continue
+
+                index = int(index)
+                mappings[index][block_name][param] = value
+        return mappings
+
+
+class StreamBlockFactory(CompoundBlockFactoryMixin, factory.Factory):
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def _generate(cls, strategy, params):
+        block_mappings = cls._get_indexed_declaration_mappings(params)
+        stream_data = []
+        for index, block_items in sorted(block_mappings.items()):
+            for block_name, block_params in block_items.items():
+                block_factory = cls._get_block_factory(block_name)
+                if isinstance(block_factory, factory.SubFactory) and not isinstance(
+                    block_factory, ListBlockFactory
+                ):
+                    inner_factory = block_factory.get_factory()
+                    stream_data.append((block_name, inner_factory(**block_params)))
+                else:
+                    stream_data.append((block_name, block_factory(**block_params)))
+
+        if cls._meta.model is not None:
+            return blocks.StreamValue(cls._meta.model(), stream_data)
+        return stream_data
 
 
 class StreamFieldFactory(ParameteredAttribute):
@@ -32,43 +91,25 @@ class StreamFieldFactory(ParameteredAttribute):
 
     """
 
-    def __init__(self, factories, **kwargs):
-        super(StreamFieldFactory, self).__init__(**kwargs)
-        self.factories = factories
+    def __init__(self, block_types, **kwargs):
+        super().__init__(**kwargs)
+        if isinstance(block_types, dict):
+            # Old style definition, dict mapping block name -> block factory
+            self.stream_block_factory = type(
+                "AutoStreamBlockFactory", (StreamBlockFactory,), block_types
+            )
+        elif isinstance(block_types, type) and issubclass(
+            block_types, StreamBlockFactory
+        ):
+            self.stream_block_factory = block_types
+        else:
+            raise TypeError(
+                "StreamFieldFactory argument must be a StreamBlockFactory subclass or dict "
+                "mapping block names to factories"
+            )
 
-    def get_factory_for_block(self, block_name):
-        try:
-            return self.factories[block_name]
-        except KeyError:
-            raise ValueError("No factory defined for block `%s`" % block_name)
-
-    def generate(self, step, params):
-
-        result = defaultdict(lambda: defaultdict(lambda: defaultdict()))
-
-        for key, value in params.items():
-            if key.isdigit():
-                index, block_name = int(key), value
-                block_factory = self.get_factory_for_block(block_name)
-                result[index][block_name] = {}
-            else:
-                try:
-                    index, block_name, param = key.split("__", 2)
-                except ValueError:
-                    continue
-                if not index.isdigit():
-                    continue
-
-                index = int(index)
-                result[index][block_name][param] = value
-
-        retval = []
-        for index, block_items in sorted(result.items()):
-            for block_name, block_params in block_items.items():
-                block_factory = self.get_factory_for_block(block_name)
-                value = block_factory(**block_params)
-                retval.append((block_name, value))
-        return retval
+    def evaluate(self, instance, step, extra):
+        return self.stream_block_factory(**extra)
 
 
 class ListBlockFactory(factory.SubFactory):
@@ -83,7 +124,7 @@ class ListBlockFactory(factory.SubFactory):
             if key.isdigit():
                 result[int(key)]["value"] = value
             else:
-                prefix, label = key.split("__", 2)
+                prefix, label = key.split("__", maxsplit=1)
                 if prefix and prefix.isdigit():
                     result[int(prefix)][label] = value
 
