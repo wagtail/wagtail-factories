@@ -65,17 +65,23 @@ class StreamBlockFactory(factory.Factory):
         for index, block_items in sorted(indexed_mappings.items()):
             for block_name, block_params in block_items.items():
                 block_factory = cls._get_block_factory(block_name)
-                if isinstance(block_factory, factory.SubFactory) and not isinstance(
-                    block_factory, ListBlockFactory
-                ):
-                    inner_factory = block_factory.get_factory()
-                    stream_data.append((block_name, inner_factory(**block_params)))
-                else:
+                if isinstance(block_factory, ListBlockFactory):
                     stream_data.append((block_name, block_factory(**block_params)))
+                elif isinstance(block_factory, factory.SubFactory):
+                    inner_factory = block_factory.get_factory()
+                    stream_data.append(
+                        (block_name, inner_factory.generate(strategy, **block_params))
+                    )
+                else:
+                    stream_data.append(
+                        (block_name, block_factory.generate(strategy, **block_params))
+                    )
 
-        if cls._meta.model is not None:
-            return blocks.StreamValue(cls._meta.model(), stream_data)
-        return stream_data
+        if cls._meta.model is None:
+            # We got an old style definition, so aren't aware of a StreamBlock class for
+            # the StreamField's child blocks.
+            return stream_data
+        return blocks.StreamValue(cls._meta.model(), stream_data)
 
 
 class StreamFieldFactory(ParameteredAttribute):
@@ -180,14 +186,16 @@ class StructBlockFactory(factory.Factory):
         model = blocks.StructBlock
 
     @classmethod
-    def _get_child_block_handler(cls, block_name, block_instance):
+    def _get_child_block_handler(cls, block_name, block_instance, strategy):
         if block_name in cls._meta.declarations:
             declaration = cls._meta.declarations[block_name]
-            if isinstance(declaration, (factory.Factory, ListBlockFactory)):
+            if isinstance(declaration, ListBlockFactory):
                 return lambda **params: declaration(**params)
+            elif isinstance(declaration, factory.Factory):
+                return lambda **params: declaration.generate(strategy, **params)
             elif isinstance(declaration, factory.SubFactory):
                 wrapped_factory = declaration.get_factory()
-                return lambda **params: wrapped_factory(**params)
+                return lambda **params: wrapped_factory.generate(strategy, **params)
             else:
                 # It's either a scalar or a non-factory callable
                 return lambda: declaration
@@ -211,7 +219,7 @@ class StructBlockFactory(factory.Factory):
 
         block_data = []
         for block_name, instance in block.child_blocks.items():
-            handler = cls._get_child_block_handler(block_name, instance)
+            handler = cls._get_child_block_handler(block_name, instance, strategy)
             if block_name in deep_mappings:
                 # The user provided a deep declaration
                 block_data.append((block_name, handler(**deep_mappings[block_name])))
