@@ -121,7 +121,7 @@ def test_custom_page_streamfield_data_complex():
             (
                 "item",
                 StructValue(None, [("label", "my-label"), ("value", 100)]),
-                ),
+            ),
             ("items", []),
             ("image", None),
         ],

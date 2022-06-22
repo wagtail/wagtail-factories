@@ -23,7 +23,10 @@ __all__ = [
 ]
 
 
-class CompoundBlockFactoryMixin:
+class StreamBlockFactory(factory.Factory):
+    class Meta:
+        abstract = True
+
     @classmethod
     def _get_block_factory(cls, block_name):
         """
@@ -36,7 +39,7 @@ class CompoundBlockFactoryMixin:
             raise ValueError("No factory defined for block `%s`" % block_name)
 
     @classmethod
-    def _get_indexed_declaration_mappings(cls, params):
+    def _get_indexed_mappings(cls, params):
         mappings = defaultdict(lambda: defaultdict(lambda: defaultdict()))
 
         for key, value in params.items():
@@ -55,16 +58,11 @@ class CompoundBlockFactoryMixin:
                 mappings[index][block_name][param] = value
         return mappings
 
-
-class StreamBlockFactory(CompoundBlockFactoryMixin, factory.Factory):
-    class Meta:
-        abstract = True
-
     @classmethod
     def _generate(cls, strategy, params):
-        block_mappings = cls._get_indexed_declaration_mappings(params)
+        indexed_mappings = cls._get_indexed_mappings(params)
         stream_data = []
-        for index, block_items in sorted(block_mappings.items()):
+        for index, block_items in sorted(indexed_mappings.items()):
             for block_name, block_params in block_items.items():
                 block_factory = cls._get_block_factory(block_name)
                 if isinstance(block_factory, factory.SubFactory) and not isinstance(
