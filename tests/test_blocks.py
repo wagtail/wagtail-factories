@@ -180,6 +180,16 @@ def test_page_with_stream_block():
 
 
 @pytest.mark.django_db
+def test_page_with_stream_block_default_value():
+    root_page = wagtail_factories.PageFactory(parent=None)
+    page = PageWithStreamBlockFactory(
+        parent=root_page,
+        body__0="struct_block",
+    )
+    assert page.body[0].value["title"] == "my title"
+
+
+@pytest.mark.django_db
 def test_page_with_nested_stream_block():
     root_page = wagtail_factories.PageFactory(parent=None)
     page = PageWithNestedStreamBlockFactory(
@@ -187,6 +197,16 @@ def test_page_with_nested_stream_block():
         body__0__inner_stream__0__struct_block__title="foo",
     )
     assert page.body[0].value[0].value["title"] == "foo"
+
+
+@pytest.mark.django_db
+def test_page_with_nested_stream_block_default_value():
+    root_page = wagtail_factories.PageFactory(parent=None)
+    page = PageWithNestedStreamBlockFactory(
+        parent=root_page,
+        body__0__inner_stream__0="struct_block",
+    )
+    assert page.body[0].value[0].value["title"] == "my title"
 
 
 @pytest.mark.django_db
