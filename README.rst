@@ -86,9 +86,9 @@ Documentation is still in progress, but see the `tests`_ for more examples.
 
 
 Using StreamBlockFactory
-------------------------
+========================
 
-StreamBlockFactory can be used in conjunction with the other block factory types to create complex, nested StreamValues, much like how StreamBlock can be used to define the blocks for a complex StreamField.
+StreamBlockFactory can be used in conjunction with the other block factory types to create complex, nested StreamValues, much like how StreamBlock can be used to declare the blocks for a complex StreamField.
 
 First, define your StreamBlockFactory subclass, using factory.SubFactory to wrap child block declarations. Be sure to include your StreamBlock subclass as the model attribute on the inner Meta class.
 
@@ -129,8 +129,8 @@ To generate the default value for a block factory, terminate your declaration at
     MyPageFactory(body__0="my_struct_block")
 
 
-Alternative Declaration Syntax
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Alternative StreamFieldFactory declaration syntax
+=================================================
 
 Prior to version 2.1.0, StreamFieldFactory could only be used by providing a dict mapping block names to block factory classes as the single argument, for example:
 
