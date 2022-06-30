@@ -10,7 +10,9 @@ except ImportError:
     # Wagtail<3.0
     from wagtail.core import blocks
 
+from wagtail_factories.builder import StreamFieldStepBuilder
 from wagtail_factories.factories import ImageFactory
+from wagtail_factories.options import StreamBlockFactoryOptions
 
 __all__ = [
     "CharBlockFactory",
@@ -24,64 +26,40 @@ __all__ = [
 
 
 class StreamBlockFactory(factory.Factory):
-    class Meta:
-        abstract = True
-
-    @classmethod
-    def _get_block_factory(cls, block_name):
-        """
-        Look up the factory associated with block_name in the compound block's
-        declaration.
-        """
-        try:
-            return cls._meta.declarations[block_name]
-        except KeyError:
-            raise ValueError("No factory defined for block `%s`" % block_name)
-
-    @classmethod
-    def _get_indexed_mappings(cls, params):
-        mappings = defaultdict(lambda: defaultdict(lambda: defaultdict()))
-
-        for key, value in params.items():
-            if key.isdigit():
-                index, block_name = int(key), value
-                mappings[index][block_name] = {}
-            else:
-                try:
-                    index, block_name, param = key.split("__", 2)
-                except ValueError:
-                    continue
-                if not index.isdigit():
-                    continue
-
-                index = int(index)
-                mappings[index][block_name][param] = value
-        return mappings
+    _options_class = StreamBlockFactoryOptions
 
     @classmethod
     def _generate(cls, strategy, params):
-        indexed_mappings = cls._get_indexed_mappings(params)
-        stream_data = []
-        for index, block_items in sorted(indexed_mappings.items()):
-            for block_name, block_params in block_items.items():
-                block_factory = cls._get_block_factory(block_name)
-                if isinstance(block_factory, ListBlockFactory):
-                    stream_data.append((block_name, block_factory(**block_params)))
-                elif isinstance(block_factory, factory.SubFactory):
-                    inner_factory = block_factory.get_factory()
-                    stream_data.append(
-                        (block_name, inner_factory.generate(strategy, **block_params))
-                    )
-                else:
-                    stream_data.append(
-                        (block_name, block_factory.generate(strategy, **block_params))
-                    )
+        if cls._meta.abstract:
+            raise factory.errors.FactoryError(
+                "Cannot generate instances of abstract factory %(f)s; "
+                "Ensure %(f)s.Meta.model is set and %(f)s.Meta.abstract "
+                "is either not set or False." % dict(f=cls.__name__)
+            )
+        step = StreamFieldStepBuilder(cls._meta, params, strategy)
+        return step.build()
 
+    @classmethod
+    def _construct_stream(cls, block_class, block_indices, step, *args, **kwargs):
+        stream_data = [None] * (max(block_indices.values()) + 1)
+        for block_name, value in kwargs.items():
+            stream_data[block_indices[block_name]] = (block_name, value)
         if cls._meta.model is None:
             # We got an old style definition, so aren't aware of a StreamBlock class for
             # the StreamField's child blocks.
             return stream_data
         return blocks.StreamValue(cls._meta.model(), stream_data)
+
+    @classmethod
+    def _build(cls, block_class, block_indices, step, *args, **kwargs):
+        return cls._construct_stream(block_class, block_indices, step, *args, **kwargs)
+
+    @classmethod
+    def _create(cls, block_class, block_indices, step, *args, **kwargs):
+        return cls._construct_stream(block_class, block_indices, step, *args, **kwargs)
+
+    class Meta:
+        abstract = True
 
 
 class StreamFieldFactory(ParameteredAttribute):

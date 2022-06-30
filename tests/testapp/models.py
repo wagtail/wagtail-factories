@@ -46,6 +46,13 @@ class MyStreamBlock(blocks.StreamBlock):
     char_block = blocks.CharBlock()
 
 
+class SimpleStreamBlock(blocks.StreamBlock):
+    # No nesting, atomic blocks only
+    number = blocks.IntegerBlock()
+    text = blocks.CharBlock()
+    extra_text = blocks.CharBlock()
+
+
 class NestedStreamBlock(blocks.StreamBlock):
     inner_stream = MyStreamBlock()
 
@@ -64,6 +71,10 @@ class DeeplyNestedStreamBlockInListBlock(blocks.StreamBlock):
 
 class PageWithStreamBlock(Page):
     body = StreamField(MyStreamBlock())
+
+
+class PageWithSimpleStreamBlock(Page):
+    body = StreamField(SimpleStreamBlock())
 
 
 class PageWithNestedStreamBlock(Page):
