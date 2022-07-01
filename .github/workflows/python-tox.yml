@@ -51,6 +51,6 @@ jobs:
         TEST_DB_NAME: wagtail_factories
         TEST_DB_USER: wagtail_factories
         TEST_DB_PASSWORD: secret
-        TOX_ENV: "python${{ matrix.python-version.tox }}-django${{ matrix.django }}-wagtail${{ matrix.wagtail }}-factoryboy${{ matrix.factoryboy }}"
+        TOX_ENV: "py${{ matrix.python-version.tox }}-django${{ matrix.django }}-wagtail${{ matrix.wagtail }}-factoryboy${{ matrix.factoryboy }}"
       run: |
         tox -e $TOX_ENV
