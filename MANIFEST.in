@@ -3,7 +3,6 @@ exclude *
 recursive-exclude * *
 
 graft src/wagtail_factories
-graft sandbox
 
 include README.rst
 include CHANGES
