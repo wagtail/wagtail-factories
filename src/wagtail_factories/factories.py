@@ -13,7 +13,6 @@ except ImportError:
     from wagtail.core.models import Collection, Page, Site
 
 from factory.django import DjangoModelFactory
-
 from wagtail.documents import get_document_model
 
 __all__ = [
