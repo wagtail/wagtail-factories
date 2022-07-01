@@ -1,11 +1,16 @@
 from collections import OrderedDict
 
 import pytest
-from wagtail.core.blocks import StructValue
 from wagtail.images.models import Image
 
 import wagtail_factories
 from tests.testapp.factories import MyBlockFactory, MyTestPageWithStreamFieldFactory
+
+try:
+    from wagtail.blocks import StructValue
+except ImportError:
+    # Wagtail<3.0
+    from wagtail.core.blocks import StructValue
 
 
 @pytest.mark.django_db
@@ -120,7 +125,7 @@ def test_custom_page_streamfield_data_complex():
 
     assert page.body[3].block_type == "image"
     assert page.body[3].value == image
-    
+
     content = str(page.body)
     assert "block-image" in content
 
