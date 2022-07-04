@@ -10,9 +10,15 @@ except ImportError:
     # Wagtail<3.0
     from wagtail.core import blocks
 
-from wagtail_factories.builder import StreamFieldStepBuilder
+from wagtail_factories.builder import (
+    StreamBlockStepBuilder,
+    StructBlockStepBuilder,
+)
 from wagtail_factories.factories import ImageFactory
-from wagtail_factories.options import StreamBlockFactoryOptions
+from wagtail_factories.options import (
+    StreamBlockFactoryOptions,
+    StructBlockFactoryOptions,
+)
 
 __all__ = [
     "CharBlockFactory",
@@ -27,23 +33,30 @@ __all__ = [
 
 class StreamBlockFactory(factory.Factory):
     _options_class = StreamBlockFactoryOptions
+    _builder_class = StreamBlockStepBuilder
 
     @classmethod
     def _generate(cls, strategy, params):
+        # TODO: this check fails for old style StreamFieldFactory definitions, as we're
+        # generating a StreamBlockFactory subclass without an inner Meta class
         if cls._meta.abstract:
             raise factory.errors.FactoryError(
                 "Cannot generate instances of abstract factory %(f)s; "
                 "Ensure %(f)s.Meta.model is set and %(f)s.Meta.abstract "
                 "is either not set or False." % dict(f=cls.__name__)
             )
-        step = StreamFieldStepBuilder(cls._meta, params, strategy)
+        step = cls._builder_class(cls._meta, params, strategy)
         return step.build()
 
     @classmethod
-    def _construct_stream(cls, block_class, block_indices, step, *args, **kwargs):
-        stream_data = [None] * (max(block_indices.values()) + 1)
+    def _construct_stream(cls, block_class, *args, **kwargs):
+        def get_index(key):
+            return int(key.split(".")[0])
+
+        stream_data = [None] * (max(map(get_index, kwargs.keys())) + 1)
         for block_name, value in kwargs.items():
-            stream_data[block_indices[block_name]] = (block_name, value)
+            i, name = block_name.split(".")
+            stream_data[int(i)] = (name, value)
         if cls._meta.model is None:
             # We got an old style definition, so aren't aware of a StreamBlock class for
             # the StreamField's child blocks.
@@ -51,12 +64,12 @@ class StreamBlockFactory(factory.Factory):
         return blocks.StreamValue(cls._meta.model(), stream_data)
 
     @classmethod
-    def _build(cls, block_class, block_indices, step, *args, **kwargs):
-        return cls._construct_stream(block_class, block_indices, step, *args, **kwargs)
+    def _build(cls, block_class, *args, **kwargs):
+        return cls._construct_stream(block_class, *args, **kwargs)
 
     @classmethod
-    def _create(cls, block_class, block_indices, step, *args, **kwargs):
-        return cls._construct_stream(block_class, block_indices, step, *args, **kwargs)
+    def _create(cls, block_class, *args, **kwargs):
+        return cls._construct_stream(block_class, *args, **kwargs)
 
     class Meta:
         abstract = True
@@ -160,59 +173,23 @@ class ImageChooserBlockFactory(ChooserBlockFactory):
 
 
 class StructBlockFactory(factory.Factory):
+    _options_class = StructBlockFactoryOptions
+    _builder_class = StructBlockStepBuilder
+
     class Meta:
         model = blocks.StructBlock
 
     @classmethod
-    def _get_child_block_handler(cls, block_name, block_instance, strategy):
-        if block_name in cls._meta.declarations:
-            declaration = cls._meta.declarations[block_name]
-            if isinstance(declaration, ListBlockFactory):
-                return lambda **params: declaration(**params)
-            elif isinstance(declaration, factory.Factory):
-                return lambda **params: declaration.generate(strategy, **params)
-            elif isinstance(declaration, factory.SubFactory):
-                wrapped_factory = declaration.get_factory()
-                return lambda **params: wrapped_factory.generate(strategy, **params)
-            else:
-                # It's either a scalar or a non-factory callable
-                return lambda: declaration
-        else:
-            return lambda: block_instance.get_default()
-
-    @staticmethod
-    def _get_deep_mappings(params):
-        mappings = defaultdict(dict)
-        for key, value in params.items():
-            block_name, *param = key.split("__", maxsplit=1)
-            if param:
-                # It's a deep declaration, like block__title
-                mappings[block_name][param[0]] = value
-        return mappings
+    def _construct_struct_value(cls, block_class, params):
+        return blocks.StructValue(
+            block_class(),
+            [(name, value) for name, value in params.items()],
+        )
 
     @classmethod
-    def _generate(cls, strategy, params):
-        block = cls._meta.model()
-        deep_mappings = cls._get_deep_mappings(params)
-
-        block_data = []
-        for block_name, instance in block.child_blocks.items():
-            handler = cls._get_child_block_handler(block_name, instance, strategy)
-            if block_name in deep_mappings:
-                # The user provided a deep declaration
-                block_data.append((block_name, handler(**deep_mappings[block_name])))
-            elif block_name in params:
-                # User provided a declaration for this level of nesting - a scalar
-                block_data.append((block_name, params[block_name]))
-            else:
-                block_data.append((block_name, handler()))
-
-        return blocks.StructValue(block, block_data)
+    def _build(cls, block_class, *args, **kwargs):
+        return cls._construct_struct_value(block_class, kwargs)
 
     @classmethod
-    def _build(cls, model_class, *args, **kwargs):
-        return cls._generate(factory.enums.BUILD_STRATEGY, kwargs)
-
-    @classmethod
-    def _create(cls, model_class, *args, **kwargs):
-        return cls._generate(factory.enums.CREATE_STRATEGY)
+    def _create(cls, block_class, *args, **kwargs):
+        return cls._construct_struct_value(block_class, kwargs)

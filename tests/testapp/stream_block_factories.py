@@ -6,8 +6,15 @@ from . import models
 from .factories import MyBlockFactory
 
 
+class StructBlockWithLazyAttrFactory(MyBlockFactory):
+    title = factory.LazyFunction(lambda: "foobar")
+
+    class Meta:
+        model = models.MyBlock
+
+
 class MyStreamBlockFactory(wagtail_factories.StreamBlockFactory):
-    struct_block = factory.SubFactory(MyBlockFactory)
+    struct_block = factory.SubFactory(StructBlockWithLazyAttrFactory)
     char_block = factory.SubFactory(wagtail_factories.CharBlockFactory)
 
     class Meta:

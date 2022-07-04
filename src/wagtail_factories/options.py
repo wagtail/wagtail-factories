@@ -1,18 +1,31 @@
-from factory import enums
+from factory import enums, declarations
 from factory.base import FactoryOptions, StubObject
 
 
 class StreamBlockFactoryOptions(FactoryOptions):
-    def instantiate(self, step, args, kwargs):
-        block_class = self.get_model_class()
-        if step.builder.strategy == enums.BUILD_STRATEGY:
-            return self.factory._build(
-                block_class, step.builder.block_indices, step, *args, **kwargs
-            )
-        elif step.builder.strategy == enums.CREATE_STRATEGY:
-            return self.factory._create(
-                block_class, step.builder.block_indices, step, *args, **kwargs
-            )
-        else:
-            assert step.builder.strategy == enums.STUB_STRATEGY
-            return StubObject(**kwargs)
+    def prepare_arguments(self, attributes):
+        # Like the base implementation, but ignore args as they are not relevant
+        # for instantiating StreamValues.
+
+        def get_base_name(key):
+            # Keys at this point will be like <index>.<block_name>
+            return key.split(".")[1]
+
+        kwargs = dict(attributes)
+        # 1. Extension points
+        kwargs = self.factory._adjust_kwargs(**kwargs)
+
+        # 2. Remove hidden objects
+        kwargs = {
+            k: v
+            for k, v in kwargs.items()
+            if (_k := get_base_name(k)) not in self.exclude
+            and _k not in self.parameters
+            and v is not declarations.SKIP
+        }
+
+        return (), kwargs
+
+
+class StructBlockFactoryOptions(FactoryOptions):
+    pass
