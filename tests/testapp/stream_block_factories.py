@@ -13,6 +13,33 @@ class StructBlockWithLazyAttrFactory(MyBlockFactory):
         model = models.MyBlock
 
 
+class SimpleStructBlockFactory(wagtail_factories.StructBlockFactory):
+    text = factory.LazyAttribute(lambda obj: f"{obj.boolean}{obj.number}")
+    number = factory.Sequence(lambda n: n)
+    boolean = factory.LazyFunction(lambda: True)
+
+    class Meta:
+        model = models.SimpleStructBlock
+
+
+class SimpleStructBlockInnerStreamFactory(wagtail_factories.StreamBlockFactory):
+    simple_struct_block = factory.SubFactory(SimpleStructBlockFactory)
+
+
+class SimpleStructBlockOuterStreamFactory(wagtail_factories.StreamBlockFactory):
+    inner_stream = factory.SubFactory(SimpleStructBlockInnerStreamFactory)
+
+    class Meta:
+        model = models.SimpleStructBlockNestedStream
+
+
+class PageWithSimpleStructBlockNestedFactory(wagtail_factories.PageFactory):
+    body = wagtail_factories.StreamFieldFactory(SimpleStructBlockOuterStreamFactory)
+
+    class Meta:
+        model = models.PageWithSimpleStructBlockNested
+
+
 class MyStreamBlockFactory(wagtail_factories.StreamBlockFactory):
     struct_block = factory.SubFactory(StructBlockWithLazyAttrFactory)
     char_block = factory.SubFactory(wagtail_factories.CharBlockFactory)
@@ -49,75 +76,11 @@ class DeeplyNestedStreamBlockFactory(wagtail_factories.StreamBlockFactory):
         model = models.DeeplyNestedStreamBlock
 
 
-class SimpleStreamBlockFactoryWithSequence(wagtail_factories.StreamBlockFactory):
-    number = factory.Sequence(lambda n: n)
-    text = "foo"
-    extra_text = "bar"
-
-    class Meta:
-        model = models.SimpleStreamBlock
-
-
-class SimpleStreamBlockFactoryWithLazyFunction(wagtail_factories.StreamBlockFactory):
-    number = 42
-    text = "foo"
-    extra_text = factory.LazyFunction(lambda: "lazy bar")
-
-    class Meta:
-        model = models.SimpleStreamBlock
-
-
-class SimpleStreamBlockFactoryWithLazyAttribute(wagtail_factories.StreamBlockFactory):
-    number = 42
-    text = "foo"
-    extra_text = factory.LazyAttribute(lambda obj: f"{obj.text}{obj.number}")
-
-    class Meta:
-        model = models.SimpleStreamBlock
-
-
-class SimpleStreamBlockFactoryWithLazyCombo(wagtail_factories.StreamBlockFactory):
-    number = factory.Sequence(lambda n: n)
-    text = factory.LazyFunction(lambda: "foo")
-    extra_text = factory.LazyAttribute(lambda obj: f"{obj.text}{obj.number}")
-
-    class Meta:
-        model = models.SimpleStreamBlock
-
-
 class PageWithStreamBlockFactory(wagtail_factories.PageFactory):
     body = wagtail_factories.StreamFieldFactory(MyStreamBlockFactory)
 
     class Meta:
         model = models.PageWithStreamBlock
-
-
-class PageWithSimpleStreamBlockSequenceFactory(wagtail_factories.PageFactory):
-    body = wagtail_factories.StreamFieldFactory(SimpleStreamBlockFactoryWithSequence)
-
-    class Meta:
-        model = models.PageWithSimpleStreamBlock
-
-
-class PageWithSimpleStreamBlockLazyFunctionFactory(wagtail_factories.PageFactory):
-    body = wagtail_factories.StreamFieldFactory(SimpleStreamBlockFactoryWithLazyFunction)
-
-    class Meta:
-        model = models.PageWithSimpleStreamBlock
-
-
-class PageWithSimpleStreamBlockLazyAttributeFactory(wagtail_factories.PageFactory):
-    body = wagtail_factories.StreamFieldFactory(SimpleStreamBlockFactoryWithLazyAttribute)
-
-    class Meta:
-        model = models.PageWithSimpleStreamBlock
-
-
-class PageWithSimpleStreamBlockLazyComboFactory(wagtail_factories.PageFactory):
-    body = wagtail_factories.StreamFieldFactory(SimpleStreamBlockFactoryWithLazyCombo)
-
-    class Meta:
-        model = models.PageWithSimpleStreamBlock
 
 
 class PageWithNestedStreamBlockFactory(wagtail_factories.PageFactory):

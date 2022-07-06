@@ -1,4 +1,5 @@
 import pytest
+from django.test import TestCase
 
 import wagtail_factories
 from tests.testapp.stream_block_factories import (
@@ -6,142 +7,74 @@ from tests.testapp.stream_block_factories import (
     PageWithNestedStreamBlockFactory,
     PageWithStreamBlockInStructBlockFactory,
     PageWithStreamBlockInListBlockFactory,
-    PageWithSimpleStreamBlockSequenceFactory,
-    PageWithSimpleStreamBlockLazyFunctionFactory,
-    PageWithSimpleStreamBlockLazyAttributeFactory,
-    PageWithSimpleStreamBlockLazyComboFactory,
+    PageWithSimpleStructBlockNestedFactory,
 )
 
 
-@pytest.mark.django_db
-def test_page_with_stream_block():
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithStreamBlockFactory(
-        parent=root_page,
-        body__0__struct_block__title="foo",
-    )
-    assert page.body[0].block_type == "struct_block"
-    assert page.body[0].value["title"] == "foo"
+class PageWithStreamBlockTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.root_page = wagtail_factories.PageFactory(parent=None)
 
+    def test_page_with_stream_block(self):
+        page = PageWithStreamBlockFactory(
+            parent=self.root_page,
+            body__0__struct_block__title="foo",
+        )
+        self.assertEqual(page.body[0].block_type, "struct_block")
+        self.assertEqual(page.body[0].value["title"], "foo")
 
-@pytest.mark.django_db
-def test_stream_block_with_struct_block_lazy_attrs():
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithStreamBlockFactory(
-        parent=root_page,
-        body__0="struct_block",
-    )
-    assert page.body[0].block_type == "struct_block"
-    assert page.body[0].value["title"] == "lazy function foobar"
+    def test_stream_block_with_struct_block_lazy_attrs(self):
+        page = PageWithStreamBlockFactory(
+            parent=self.root_page,
+            body__0="struct_block",
+        )
+        self.assertEqual(page.body[0].block_type, "struct_block")
+        self.assertEqual(page.body[0].value["title"], "lazy function foobar")
 
+    def test_page_with_stream_block_default_value(self):
+        page = PageWithStreamBlockFactory(
+            parent=self.root_page,
+            body__0="struct_block",
+        )
+        self.assertEqual(page.body[0].value["title"], "lazy function foobar")
 
-@pytest.mark.django_db
-def test_page_with_stream_block_default_value():
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithStreamBlockFactory(
-        parent=root_page,
-        body__0="struct_block",
-    )
-    assert page.body[0].value["title"] == "lazy function foobar"
+    def test_page_with_nested_stream_block(self):
+        page = PageWithNestedStreamBlockFactory(
+            parent=self.root_page,
+            body__0__inner_stream__0__struct_block__title="foo",
+        )
+        self.assertEqual(page.body[0].value[0].value["title"], "foo")
 
+    def test_page_with_nested_stream_block_default_value(self):
+        page = PageWithNestedStreamBlockFactory(
+            parent=self.root_page,
+            body__0__inner_stream__0="struct_block",
+        )
+        self.assertEqual(page.body[0].value[0].value["title"], "lazy function foobar")
 
-@pytest.mark.django_db
-def test_page_with_nested_stream_block():
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithNestedStreamBlockFactory(
-        parent=root_page,
-        body__0__inner_stream__0__struct_block__title="foo",
-    )
-    assert page.body[0].value[0].value["title"] == "foo"
+    def test_page_with_deeply_nested_stream_block(self):
+        page = PageWithStreamBlockInStructBlockFactory(
+            parent=self.root_page,
+            body__0__struct_block__inner_stream__0__struct_block__title="foo",
+        )
+        self.assertEqual(page.body[0].value["inner_stream"][0].value["title"], "foo")
 
+    def test_page_with_deeply_nested_stream_block_in_list_block(self):
+        page = PageWithStreamBlockInListBlockFactory(
+            parent=self.root_page,
+            body__0__list_block__0__0__struct_block__title="foo",
+        )
+        self.assertEqual(page.body[0].value[0][0].value["title"], "foo")
 
-@pytest.mark.django_db
-def test_page_with_nested_stream_block_default_value():
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithNestedStreamBlockFactory(
-        parent=root_page,
-        body__0__inner_stream__0="struct_block",
-    )
-    assert page.body[0].value[0].value["title"] == "lazy function foobar"
-
-
-@pytest.mark.django_db
-def test_page_with_deeply_nested_stream_block():
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithStreamBlockInStructBlockFactory(
-        parent=root_page,
-        body__0__struct_block__inner_stream__0__struct_block__title="foo",
-    )
-    assert page.body[0].value["inner_stream"][0].value["title"] == "foo"
-
-
-@pytest.mark.django_db
-def test_page_with_deeply_nested_stream_block_in_list_block():
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithStreamBlockInListBlockFactory(
-        parent=root_page,
-        body__0__list_block__0__0__struct_block__title="foo",
-    )
-    assert page.body[0].value[0][0].value["title"] == "foo"
-
-
-@pytest.mark.django_db
-def test_page_with_sequence_in_stream_block():
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithSimpleStreamBlockSequenceFactory(
-        parent=root_page,
-        body__0="number",
-        body__1="text",
-        body__2="extra_text",
-        body__3__number=42,
-    )
-
-    assert page.body[0].value == 0
-    assert page.body[1].value == "foo"
-    assert page.body[2].value == "bar"
-    assert page.body[3].value == 42
-
-
-@pytest.mark.django_db
-def test_page_with_lazy_function_in_stream_block():
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithSimpleStreamBlockLazyFunctionFactory(
-        parent=root_page,
-        body__0="number",
-        body__1="text",
-        body__2="extra_text",
-    )
-    assert page.body[0].value == 42
-    assert page.body[1].value == "foo"
-    assert page.body[2].value == "lazy bar"
-
-
-@pytest.mark.skip
-@pytest.mark.django_db
-def test_page_with_lazy_attr_in_stream_block():
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithSimpleStreamBlockLazyAttributeFactory(
-        parent=root_page,
-        body__0="number",
-        body__1="text",
-        body__2="extra_text",
-    )
-    assert page.body[0].value == 42
-    assert page.body[1].value == "foo"
-    assert page.body[2].value == "foo42"
-
-
-@pytest.mark.skip
-@pytest.mark.django_db
-def test_page_with_lazy_combo_in_stream_block():
-    # Combination of Sequence, LazyFunction and LazyAttribute
-    root_page = wagtail_factories.PageFactory(parent=None)
-    page = PageWithSimpleStreamBlockLazyComboFactory(
-        parent=root_page,
-        body__0="number",
-        body__1="text",
-        body__2="extra_text",
-    )
-    assert page.body[0].value == 0
-    assert page.body[1].value == "foo"
-    assert page.body[2].value == "foo0"
+    @pytest.mark.xfail
+    def test_computed_values_on_struct_block_in_nested_stream(self):
+        page = PageWithSimpleStructBlockNestedFactory(
+            body__0__inner_stream__0="simple_struct_block"
+        )
+        self.assertEqual(page.body[0].value[0].value["boolean"], True)
+        self.assertEqual(page.body[0].value[0].value["text"][:4], "True")
+        self.assertEqual(
+            page.body[0].value[0].value["text"][4:],
+            str(page.body[0].value[0].value["number"]),
+        )

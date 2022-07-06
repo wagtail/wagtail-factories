@@ -35,7 +35,7 @@ class StreamBlockFactory(factory.Factory):
 
     @classmethod
     def _generate(cls, strategy, params):
-        if cls._meta.abstract and not hasattr(cls, "_GENERATE_ABSTRACT"):
+        if cls._meta.abstract and not hasattr(cls, "__generate_abstract__"):
             raise factory.errors.FactoryError(
                 "Cannot generate instances of abstract factory %(f)s; "
                 "Ensure %(f)s.Meta.model is set and %(f)s.Meta.abstract "
@@ -50,8 +50,8 @@ class StreamBlockFactory(factory.Factory):
             return int(key.split(".")[0])
 
         stream_data = [None] * (max(map(get_index, kwargs.keys())) + 1)
-        for block_name, value in kwargs.items():
-            i, name = block_name.split(".")
+        for indexed_block_name, value in kwargs.items():
+            i, name = indexed_block_name.split(".")
             stream_data[int(i)] = (name, value)
 
         if cls._meta.model is None:
@@ -89,7 +89,7 @@ class StreamFieldFactory(ParameteredAttribute):
             self.stream_block_factory = type(
                 "_GeneratedStreamBlockFactory",
                 (StreamBlockFactory,),
-                {**block_types, "_GENERATE_ABSTRACT": True},
+                {**block_types, "__generate_abstract__": True},
             )
         elif isinstance(block_types, type) and issubclass(
             block_types, StreamBlockFactory
