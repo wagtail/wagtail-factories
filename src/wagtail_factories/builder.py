@@ -21,105 +21,105 @@ class DuplicateDeclaration(StreamFieldFactoryException):
     pass
 
 
-class StreamBlockBuildStep(BuildStep):
+class UnknownChildBlockFactory(StreamFieldFactoryException):
     pass
 
 
-class StructBlockStepBuilder(StepBuilder):
+class BaseBlockStepBuilder(StepBuilder):
+    def recurse(self, factory_meta, extras):
+        """Recurse into a sub-factory call."""
+        builder_class = factory_meta.factory._builder_class
+        return builder_class(factory_meta, extras, strategy=self.strategy)
+
+
+class StructBlockStepBuilder(BaseBlockStepBuilder):
     pass
 
 
-class StreamBlockStepBuilder(StepBuilder):
-    DEFAULT_SENTINEL = object()
+class ListBlockStepBuilder(BaseBlockStepBuilder):
+    pass
 
+
+class StreamBlockStepBuilder(BaseBlockStepBuilder):
     def __init__(self, factory_meta, extras, strategy):
-        base_decls = self.get_block_declarations(extras)
-        super().__init__(factory_meta, base_decls, strategy)
+        indexed_block_names, extra_declarations = self.get_block_declarations(
+            factory_meta, extras
+        )
+        new_factory_class = self.create_factory_class(factory_meta, indexed_block_names)
+        super().__init__(new_factory_class._meta, extra_declarations, strategy)
 
-    def get_block_declarations(self, extras):
-        base_decls = defaultdict(dict)
+    def get_block_declarations(self, factory_meta, extras):
+        # Mapping of stream value index -> block type so we can construct a StreamBlockFactory
+        # subclass with a declaration for each user-requested block
+        indexed_block_names = {}
 
-        def get_key(i, name):
-            # The same block type might appear more than once at any given level of the
-            # StreamValue, so we can't hash on the name alone. We also can't use "__" to delimit,
-            # as DeclarationSet will parse that as a deep declaration.
-            return f"{i}.{name}"
+        # Declarations passed at instantiation, renamed from <index>__<name>__... to
+        # <index>.<block_name>__..., so we can create a unique declaration on our dynamically
+        # created StreamBlockFactory subclass for each user-requested block only
+        extra_declarations = {}
 
         for k, v in extras.items():
             if k.isdigit():
-                # We got a declaration like `1="foo_block"' - index 1 should get the
+                # We got a declaration like `<index>="foo_block"' - <index> should get the
                 # default value for foo_block.
-                base_decls[get_key(k, v)] = self.DEFAULT_SENTINEL
+                if v not in factory_meta.base_declarations:
+                    raise UnknownChildBlockFactory(
+                        f"No factory defined for block '{v}'"
+                    )
+                key = int(k)
+                if key in indexed_block_names and indexed_block_names[key] != v:
+                    raise DuplicateDeclaration(
+                        f"Multiple declarations for index {key} at this level of nesting "
+                        f"({v}, {indexed_block_names[key]})"
+                    )
+                indexed_block_names[key] = v
+
+                # Don't store this key in extra_declarations, it will get the factory's default
+                # value
             else:
                 try:
                     i, name, *param = k.split("__", maxsplit=2)
+                    key = int(i)
                 except (ValueError, TypeError):
                     raise InvalidDeclaration(
                         "StreamFieldFactory declarations must be of the form "
                         "<index>=<block_name>, <index>__<block_name>=value or "
                         f"<index>__<block_name>__<param>=value, got: {k}"
                     )
-                key = get_key(i, name)
+                if key in indexed_block_names and indexed_block_names[key] != name:
+                    raise DuplicateDeclaration(
+                        f"Multiple declarations for index {key} at this level of nesting "
+                        f"({name}, {indexed_block_names[key]})"
+                    )
+                indexed_block_names[key] = name
+                extra_declarations[f"{i}." + "__".join([name, *param])] = v
 
-                if param:
-                    # We got a declaration like 1__block_name__block_param=value.  Build
-                    # up a dict of params for block_name, which will be passed through to
-                    # the subfactory responsible for building block_name.
-                    base_decls[key][param[0]] = v
-                elif key in base_decls:
-                    raise DuplicateDeclaration
-                else:
-                    # We got a declaration like 1__block_name=value: assume block_name to
-                    # be an atomic block type, receiving a scalar value.
-                    base_decls[key] = v
+        return indexed_block_names, extra_declarations
 
-        return base_decls
+    def create_factory_class(self, old_factory_meta, indexed_block_names):
+        # Create a new StreamBlockFactory subclass, with a declaration for each block the user
+        # requested at instantiation. This way we can rely on the factory_boy internals for
+        # object generation
+        new_class_dict = {}
+        for i, name in indexed_block_names.items():
+            new_class_dict[f"{i}.{name}"] = old_factory_meta.base_declarations[name]
 
-    def build(self, parent_step=None, force_sequence=None):
-        # This method mostly duplicated from StepBuilder so we can get access to some of
-        # the internals
-        decls = {}
-
-        for k, v in self.extras.items():
-            if v is self.DEFAULT_SENTINEL:
-                attr_name = k.split(".")[1]
-                # TODO: raise a helpful error here - user wanted default but none declared
-                # on the StreamBlockFactory
-                decls[k] = self.factory_meta.base_declarations[attr_name]
-            else:
-                decls[k] = v
-
-        decls = DeclarationSet(decls)
-
-        # TODO: With this implementation we get the same number for every use of the
-        # sequence at this level of nesting - revisit?
-        if force_sequence is not None:
-            sequence = force_sequence
-        elif self.force_init_sequence is not None:
-            sequence = self.force_init_sequence
-        else:
-            sequence = self.factory_meta.next_sequence()
-
-        build_step = StreamBlockBuildStep(
-            builder=self,
-            sequence=sequence,
-            parent_step=parent_step,
+        new_meta_class = type(
+            "Meta",
+            (),
+            {
+                "model": old_factory_meta.model,
+                "abstract": old_factory_meta.abstract,
+                "strategy": old_factory_meta.strategy,
+                "inline_args": old_factory_meta.inline_args,
+                "exclude": old_factory_meta.exclude,
+                "rename": old_factory_meta.rename,
+            },
         )
-        build_step.resolve(decls)
+        new_class_dict["Meta"] = new_meta_class
 
-        args, kwargs = self.factory_meta.prepare_arguments(build_step.attributes)
+        from wagtail_factories.blocks import StreamBlockFactory
 
-        instance = self.factory_meta.instantiate(
-            step=build_step,
-            args=args,
-            kwargs=kwargs,
+        return type(
+            "_GeneratedStreamBlockFactory", (StreamBlockFactory,), new_class_dict
         )
-
-        # TODO: see super().build - does it make sense to process PostGeneration
-        # declarations for StreamBlockFactories?
-        return instance
-
-    def recurse(self, factory_meta, extras):
-        """Recurse into a sub-factory call."""
-        builder_class = factory_meta.factory._builder_class
-        return builder_class(factory_meta, extras, strategy=self.strategy)

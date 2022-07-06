@@ -25,7 +25,3 @@ class StreamBlockFactoryOptions(FactoryOptions):
         }
 
         return (), kwargs
-
-
-class StructBlockFactoryOptions(FactoryOptions):
-    pass

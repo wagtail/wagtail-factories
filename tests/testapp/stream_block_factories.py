@@ -7,7 +7,7 @@ from .factories import MyBlockFactory
 
 
 class StructBlockWithLazyAttrFactory(MyBlockFactory):
-    title = factory.LazyFunction(lambda: "foobar")
+    title = factory.LazyFunction(lambda: "lazy function foobar")
 
     class Meta:
         model = models.MyBlock
@@ -30,7 +30,6 @@ class NestedStreamBlockFactory(wagtail_factories.StreamBlockFactory):
 
 class StructBlockWithStreamBlockFactory(wagtail_factories.StructBlockFactory):
     inner_stream = factory.SubFactory(MyStreamBlockFactory)
-    foo = "bar"
 
     class Meta:
         model = models.StructBlockWithStreamBlock
