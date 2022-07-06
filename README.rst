@@ -88,9 +88,9 @@ Documentation is still in progress, but see the `tests`_ for more examples.
 Using StreamBlockFactory
 ========================
 
-StreamBlockFactory can be used in conjunction with the other block factory types to create complex, nested StreamValues, much like how StreamBlock can be used to declare the blocks for a complex StreamField.
+``StreamBlockFactory`` can be used in conjunction with the other block factory types to create complex, nested ``StreamValues``, much like how ``StreamBlock`` can be used to declare the blocks for a complex ``StreamField``.
 
-First, define your StreamBlockFactory subclass, using factory.SubFactory to wrap child block declarations. Be sure to include your StreamBlock subclass as the model attribute on the inner Meta class.
+First, define your ``StreamBlockFactory`` subclass, using ``factory.SubFactory`` to wrap child block declarations. Be sure to include your ``StreamBlock`` subclass as the model attribute on the inner ``Meta`` class.
 
 .. code-block:: python
 
@@ -101,7 +101,7 @@ First, define your StreamBlockFactory subclass, using factory.SubFactory to wrap
             model = MyStreamBlock
 
 
-Then include your StreamBlockFactory subclass on a model factory as the argument to a StreamFieldFactory.
+Then include your ``StreamBlockFactory`` subclass on a model factory as the argument to a ``StreamFieldFactory``.
 
 .. code-block:: python
 
@@ -112,7 +112,7 @@ Then include your StreamBlockFactory subclass on a model factory as the argument
             model = MyPage
 
 
-You can then use a modified version of factory_boy's deep object declaration syntax to build up StreamValues on the fly.
+You can then use a modified version of factory_boy's deep object declaration syntax to build up ``StreamValues`` on the fly.
 
 .. code-block:: python
 
@@ -132,7 +132,7 @@ To generate the default value for a block factory, terminate your declaration at
 Alternative StreamFieldFactory declaration syntax
 =================================================
 
-Prior to version 2.1.0, StreamFieldFactory could only be used by providing a dict mapping block names to block factory classes as the single argument, for example:
+Prior to version 2.1.0, ``StreamFieldFactory`` could only be used by providing a dict mapping block names to block factory classes as the single argument, for example:
 
 .. code-block:: python
 
