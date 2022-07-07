@@ -60,6 +60,24 @@ class PageWithStreamBlockTestCase(TestCase):
         )
         self.assertEqual(page.body[0].value["inner_stream"][0].value["title"], "foo")
 
+    def test_page_with_deeply_nested_stream_block_defaults(self):
+        page = PageWithStreamBlockInStructBlockFactory(
+            parent=self.root_page,
+            body__0__struct_block__inner_stream__0="char_block",
+            body__1__struct_block__inner_stream__0="struct_block",
+        )
+
+        self.assertEqual(page.body[0].value["inner_stream"][0].block_type, "char_block")
+        # Default value for the CharBlock is None
+        self.assertIsNone(page.body[0].value["inner_stream"][0].value)
+
+        self.assertEqual(
+            page.body[1].value["inner_stream"][0].block_type, "struct_block"
+        )
+        self.assertEqual(
+            page.body[1].value["inner_stream"][0].value["title"], "lazy function foobar"
+        )
+
     def test_page_with_deeply_nested_stream_block_in_list_block(self):
         page = PageWithStreamBlockInListBlockFactory(
             parent=self.root_page,

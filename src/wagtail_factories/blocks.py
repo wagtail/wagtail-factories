@@ -46,6 +46,9 @@ class StreamBlockFactory(factory.Factory):
 
     @classmethod
     def _construct_stream(cls, block_class, *args, **kwargs):
+        if not kwargs:
+            return []
+
         def get_index(key):
             return int(key.split(".")[0])
 
@@ -160,12 +163,18 @@ class BlockFactory(factory.Factory):
         abstract = True
 
     @classmethod
-    def _build(cls, model_class, value):
-        return model_class().clean(value)
+    def _construct_block(cls, block_class, *args, **kwargs):
+        if kwargs.get("value"):
+            return block_class().clean(kwargs["value"])
+        return block_class().get_default()
 
     @classmethod
-    def _create(cls, model_class, value):
-        return model_class().clean(value)
+    def _build(cls, block_class, *args, **kwargs):
+        return cls._construct_block(block_class, *args, **kwargs)
+
+    @classmethod
+    def _create(cls, block_class, *args, **kwargs):
+        return cls._construct_block(block_class, *args, **kwargs)
 
 
 class CharBlockFactory(BlockFactory):
