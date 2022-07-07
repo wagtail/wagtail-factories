@@ -3,77 +3,410 @@
 from django.db import migrations, models
 import django.db.models.deletion
 import tests.testapp.models
-import wagtail.blocks
-import wagtail.fields
-import wagtail.images.blocks
+
+try:
+    from wagtail import blocks, fields
+except ImportError:
+    # Wagtail<3.0
+    from wagtail.core import blocks, fields
+
+import wagtail.images.blocks as image_blocks
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('wagtailcore', '0069_log_entry_jsonfield'),
-        ('testapp', '0001_initial'),
+        ("testapp", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PageWithNestedStreamBlock',
+            name="PageWithNestedStreamBlock",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('body', wagtail.fields.StreamField([('inner_stream', wagtail.blocks.StreamBlock([('struct_block', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock(max_length=100)), ('item', wagtail.blocks.StructBlock([('label', wagtail.blocks.CharBlock()), ('value', wagtail.blocks.IntegerBlock())])), ('items', wagtail.blocks.ListBlock(tests.testapp.models.MyBlockItem)), ('image', wagtail.images.blocks.ImageChooserBlock())])), ('char_block', wagtail.blocks.CharBlock())]))], use_json_field=None)),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "body",
+                    fields.StreamField(
+                        [
+                            (
+                                "inner_stream",
+                                blocks.StreamBlock(
+                                    [
+                                        (
+                                            "struct_block",
+                                            blocks.StructBlock(
+                                                [
+                                                    (
+                                                        "title",
+                                                        blocks.CharBlock(
+                                                            max_length=100
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "item",
+                                                        blocks.StructBlock(
+                                                            [
+                                                                (
+                                                                    "label",
+                                                                    blocks.CharBlock(),
+                                                                ),
+                                                                (
+                                                                    "value",
+                                                                    blocks.IntegerBlock(),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "items",
+                                                        blocks.ListBlock(
+                                                            tests.testapp.models.MyBlockItem
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "image",
+                                                        image_blocks.ImageChooserBlock(),
+                                                    ),
+                                                ]
+                                            ),
+                                        ),
+                                        ("char_block", blocks.CharBlock()),
+                                    ]
+                                ),
+                            )
+                        ],
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.CreateModel(
-            name='PageWithSimpleStructBlockNested',
+            name="PageWithSimpleStructBlockNested",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('body', wagtail.fields.StreamField([('inner_stream', wagtail.blocks.StreamBlock([('simple_struct_block', wagtail.blocks.StructBlock([('text', wagtail.blocks.CharBlock()), ('number', wagtail.blocks.IntegerBlock()), ('boolean', wagtail.blocks.BooleanBlock())]))]))], use_json_field=None)),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "body",
+                    fields.StreamField(
+                        [
+                            (
+                                "inner_stream",
+                                blocks.StreamBlock(
+                                    [
+                                        (
+                                            "simple_struct_block",
+                                            blocks.StructBlock(
+                                                [
+                                                    (
+                                                        "text",
+                                                        blocks.CharBlock(),
+                                                    ),
+                                                    (
+                                                        "number",
+                                                        blocks.IntegerBlock(),
+                                                    ),
+                                                    (
+                                                        "boolean",
+                                                        blocks.BooleanBlock(),
+                                                    ),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            )
+                        ],
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.CreateModel(
-            name='PageWithStreamBlock',
+            name="PageWithStreamBlock",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('body', wagtail.fields.StreamField([('struct_block', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock(max_length=100)), ('item', wagtail.blocks.StructBlock([('label', wagtail.blocks.CharBlock()), ('value', wagtail.blocks.IntegerBlock())])), ('items', wagtail.blocks.ListBlock(tests.testapp.models.MyBlockItem)), ('image', wagtail.images.blocks.ImageChooserBlock())])), ('char_block', wagtail.blocks.CharBlock())], use_json_field=None)),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "body",
+                    fields.StreamField(
+                        [
+                            (
+                                "struct_block",
+                                blocks.StructBlock(
+                                    [
+                                        (
+                                            "title",
+                                            blocks.CharBlock(max_length=100),
+                                        ),
+                                        (
+                                            "item",
+                                            blocks.StructBlock(
+                                                [
+                                                    (
+                                                        "label",
+                                                        blocks.CharBlock(),
+                                                    ),
+                                                    (
+                                                        "value",
+                                                        blocks.IntegerBlock(),
+                                                    ),
+                                                ]
+                                            ),
+                                        ),
+                                        (
+                                            "items",
+                                            blocks.ListBlock(
+                                                tests.testapp.models.MyBlockItem
+                                            ),
+                                        ),
+                                        (
+                                            "image",
+                                            image_blocks.ImageChooserBlock(),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            ("char_block", blocks.CharBlock()),
+                        ],
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.CreateModel(
-            name='PageWithStreamBlockInListBlock',
+            name="PageWithStreamBlockInListBlock",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('body', wagtail.fields.StreamField([('list_block', wagtail.blocks.ListBlock(wagtail.blocks.StreamBlock([('struct_block', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock(max_length=100)), ('item', wagtail.blocks.StructBlock([('label', wagtail.blocks.CharBlock()), ('value', wagtail.blocks.IntegerBlock())])), ('items', wagtail.blocks.ListBlock(tests.testapp.models.MyBlockItem)), ('image', wagtail.images.blocks.ImageChooserBlock())])), ('char_block', wagtail.blocks.CharBlock())])))], use_json_field=None)),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "body",
+                    fields.StreamField(
+                        [
+                            (
+                                "list_block",
+                                blocks.ListBlock(
+                                    blocks.StreamBlock(
+                                        [
+                                            (
+                                                "struct_block",
+                                                blocks.StructBlock(
+                                                    [
+                                                        (
+                                                            "title",
+                                                            blocks.CharBlock(
+                                                                max_length=100
+                                                            ),
+                                                        ),
+                                                        (
+                                                            "item",
+                                                            blocks.StructBlock(
+                                                                [
+                                                                    (
+                                                                        "label",
+                                                                        blocks.CharBlock(),
+                                                                    ),
+                                                                    (
+                                                                        "value",
+                                                                        blocks.IntegerBlock(),
+                                                                    ),
+                                                                ]
+                                                            ),
+                                                        ),
+                                                        (
+                                                            "items",
+                                                            blocks.ListBlock(
+                                                                tests.testapp.models.MyBlockItem
+                                                            ),
+                                                        ),
+                                                        (
+                                                            "image",
+                                                            image_blocks.ImageChooserBlock(),
+                                                        ),
+                                                    ]
+                                                ),
+                                            ),
+                                            ("char_block", blocks.CharBlock()),
+                                        ]
+                                    )
+                                ),
+                            )
+                        ],
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.CreateModel(
-            name='PageWithStreamBlockInStructBlock',
+            name="PageWithStreamBlockInStructBlock",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('body', wagtail.fields.StreamField([('struct_block', wagtail.blocks.StructBlock([('inner_stream', wagtail.blocks.StreamBlock([('struct_block', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock(max_length=100)), ('item', wagtail.blocks.StructBlock([('label', wagtail.blocks.CharBlock()), ('value', wagtail.blocks.IntegerBlock())])), ('items', wagtail.blocks.ListBlock(tests.testapp.models.MyBlockItem)), ('image', wagtail.images.blocks.ImageChooserBlock())])), ('char_block', wagtail.blocks.CharBlock())]))]))], use_json_field=None)),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "body",
+                    fields.StreamField(
+                        [
+                            (
+                                "struct_block",
+                                blocks.StructBlock(
+                                    [
+                                        (
+                                            "inner_stream",
+                                            blocks.StreamBlock(
+                                                [
+                                                    (
+                                                        "struct_block",
+                                                        blocks.StructBlock(
+                                                            [
+                                                                (
+                                                                    "title",
+                                                                    blocks.CharBlock(
+                                                                        max_length=100
+                                                                    ),
+                                                                ),
+                                                                (
+                                                                    "item",
+                                                                    blocks.StructBlock(
+                                                                        [
+                                                                            (
+                                                                                "label",
+                                                                                blocks.CharBlock(),
+                                                                            ),
+                                                                            (
+                                                                                "value",
+                                                                                blocks.IntegerBlock(),
+                                                                            ),
+                                                                        ]
+                                                                    ),
+                                                                ),
+                                                                (
+                                                                    "items",
+                                                                    blocks.ListBlock(
+                                                                        tests.testapp.models.MyBlockItem
+                                                                    ),
+                                                                ),
+                                                                (
+                                                                    "image",
+                                                                    image_blocks.ImageChooserBlock(),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "char_block",
+                                                        blocks.CharBlock(),
+                                                    ),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            )
+                        ],
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.AlterField(
-            model_name='mytestpage',
-            name='body',
-            field=wagtail.fields.StreamField([('char_array', wagtail.blocks.ListBlock(wagtail.blocks.CharBlock())), ('int_array', wagtail.blocks.ListBlock(wagtail.blocks.IntegerBlock())), ('struct', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock(max_length=100)), ('item', wagtail.blocks.StructBlock([('label', wagtail.blocks.CharBlock()), ('value', wagtail.blocks.IntegerBlock())])), ('items', wagtail.blocks.ListBlock(tests.testapp.models.MyBlockItem)), ('image', wagtail.images.blocks.ImageChooserBlock())])), ('image', wagtail.images.blocks.ImageChooserBlock())], use_json_field=None),
+            model_name="mytestpage",
+            name="body",
+            field=fields.StreamField(
+                [
+                    (
+                        "char_array",
+                        blocks.ListBlock(blocks.CharBlock()),
+                    ),
+                    (
+                        "int_array",
+                        blocks.ListBlock(blocks.IntegerBlock()),
+                    ),
+                    (
+                        "struct",
+                        blocks.StructBlock(
+                            [
+                                ("title", blocks.CharBlock(max_length=100)),
+                                (
+                                    "item",
+                                    blocks.StructBlock(
+                                        [
+                                            ("label", blocks.CharBlock()),
+                                            ("value", blocks.IntegerBlock()),
+                                        ]
+                                    ),
+                                ),
+                                (
+                                    "items",
+                                    blocks.ListBlock(
+                                        tests.testapp.models.MyBlockItem
+                                    ),
+                                ),
+                                ("image", image_blocks.ImageChooserBlock()),
+                            ]
+                        ),
+                    ),
+                    ("image", image_blocks.ImageChooserBlock()),
+                ],
+            ),
         ),
     ]
