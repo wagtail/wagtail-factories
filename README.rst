@@ -132,7 +132,7 @@ To generate the default value for a block factory, terminate your declaration at
 Alternative StreamFieldFactory declaration syntax
 =================================================
 
-Prior to version 2.1.0, ``StreamFieldFactory`` could only be used by providing a dict mapping block names to block factory classes as the single argument, for example:
+Prior to version 3.0, ``StreamFieldFactory`` could only be used by providing a dict mapping block names to block factory classes as the single argument, for example:
 
 .. code-block:: python
 
@@ -154,4 +154,26 @@ Prior to version 2.1.0, ``StreamFieldFactory`` could only be used by providing a
             model = models.MyTestPage
     
 
-This style of declaration is still supported, with the caveat that nested stream blocks are not supported for this approach.
+This style of declaration is still supported, with the caveat that nested stream blocks are not supported for this approach. From version 3.0, all ``BlockFactory`` values in a ``StreamFieldFactory`` definition of this style *must* be wrapped in factory_boy ``SubFactories``. For example, the above example must be updated to the following for 3.0 compatibility.
+
+.. code-block:: python
+
+    class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
+        body = wagtail_factories.StreamFieldFactory(
+            {
+                "char_array": wagtail_factories.ListBlockFactory(
+                    wagtail_factories.CharBlockFactory
+                ),
+                "int_array": wagtail_factories.ListBlockFactory(
+                    wagtail_factories.IntegerBlockFactory
+                ),
+                "struct": factory.SubFactory(MyBlockFactory),
+                "image": factory.SubFactory(wagtail_factories.ImageChooserBlockFactory),
+            }
+        )
+
+        class Meta:
+            model = models.MyTestPage
+
+
+This requirement does *not* apply to ``ListBlockFactory``, which is a subclass of ``SubFactory``.
