@@ -8,13 +8,20 @@ from tests.testapp.stream_block_factories import (
     PageWithStreamBlockInListBlockFactory,
     PageWithStreamBlockInStructBlockFactory,
 )
+from wagtail_factories.builder import (
+    DuplicateDeclaration,
+    InvalidDeclaration,
+    UnknownChildBlockFactory,
+)
 
 
-class PageWithStreamBlockTestCase(TestCase):
+class PageTreeTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.root_page = wagtail_factories.PageFactory(parent=None)
 
+
+class PageWithStreamBlockTestCase(PageTreeTestCase):
     def test_page_with_stream_block(self):
         page = PageWithStreamBlockFactory(
             parent=self.root_page,
@@ -110,3 +117,42 @@ class PageWithStreamBlockTestCase(TestCase):
         self.assertEqual(page.body[0].value[0].value["text"], text)
         self.assertEqual(page.body[0].value[0].value["number"], number)
         self.assertEqual(page.body[0].value[0].value["boolean"], boolean)
+
+
+class StreamFieldFactoryErrorsTestCase(PageTreeTestCase):
+    def test_raises_missing_index(self):
+        test_values = (
+            ({"body__1": "struct_block"}, 0),
+            ({"body__0": "struct_block", "body__2": "struct_block"}, 1),
+        )
+        for params, missing_index in test_values:
+            with self.subTest(params=params):
+                with self.assertRaisesRegex(
+                    InvalidDeclaration, f"missing required index {missing_index}"
+                ):
+                    PageWithStreamBlockFactory(**params)
+
+    def test_raises_duplicate_declaration(self):
+        test_values = (
+            (
+                {"body__0__struct_block__title": "title", "body__0": "char_block"},
+                "got char_block, already have struct_block",
+            ),
+            (
+                {
+                    "body__0__struct_block__title": "foobar",
+                    "body__0__char_block": "baz",
+                },
+                "got char_block, already have struct_block",
+            ),
+        )
+        for params, msg in test_values:
+            with self.subTest(params=params):
+                with self.assertRaisesRegex(DuplicateDeclaration, msg):
+                    PageWithStreamBlockFactory(**params)
+
+    def test_raises_unknown_child_block(self):
+        with self.assertRaisesRegex(
+            UnknownChildBlockFactory, "No factory defined for block 'foobar'"
+        ):
+            PageWithStreamBlockFactory(body__0="foobar")

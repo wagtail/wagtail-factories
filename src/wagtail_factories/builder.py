@@ -1,3 +1,5 @@
+from itertools import zip_longest
+
 from factory import SubFactory
 from factory.builder import StepBuilder
 
@@ -73,7 +75,7 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
                 if key in indexed_block_names and indexed_block_names[key] != v:
                     raise DuplicateDeclaration(
                         f"Multiple declarations for index {key} at this level of nesting "
-                        f"({v}, {indexed_block_names[key]})"
+                        f"(got {v}, already have {indexed_block_names[key]})"
                     )
                 indexed_block_names[key] = v
             else:
@@ -89,12 +91,21 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
                 if key in indexed_block_names and indexed_block_names[key] != name:
                     raise DuplicateDeclaration(
                         f"Multiple declarations for index {key} at this level of nesting "
-                        f"({name}, {indexed_block_names[key]})"
+                        f"(got {name}, already have {indexed_block_names[key]})"
                     )
                 indexed_block_names[key] = name
                 extra_declarations[f"{i}." + "__".join([name, *param])] = v
 
+        self.validate_block_indexes(indexed_block_names, factory_meta)
         return indexed_block_names, extra_declarations
+
+    def validate_block_indexes(self, indexed_block_names, factory_meta):
+        indexes = sorted(indexed_block_names.keys())
+        for declared, expected in zip_longest(indexes, range(max(indexes) + 1)):
+            if declared != expected:
+                raise InvalidDeclaration(
+                    f"Parameters for {factory_meta.factory} missing required index {expected}"
+                )
 
     def create_factory_class(self, old_factory_meta, indexed_block_names):
         # Create a new StreamBlockFactory subclass, with a declaration for each block the user
@@ -103,7 +114,6 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
         new_class_dict = {}
 
         block_def = old_factory_meta.get_block_definition()
-        # current block should be a StreamBlock
         for i, name in indexed_block_names.items():
             declared_value = old_factory_meta.base_declarations[name]
             if block_def is not None and isinstance(declared_value, SubFactory):
