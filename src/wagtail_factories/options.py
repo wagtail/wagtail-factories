@@ -1,8 +1,15 @@
-from factory import enums, declarations
-from factory.base import FactoryOptions, StubObject
+from factory import declarations
+from factory.base import FactoryOptions, OptionDefault
 
 
-class StreamBlockFactoryOptions(FactoryOptions):
+class BlockFactoryOptions(FactoryOptions):
+    def _build_default_options(self):
+        options = super()._build_default_options()
+        options.append(OptionDefault("block_def", None))
+        return options
+
+
+class StreamBlockFactoryOptions(BlockFactoryOptions):
     def prepare_arguments(self, attributes):
         # Like the base implementation, but ignore args as they are not relevant
         # for instantiating StreamValues.
@@ -16,12 +23,20 @@ class StreamBlockFactoryOptions(FactoryOptions):
         kwargs = self.factory._adjust_kwargs(**kwargs)
 
         # 2. Remove hidden objects
-        kwargs = {
-            k: v
-            for k, v in kwargs.items()
-            if (_k := get_base_name(k)) not in self.exclude
-            and _k not in self.parameters
-            and v is not declarations.SKIP
-        }
+        filtered_kwargs = {}
+        for k, v in kwargs.items():
+            base_name = get_base_name(k)
+            if (
+                base_name not in self.exclude
+                and base_name not in self.parameters
+                and v is not declarations.SKIP
+            ):
+                filtered_kwargs[k] = v
 
-        return (), kwargs
+        return (), filtered_kwargs
+
+    def get_block_definition(self):
+        if self.block_def is not None:
+            return self.block_def
+        elif self.model is not None:
+            return self.model()

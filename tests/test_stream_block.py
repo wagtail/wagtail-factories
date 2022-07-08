@@ -1,13 +1,12 @@
-import pytest
 from django.test import TestCase
 
 import wagtail_factories
 from tests.testapp.stream_block_factories import (
-    PageWithStreamBlockFactory,
     PageWithNestedStreamBlockFactory,
-    PageWithStreamBlockInStructBlockFactory,
-    PageWithStreamBlockInListBlockFactory,
     PageWithSimpleStructBlockNestedFactory,
+    PageWithStreamBlockFactory,
+    PageWithStreamBlockInListBlockFactory,
+    PageWithStreamBlockInStructBlockFactory,
 )
 
 
@@ -85,7 +84,6 @@ class PageWithStreamBlockTestCase(TestCase):
         )
         self.assertEqual(page.body[0].value[0][0].value["title"], "foo")
 
-    @pytest.mark.xfail
     def test_computed_values_on_struct_block_in_nested_stream(self):
         page = PageWithSimpleStructBlockNestedFactory(
             body__0__inner_stream__0="simple_struct_block"
@@ -96,3 +94,19 @@ class PageWithStreamBlockTestCase(TestCase):
             page.body[0].value[0].value["text"][4:],
             str(page.body[0].value[0].value["number"]),
         )
+
+    def test_factory_with_anonymous_stream_block_in_tree(self):
+        # The inner_stream child block is defined as an "anonymous" StreamBlock (i.e. declared
+        # inline like `inner_stream = StreamBlock(...)', not an explicit StreamBlock subclass) so
+        # there is no declared class with which to create the nested StreamValue. This test
+        # ensures we are passing a block definition down the recursive StepBuilder calls.
+        text, number, boolean = "Hello world", 11, True
+        page = PageWithSimpleStructBlockNestedFactory(
+            body__0__inner_stream__0__simple_struct_block__text=text,
+            body__0__inner_stream__0__simple_struct_block__number=number,
+            body__0__inner_stream__0__simple_struct_block__boolean=boolean,
+        )
+        self.assertEqual(page.body[0].value[0].block_type, "simple_struct_block")
+        self.assertEqual(page.body[0].value[0].value["text"], text)
+        self.assertEqual(page.body[0].value[0].value["number"], number)
+        self.assertEqual(page.body[0].value[0].value["boolean"], boolean)

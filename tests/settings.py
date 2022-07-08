@@ -1,5 +1,3 @@
-import os
-
 from wagtail import VERSION as WAGTAIL_VERSION
 
 CACHES = {
@@ -61,8 +59,8 @@ MIDDLEWARE = [
 ]
 
 WAGTAILSEARCH_BACKENDS = {
-    'default': {
-        'BACKEND': 'wagtail.search.backends.database',
+    "default": {
+        "BACKEND": "wagtail.search.backends.database",
     }
 }
 

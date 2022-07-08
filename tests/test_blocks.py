@@ -4,10 +4,7 @@ import pytest
 from wagtail.images.models import Image
 
 import wagtail_factories
-from tests.testapp.factories import (
-    MyBlockFactory,
-    MyTestPageWithStreamFieldFactory,
-)
+from tests.testapp.factories import MyBlockFactory, MyTestPageWithStreamFieldFactory
 
 try:
     from wagtail.blocks import StructValue

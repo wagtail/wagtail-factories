@@ -1,12 +1,11 @@
-from collections import defaultdict
+from factory import SubFactory
+from factory.builder import StepBuilder
 
-from factory.builder import (
-    parse_declarations,
-    BuildStep,
-    DeclarationSet,
-    StepBuilder,
-    Resolver,
-)
+try:
+    from wagtail import blocks
+except ImportError:
+    # Wagtail<3.0
+    from wagtail.core import blocks
 
 
 class StreamFieldFactoryException(Exception):
@@ -49,19 +48,23 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
         super().__init__(new_factory_class._meta, extra_declarations, strategy)
 
     def get_block_declarations(self, factory_meta, extras):
-        # Mapping of stream value index -> block type so we can construct a StreamBlockFactory
-        # subclass with a declaration for each user-requested block
+        # Mapping of StreamValue index -> block name. We will use this to create a
+        # StreamBlockFactory subclass with one declaration for each pair, named
+        # <index>.<block_name>
         indexed_block_names = {}
 
-        # Declarations passed at instantiation, renamed from <index>__<name>__... to
-        # <index>.<block_name>__..., so we can create a unique declaration on our dynamically
-        # created StreamBlockFactory subclass for each user-requested block only
+        # Extra declarations passed at instantiation, renamed from <index>__<name>__... to
+        # <index>.<block_name>__..., to match the declarations on the StreamBlockFactory subclass
+        # we will generate. As DeclarationSet splits parameter names on "__" the
+        # <index>.<block_name> keys won't cause errors for unknown declarations (0__foo_block
+        # implies a declaration "0" with context "foo_block"). They will also have the important
+        # property of being uniquely hashable
         extra_declarations = {}
 
         for k, v in extras.items():
             if k.isdigit():
                 # We got a declaration like `<index>="foo_block"' - <index> should get the
-                # default value for foo_block.
+                # default value for foo_block, so don't store this item in extra_declarations
                 if v not in factory_meta.base_declarations:
                     raise UnknownChildBlockFactory(
                         f"No factory defined for block '{v}'"
@@ -73,9 +76,6 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
                         f"({v}, {indexed_block_names[key]})"
                     )
                 indexed_block_names[key] = v
-
-                # Don't store this key in extra_declarations, it will get the factory's default
-                # value
             else:
                 try:
                     i, name, *param = k.split("__", maxsplit=2)
@@ -101,14 +101,31 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
         # requested at instantiation. This way we can rely on the factory_boy internals for
         # object generation
         new_class_dict = {}
+
+        block_def = old_factory_meta.get_block_definition()
+        # current block should be a StreamBlock
         for i, name in indexed_block_names.items():
-            new_class_dict[f"{i}.{name}"] = old_factory_meta.base_declarations[name]
+            declared_value = old_factory_meta.base_declarations[name]
+            if block_def is not None and isinstance(declared_value, SubFactory):
+                # Annotate the subfactory's factory with the correct block definition for that
+                # branch of the tree, so we can construct a StreamValue if there's no explicit
+                # block class defined (e.g. if a nested StreamBlock was declared inline like
+                # `inner_stream = StreamBlock(...))'
+                child_def = block_def.child_blocks[name]
+                if isinstance(child_def, blocks.ListBlock):
+                    # ListBlock is a special case as it is a concrete node in the stream block
+                    # tree, but ListBlockFactory is a SubFactory subclass, making it "abstract"
+                    # in the factory tree
+                    child_def = child_def.child_block
+                declared_value.get_factory()._meta.block_def = child_def
+            new_class_dict[f"{i}.{name}"] = declared_value
 
         new_meta_class = type(
             "Meta",
             (),
             {
                 "model": old_factory_meta.model,
+                "block_def": old_factory_meta.block_def,
                 "abstract": old_factory_meta.abstract,
                 "strategy": old_factory_meta.strategy,
                 "inline_args": old_factory_meta.inline_args,

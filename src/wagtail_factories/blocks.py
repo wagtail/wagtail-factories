@@ -11,12 +11,12 @@ except ImportError:
     from wagtail.core import blocks
 
 from wagtail_factories.builder import (
+    ListBlockStepBuilder,
     StreamBlockStepBuilder,
     StructBlockStepBuilder,
-    ListBlockStepBuilder,
 )
 from wagtail_factories.factories import ImageFactory
-from wagtail_factories.options import StreamBlockFactoryOptions
+from wagtail_factories.options import BlockFactoryOptions, StreamBlockFactoryOptions
 
 __all__ = [
     "CharBlockFactory",
@@ -57,11 +57,15 @@ class StreamBlockFactory(factory.Factory):
             i, name = indexed_block_name.split(".")
             stream_data[int(i)] = (name, value)
 
-        if cls._meta.model is None:
-            # We got an old style definition, so aren't aware of a StreamBlock class for
-            # the StreamField's child blocks.
+        block_def = cls._meta.get_block_definition()
+        if block_def is None:
+            # We got an old style definition, so aren't aware of a StreamBlock class for the
+            # StreamField's child blocks. As nesting of StreamBlocks isn't supported for this
+            # kind of declaration, returning the stream data without up-casting it to a
+            # StreamValue is ok here. StreamField handles conversion to a StreamValue, but not
+            # recursively.
             return stream_data
-        return blocks.StreamValue(cls._meta.model(), stream_data)
+        return blocks.StreamValue(block_def, stream_data)
 
     @classmethod
     def _build(cls, block_class, *args, **kwargs):
@@ -97,6 +101,7 @@ class StreamFieldFactory(ParameteredAttribute):
         elif isinstance(block_types, type) and issubclass(
             block_types, StreamBlockFactory
         ):
+            block_types._meta.block_def = block_types._meta.model()
             self.stream_block_factory = block_types
         else:
             raise TypeError(
@@ -127,13 +132,17 @@ class ListBlockFactory(factory.SubFactory):
                     result[int(prefix)][label] = value
 
         retval = []
+
+        force_sequence = step.sequence if self.FORCE_SEQUENCE else None
         for index, index_params in sorted(result.items()):
-            item = subfactory(**index_params)
-            retval.append(item)
+            retval.append(
+                step.recurse(subfactory, index_params, force_sequence=force_sequence)
+            )
         return retval
 
 
 class StructBlockFactory(factory.Factory):
+    _options_class = BlockFactoryOptions
     _builder_class = StructBlockStepBuilder
 
     class Meta:
@@ -157,6 +166,7 @@ class StructBlockFactory(factory.Factory):
 
 
 class BlockFactory(factory.Factory):
+    _options_class = BlockFactoryOptions
     _builder_class = factory.builder.StepBuilder
 
     class Meta:
