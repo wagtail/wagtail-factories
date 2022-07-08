@@ -3,6 +3,8 @@ from django.test import TestCase
 import wagtail_factories
 from tests.testapp.stream_block_factories import (
     PageWithNestedStreamBlockFactory,
+    PageWithSimpleStructBlockNestedDeepDefaultsFactory,
+    PageWithSimpleStructBlockNestedDefaultsFactory,
     PageWithSimpleStructBlockNestedFactory,
     PageWithStreamBlockFactory,
     PageWithStreamBlockInListBlockFactory,
@@ -117,6 +119,22 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
         self.assertEqual(page.body[0].value[0].value["text"], text)
         self.assertEqual(page.body[0].value[0].value["number"], number)
         self.assertEqual(page.body[0].value[0].value["boolean"], boolean)
+
+    def test_sub_factory_defaults(self):
+        page = PageWithSimpleStructBlockNestedDefaultsFactory(
+            body__0__inner_stream__0="simple_struct_block",
+        )
+        self.assertEqual(page.body[0].value[0].value["text"], "default text")
+        self.assertEqual(page.body[0].value[0].value["number"], 11)
+        self.assertEqual(page.body[0].value[0].value["boolean"], False)
+
+    def test_sub_factory_deep_defaults(self):
+        page = PageWithSimpleStructBlockNestedDeepDefaultsFactory(
+            body__0="inner_stream",
+        )
+        self.assertEqual(page.body[0].value[0].value["text"], "deep text")
+        self.assertEqual(page.body[0].value[0].value["number"], 111)
+        self.assertEqual(page.body[0].value[1].value["text"], "deep text 2")
 
 
 class StreamFieldFactoryErrorsTestCase(PageTreeTestCase):

@@ -26,6 +26,12 @@ class SimpleStructBlockInnerStreamFactory(wagtail_factories.StreamBlockFactory):
     simple_struct_block = factory.SubFactory(SimpleStructBlockFactory)
 
 
+class SimpleStructBlockInnerStreamDefaultsFactory(wagtail_factories.StreamBlockFactory):
+    simple_struct_block = factory.SubFactory(
+        SimpleStructBlockFactory, text="default text", number=11, boolean=False
+    )
+
+
 class SimpleStructBlockOuterStreamFactory(wagtail_factories.StreamBlockFactory):
     inner_stream = factory.SubFactory(SimpleStructBlockInnerStreamFactory)
 
@@ -33,8 +39,49 @@ class SimpleStructBlockOuterStreamFactory(wagtail_factories.StreamBlockFactory):
         model = models.SimpleStructBlockNestedStream
 
 
+class SimpleStructBlockOuterStreamDefaultsFactory(wagtail_factories.StreamBlockFactory):
+    inner_stream = factory.SubFactory(SimpleStructBlockInnerStreamDefaultsFactory)
+
+    class Meta:
+        model = models.SimpleStructBlockNestedStream
+
+
+class SimpleStructBlockOuterStreamDeepDefaultsFactory(
+    wagtail_factories.StreamBlockFactory
+):
+    inner_stream = factory.SubFactory(
+        SimpleStructBlockInnerStreamFactory,
+        **{
+            "0__simple_struct_block__text": "deep text",
+            "0__simple_struct_block__number": 111,
+            "1__simple_struct_block__text": "deep text 2",
+        },
+    )
+
+    class Meta:
+        model = models.SimpleStructBlockNestedStream
+
+
 class PageWithSimpleStructBlockNestedFactory(wagtail_factories.PageFactory):
     body = wagtail_factories.StreamFieldFactory(SimpleStructBlockOuterStreamFactory)
+
+    class Meta:
+        model = models.PageWithSimpleStructBlockNested
+
+
+class PageWithSimpleStructBlockNestedDefaultsFactory(wagtail_factories.PageFactory):
+    body = wagtail_factories.StreamFieldFactory(
+        SimpleStructBlockOuterStreamDefaultsFactory
+    )
+
+    class Meta:
+        model = models.PageWithSimpleStructBlockNested
+
+
+class PageWithSimpleStructBlockNestedDeepDefaultsFactory(wagtail_factories.PageFactory):
+    body = wagtail_factories.StreamFieldFactory(
+        SimpleStructBlockOuterStreamDeepDefaultsFactory
+    )
 
     class Meta:
         model = models.PageWithSimpleStructBlockNested
