@@ -80,7 +80,7 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
                 indexed_block_names[key] = v
             else:
                 try:
-                    i, name, *param = k.split("__", maxsplit=2)
+                    i, name, *params = k.split("__", maxsplit=2)
                     key = int(i)
                 except (ValueError, TypeError):
                     raise InvalidDeclaration(
@@ -94,10 +94,14 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
                         f"(got {name}, already have {indexed_block_names[key]})"
                     )
                 indexed_block_names[key] = name
-                extra_declarations[f"{i}." + "__".join([name, *param])] = v
+                transformed_key = self.reconstruct_key(i, name, params)
+                extra_declarations[transformed_key] = v
 
         self.validate_block_indexes(indexed_block_names, factory_meta)
         return indexed_block_names, extra_declarations
+
+    def reconstruct_key(self, index, name, params):
+        return f"{index}.{'__'.join((name, *params))}"
 
     def validate_block_indexes(self, indexed_block_names, factory_meta):
         indexes = sorted(indexed_block_names.keys())
