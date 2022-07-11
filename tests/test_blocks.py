@@ -8,9 +8,11 @@ from tests.testapp.factories import MyBlockFactory, MyTestPageWithStreamFieldFac
 
 try:
     from wagtail.blocks import StructValue
+    from wagtail.models import Page
 except ImportError:
     # Wagtail<3.0
     from wagtail.core.blocks import StructValue
+    from wagtail.core.models import Page
 
 
 @pytest.mark.django_db
@@ -151,6 +153,14 @@ def test_custom_page_streamfield_default_blocks():
 
     content = str(page.body)
     assert content.count("block-image") == 2
+
+
+@pytest.mark.django_db
+def test_page_chooser_block():
+    value = wagtail_factories.PageChooserBlockFactory()
+    page = Page.objects.last()
+
+    assert value == page
 
 
 @pytest.mark.django_db
