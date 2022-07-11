@@ -15,8 +15,9 @@ from wagtail_factories.builder import (
     StreamBlockStepBuilder,
     StructBlockStepBuilder,
 )
-from wagtail_factories.factories import ImageFactory
+from wagtail_factories.factories import ImageFactory, PageFactory
 from wagtail_factories.options import BlockFactoryOptions, StreamBlockFactoryOptions
+
 
 __all__ = [
     "CharBlockFactory",
@@ -25,6 +26,7 @@ __all__ = [
     "StreamFieldFactory",
     "ListBlockFactory",
     "StructBlockFactory",
+    "PageChooserBlockFactory",
     "ImageChooserBlockFactory",
 ]
 
@@ -197,6 +199,21 @@ class IntegerBlockFactory(BlockFactory):
 
 class ChooserBlockFactory(BlockFactory):
     pass
+
+
+class PageChooserBlockFactory(ChooserBlockFactory):
+    page = factory.SubFactory(PageFactory)
+
+    class Meta:
+        model = blocks.PageChooserBlock
+
+    @classmethod
+    def _build(cls, model_class, page):
+        return page
+
+    @classmethod
+    def _create(cls, model_class, page):
+        return page
 
 
 class ImageChooserBlockFactory(ChooserBlockFactory):
