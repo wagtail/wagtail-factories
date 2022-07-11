@@ -2,6 +2,7 @@ from collections import defaultdict
 
 import factory
 from factory.declarations import ParameteredAttribute
+from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.images.blocks import ImageChooserBlock
 
 try:
@@ -15,9 +16,8 @@ from wagtail_factories.builder import (
     StreamBlockStepBuilder,
     StructBlockStepBuilder,
 )
-from wagtail_factories.factories import ImageFactory, PageFactory
+from wagtail_factories.factories import DocumentFactory, ImageFactory, PageFactory
 from wagtail_factories.options import BlockFactoryOptions, StreamBlockFactoryOptions
-
 
 __all__ = [
     "CharBlockFactory",
@@ -28,6 +28,7 @@ __all__ = [
     "StructBlockFactory",
     "PageChooserBlockFactory",
     "ImageChooserBlockFactory",
+    "DocumentChooserBlockFactory",
 ]
 
 
@@ -229,3 +230,18 @@ class ImageChooserBlockFactory(ChooserBlockFactory):
     @classmethod
     def _create(cls, model_class, image):
         return image
+
+
+class DocumentChooserBlockFactory(ChooserBlockFactory):
+    document = factory.SubFactory(DocumentFactory)
+
+    class Meta:
+        model = DocumentChooserBlock
+
+    @classmethod
+    def _build(cls, model_class, document):
+        return document
+
+    @classmethod
+    def _create(cls, model_class, document):
+        return document
