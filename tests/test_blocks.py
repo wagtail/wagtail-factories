@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 import pytest
+from wagtail.documents.models import Document
 from wagtail.images.models import Image
 
 import wagtail_factories
@@ -169,3 +170,11 @@ def test_image_chooser_block():
     image = Image.objects.last()
 
     assert value == image
+
+
+@pytest.mark.django_db
+def test_document_chooser_block():
+    value = wagtail_factories.DocumentChooserBlockFactory()
+    document = Document.objects.last()
+
+    assert value == document
