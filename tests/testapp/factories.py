@@ -45,7 +45,11 @@ class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
                 wagtail_factories.IntegerBlockFactory
             ),
             "struct": factory.SubFactory(MyBlockFactory),
+            "page": factory.SubFactory(wagtail_factories.PageChooserBlockFactory),
             "image": factory.SubFactory(wagtail_factories.ImageChooserBlockFactory),
+            "document": factory.SubFactory(
+                wagtail_factories.DocumentChooserBlockFactory
+            ),
         }
     )
 

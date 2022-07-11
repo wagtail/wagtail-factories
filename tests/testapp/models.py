@@ -15,6 +15,8 @@ try:
 except ImportError:
     # Wagtail<3.0
     from wagtail.core.models import Page
+
+from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.images.blocks import ImageChooserBlock
 
 
@@ -51,7 +53,9 @@ class MyTestPage(Page):
             ("char_array", blocks.ListBlock(blocks.CharBlock())),
             ("int_array", blocks.ListBlock(blocks.IntegerBlock())),
             ("struct", MyBlock()),
+            ("page", blocks.PageChooserBlock()),
             ("image", ImageChooserBlock()),
+            ("document", DocumentChooserBlock()),
         ]
     )
 

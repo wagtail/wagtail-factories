@@ -102,9 +102,17 @@ def test_custom_page_streamfield_data_complex():
         body__1__struct__item__value=100,
         body__1__struct__image__image=None,
         body__3__image__image__title="Blub",
+        body__4__page__page__title="Bulb",
+        body__5__document__document__title="Bubl",
     )
     assert Image.objects.count() == 1
     image = Image.objects.first()
+
+    assert Page.objects.filter(title="Bulb").exists()
+    linked_page = Page.objects.get(title="Bulb")
+
+    assert Document.objects.count() == 1
+    document = Document.objects.first()
 
     assert page.body[0].block_type == "char_array"
     assert page.body[0].value == ["foo", "bar"]
@@ -128,6 +136,12 @@ def test_custom_page_streamfield_data_complex():
 
     assert page.body[3].block_type == "image"
     assert page.body[3].value == image
+
+    assert page.body[4].block_type == "page"
+    assert page.body[4].value == linked_page
+
+    assert page.body[5].block_type == "document"
+    assert page.body[5].value == document
 
     content = str(page.body)
     assert "block-image" in content
