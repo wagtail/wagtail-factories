@@ -46,13 +46,11 @@ class StreamBlockFactory(factory.Factory):
 
     @classmethod
     def _construct_stream(cls, block_class, *args, **kwargs):
-        if not kwargs:
-            return []
-
         def get_index(key):
             return int(key.split(".")[0])
 
-        stream_data = [None] * (max(map(get_index, kwargs.keys())) + 1)
+        stream_length = max(map(get_index, kwargs.keys())) + 1 if kwargs else 0
+        stream_data = [None] * stream_length
         for indexed_block_name, value in kwargs.items():
             i, name = indexed_block_name.split(".")
             stream_data[int(i)] = (name, value)

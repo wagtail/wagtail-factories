@@ -1,5 +1,11 @@
 from django.test import TestCase
 
+try:
+    from wagtail import blocks
+except ImportError:
+    # Wagtail<3.0
+    from wagtail.core import blocks
+
 import wagtail_factories
 from tests.testapp.stream_block_factories import (
     PageWithNestedStreamBlockFactory,
@@ -135,6 +141,23 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
         self.assertEqual(page.body[0].value[0].value["text"], "deep text")
         self.assertEqual(page.body[0].value[0].value["number"], 111)
         self.assertEqual(page.body[0].value[1].value["text"], "deep text 2")
+
+
+class EmptyStreamValueTestCase(PageTreeTestCase):
+    # We should be able to generate a value for a StreamBlockFactory that received no parameters
+    # (i.e. the empty StreamValue)
+
+    def test_page_without_stream_field_params(self):
+        page = PageWithStreamBlockFactory(parent=self.root_page)
+        self.assertEqual(len(page.body), 0)
+        self.assertIsInstance(page.body, blocks.StreamValue)
+
+    def test_nested_stream_block_default_value(self):
+        page = PageWithNestedStreamBlockFactory(
+            parent=self.root_page, body__0="inner_stream"
+        )
+        self.assertEqual(len(page.body[0].value), 0)
+        self.assertIsInstance(page.body[0].value, blocks.StreamValue)
 
 
 class StreamFieldFactoryErrorsTestCase(PageTreeTestCase):

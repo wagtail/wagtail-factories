@@ -97,13 +97,17 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
                 transformed_key = self.reconstruct_key(i, name, params)
                 extra_declarations[transformed_key] = v
 
-        self.validate_block_indexes(indexed_block_names, factory_meta)
+        self.validate_block_indexes_sequential(indexed_block_names, factory_meta)
         return indexed_block_names, extra_declarations
 
     def reconstruct_key(self, index, name, params):
         return f"{index}.{'__'.join((name, *params))}"
 
-    def validate_block_indexes(self, indexed_block_names, factory_meta):
+    def validate_block_indexes_sequential(self, indexed_block_names, factory_meta):
+        if not indexed_block_names:
+            # There were no declarations for this block, we will ultimately return an empty
+            # StreamValue
+            return
         indexes = sorted(indexed_block_names.keys())
         for declared, expected in zip_longest(indexes, range(max(indexes) + 1)):
             if declared != expected:
