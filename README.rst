@@ -63,10 +63,19 @@ Documentation is still in progress, but see the `tests`_ for more examples.
             model = models.MyCarousel
 
 
-    class MyTestPageFactory(wagtail_factories.PageFactory):
+    class MyNewsPageFactory(wagtail_factories.PageFactory):
+        class Meta:
+            model = models.MyNewsPage
 
+
+    class MyNewsPageChooserBlockFactory(wagtail_factories.PageChooserBlockFactory):
+        page = factory.SubFactory(MyNewsPageFactory)
+
+
+    class MyTestPageFactory(wagtail_factories.PageFactory):
         body = wagtail_factories.StreamFieldFactory({
-            'carousel': MyCarouselFactory
+            'carousel': MyCarouselFactory,
+            'news_page': MyNewsPageChooserBlockFactory,
         })
 
         class Meta:
@@ -82,7 +91,9 @@ Documentation is still in progress, but see the `tests`_ for more examples.
             body__0__carousel__items__1__label='Slide 2',
             body__0__carousel__items__1__image__image__title='Image Slide 2',
             body__0__carousel__items__2__label='Slide 3',
-            body__0__carousel__items__2__image__image__title='Image Slide 3')
+            body__0__carousel__items__2__image__image__title='Image Slide 3',
+            body__1__news_page__page__title="News",
+        )
 
 
 Using StreamBlockFactory
