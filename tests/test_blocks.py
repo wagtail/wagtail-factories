@@ -138,7 +138,7 @@ def test_custom_page_streamfield_data_complex():
     assert page.body[3].value == image
 
     assert page.body[4].block_type == "page"
-    assert page.body[4].value == linked_page
+    assert page.body[4].value == linked_page.specific
 
     assert page.body[5].block_type == "document"
     assert page.body[5].value == document
