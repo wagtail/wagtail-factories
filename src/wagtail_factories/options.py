@@ -8,6 +8,24 @@ class BlockFactoryOptions(FactoryOptions):
         options.append(OptionDefault("block_def", None))
         return options
 
+    def get_meta_dict(self):
+        return {
+            "model": self.model,
+            "block_def": self.block_def,
+            "abstract": self.abstract,
+            "strategy": self.strategy,
+            "inline_args": self.inline_args,
+            "exclude": self.exclude,
+            "rename": self.rename,
+        }
+
+    def to_meta_class(self):
+        """
+        Create a new Meta class from this instance's options, suitable for
+        inclusion on a factory subclass
+        """
+        return type("Meta", (), self.get_meta_dict())
+
 
 class StreamBlockFactoryOptions(BlockFactoryOptions):
     def prepare_arguments(self, attributes):

@@ -119,7 +119,7 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
         # Create a new StreamBlockFactory subclass, with a declaration for each block the user
         # requested at instantiation. This way we can rely on the factory_boy internals for
         # object generation
-        new_class_dict = {}
+        new_class_dict = {"Meta": old_factory_meta.to_meta_class()}
 
         block_def = old_factory_meta.get_block_definition()
         for i, name in indexed_block_names.items():
@@ -137,21 +137,6 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
                     child_def = child_def.child_block
                 declared_value.get_factory()._meta.block_def = child_def
             new_class_dict[f"{i}.{name}"] = declared_value
-
-        new_meta_class = type(
-            "Meta",
-            (),
-            {
-                "model": old_factory_meta.model,
-                "block_def": old_factory_meta.block_def,
-                "abstract": old_factory_meta.abstract,
-                "strategy": old_factory_meta.strategy,
-                "inline_args": old_factory_meta.inline_args,
-                "exclude": old_factory_meta.exclude,
-                "rename": old_factory_meta.rename,
-            },
-        )
-        new_class_dict["Meta"] = new_meta_class
 
         from wagtail_factories.blocks import StreamBlockFactory
 
