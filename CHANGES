@@ -1,3 +1,8 @@
+3.0.0
+=====
+- Add StreamBlockFactory. Breaking change to StreamFieldFactory is usage - see
+  README.
+
 2.1.0
 =====
  - Add support for Wagtail 3.0 and drop support for all Wagtail versions
