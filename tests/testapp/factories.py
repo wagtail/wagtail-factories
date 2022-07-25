@@ -44,8 +44,8 @@ class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
             "int_array": wagtail_factories.ListBlockFactory(
                 wagtail_factories.IntegerBlockFactory
             ),
-            "struct": MyBlockFactory,
-            "image": wagtail_factories.ImageChooserBlockFactory,
+            "struct": factory.SubFactory(MyBlockFactory),
+            "image": factory.SubFactory(wagtail_factories.ImageChooserBlockFactory),
         }
     )
 

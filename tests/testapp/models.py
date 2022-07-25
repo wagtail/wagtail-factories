@@ -30,6 +30,21 @@ class MyBlock(blocks.StructBlock):
     image = ImageChooserBlock()
 
 
+class SimpleStructBlock(blocks.StructBlock):
+    # Atomic child blocks only
+    text = blocks.CharBlock()
+    number = blocks.IntegerBlock()
+    boolean = blocks.BooleanBlock()
+
+
+class SimpleStructBlockNestedStream(blocks.StreamBlock):
+    inner_stream = blocks.StreamBlock([("simple_struct_block", SimpleStructBlock())])
+
+
+class PageWithSimpleStructBlockNested(Page):
+    body = StreamField(SimpleStructBlockNestedStream())
+
+
 class MyTestPage(Page):
     body = StreamField(
         [
@@ -39,3 +54,40 @@ class MyTestPage(Page):
             ("image", ImageChooserBlock()),
         ]
     )
+
+
+class MyStreamBlock(blocks.StreamBlock):
+    struct_block = MyBlock()
+    char_block = blocks.CharBlock()
+
+
+class NestedStreamBlock(blocks.StreamBlock):
+    inner_stream = MyStreamBlock()
+
+
+class StructBlockWithStreamBlock(blocks.StructBlock):
+    inner_stream = MyStreamBlock()
+
+
+class DeeplyNestedStreamBlock(blocks.StreamBlock):
+    struct_block = StructBlockWithStreamBlock()
+
+
+class DeeplyNestedStreamBlockInListBlock(blocks.StreamBlock):
+    list_block = blocks.ListBlock(MyStreamBlock())
+
+
+class PageWithStreamBlock(Page):
+    body = StreamField(MyStreamBlock())
+
+
+class PageWithNestedStreamBlock(Page):
+    body = StreamField(NestedStreamBlock())
+
+
+class PageWithStreamBlockInStructBlock(Page):
+    body = StreamField(DeeplyNestedStreamBlock())
+
+
+class PageWithStreamBlockInListBlock(Page):
+    body = StreamField(DeeplyNestedStreamBlockInListBlock())

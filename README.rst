@@ -83,3 +83,97 @@ Documentation is still in progress, but see the `tests`_ for more examples.
             body__0__carousel__items__1__image__image__title='Image Slide 2',
             body__0__carousel__items__2__label='Slide 3',
             body__0__carousel__items__2__image__image__title='Image Slide 3')
+
+
+Using StreamBlockFactory
+========================
+
+``StreamBlockFactory`` can be used in conjunction with the other block factory types to create complex, nested ``StreamValues``, much like how ``StreamBlock`` can be used to declare the blocks for a complex ``StreamField``.
+
+First, define your ``StreamBlockFactory`` subclass, using ``factory.SubFactory`` to wrap child block declarations. Be sure to include your ``StreamBlock`` subclass as the model attribute on the inner ``Meta`` class.
+
+.. code-block:: python
+
+    class MyStreamBlockFactory(wagtail_factories.StreamBlockFactory):
+        my_struct_block = factory.SubFactory(MyStructBlockFactory)
+
+        class Meta:
+            model = MyStreamBlock
+
+
+Then include your ``StreamBlockFactory`` subclass on a model factory as the argument to a ``StreamFieldFactory``.
+
+.. code-block:: python
+
+    class MyPageFactory(wagtail_factories.PageFactory):
+        body = wagtail_factories.StreamFieldFactory(MyStreamBlockFactory)
+
+        class Meta:
+            model = MyPage
+
+
+You can then use a modified version of factory_boy's deep object declaration syntax to build up ``StreamValues`` on the fly.
+
+.. code-block:: python
+
+    MyPageFactory(
+        body__0__my_struct_block__some_field="some value",
+        body__0__my_struct_block__some_other_field="some other value",
+    )
+
+
+To generate the default value for a block factory, terminate your declaration at the index and provide the block name as the value.
+
+.. code-block:: python
+
+    MyPageFactory(body__0="my_struct_block")
+
+
+Alternative StreamFieldFactory declaration syntax
+=================================================
+
+Prior to version 3.0, ``StreamFieldFactory`` could only be used by providing a dict mapping block names to block factory classes as the single argument, for example:
+
+.. code-block:: python
+
+    class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
+        body = wagtail_factories.StreamFieldFactory(
+            {
+                "char_array": wagtail_factories.ListBlockFactory(
+                    wagtail_factories.CharBlockFactory
+                ),
+                "int_array": wagtail_factories.ListBlockFactory(
+                    wagtail_factories.IntegerBlockFactory
+                ),
+                "struct": MyBlockFactory,
+                "image": wagtail_factories.ImageChooserBlockFactory,
+            }
+        )
+    
+        class Meta:
+            model = models.MyTestPage
+    
+
+This style of declaration is still supported, with the caveat that nested stream blocks are not supported for this approach. From version 3.0, all ``BlockFactory`` values in a ``StreamFieldFactory`` definition of this style *must* be wrapped in factory_boy ``SubFactories``. For example, the above example must be updated to the following for 3.0 compatibility.
+
+.. code-block:: python
+
+    class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
+        body = wagtail_factories.StreamFieldFactory(
+            {
+                "char_array": wagtail_factories.ListBlockFactory(
+                    wagtail_factories.CharBlockFactory
+                ),
+                "int_array": wagtail_factories.ListBlockFactory(
+                    wagtail_factories.IntegerBlockFactory
+                ),
+                "struct": factory.SubFactory(MyBlockFactory),
+                "image": factory.SubFactory(wagtail_factories.ImageChooserBlockFactory),
+            }
+        )
+
+        class Meta:
+            model = models.MyTestPage
+
+
+This requirement does *not* apply to ``ListBlockFactory``, which is a subclass of ``SubFactory``.

@@ -1,5 +1,3 @@
-import os
-
 from wagtail import VERSION as WAGTAIL_VERSION
 
 CACHES = {
@@ -13,16 +11,7 @@ ROOT_URLCONF = "tests.urls"
 
 SECRET_KEY = "Gx8sMKAtnA69TR9lyAlLuSnozUv3kxdscHkpwEjatZRVQQ0laMY69KL4XPxvr3KY"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.environ.get("TEST_DB_NAME", "wagtail_factories"),
-        "USER": os.environ.get("TEST_DB_USER", None),
-        "PASSWORD": os.environ.get("TEST_DB_PASSWORD", None),
-        "HOST": os.environ.get("TEST_DB_HOST", "localhost"),
-        "PORT": os.environ.get("TEST_DB_PORT", "5432"),
-    }
-}
+DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}}
 
 INSTALLED_APPS = [
     # Wagtail packages
@@ -70,8 +59,8 @@ MIDDLEWARE = [
 ]
 
 WAGTAILSEARCH_BACKENDS = {
-    'default': {
-        'BACKEND': 'wagtail.search.backends.database',
+    "default": {
+        "BACKEND": "wagtail.search.backends.database",
     }
 }
 
