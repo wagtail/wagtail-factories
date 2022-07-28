@@ -1,3 +1,7 @@
+3.1.0
+=====
+- Add PageChooserBlock and DocumentChooserBlock
+
 3.0.0
 =====
 - Add StreamBlockFactory. Breaking change to StreamFieldFactory is usage - see
