@@ -74,8 +74,8 @@ Documentation is still in progress, but see the `tests`_ for more examples.
 
     class MyTestPageFactory(wagtail_factories.PageFactory):
         body = wagtail_factories.StreamFieldFactory({
-            'carousel': MyCarouselFactory,
-            'news_page': MyNewsPageChooserBlockFactory,
+            'carousel': factory.SubFactory(MyCarouselFactory),
+            'news_page': factory.SubFactory(MyNewsPageChooserBlockFactory),
         })
 
         class Meta:
