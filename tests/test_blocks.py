@@ -179,6 +179,19 @@ def test_page_chooser_block():
 
 
 @pytest.mark.django_db
+def test_page_chooser_block_strategy():
+    pages_count = Page.objects.count()
+
+    # Page isn't saved in database when the strategy is build
+    wagtail_factories.PageChooserBlockFactory.build()
+    assert Page.objects.count() == pages_count
+
+    # Page is saved in database when the strategy is create
+    wagtail_factories.PageChooserBlockFactory.create()
+    assert Page.objects.count() == pages_count + 1
+
+
+@pytest.mark.django_db
 def test_image_chooser_block():
     value = wagtail_factories.ImageChooserBlockFactory()
     image = Image.objects.last()
@@ -187,8 +200,34 @@ def test_image_chooser_block():
 
 
 @pytest.mark.django_db
+def test_image_chooser_block_strategy():
+    images_count = Image.objects.count()
+
+    # Image isn't saved in database when the strategy is build
+    wagtail_factories.ImageChooserBlockFactory.build()
+    assert Image.objects.count() == images_count
+
+    # Image is saved in database when the strategy is create
+    wagtail_factories.ImageChooserBlockFactory.create()
+    assert Image.objects.count() == images_count + 1
+
+
+@pytest.mark.django_db
 def test_document_chooser_block():
     value = wagtail_factories.DocumentChooserBlockFactory()
     document = Document.objects.last()
 
     assert value == document
+
+
+@pytest.mark.django_db
+def test_document_chooser_block_strategy():
+    documents_count = Document.objects.count()
+
+    # Document isn't saved in database when the strategy is build
+    wagtail_factories.DocumentChooserBlockFactory.build()
+    assert Document.objects.count() == documents_count
+
+    # Document is saved in database when the strategy is create
+    wagtail_factories.DocumentChooserBlockFactory.create()
+    assert Document.objects.count() == documents_count + 1
