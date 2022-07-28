@@ -179,37 +179,11 @@ def test_page_chooser_block():
 
 
 @pytest.mark.django_db
-def test_page_chooser_block_strategy():
-    pages_count = Page.objects.count()
-
-    # Page isn't saved in database when the strategy is build
-    wagtail_factories.PageChooserBlockFactory.build()
-    assert Page.objects.count() == pages_count
-
-    # Page is saved in database when the strategy is create
-    wagtail_factories.PageChooserBlockFactory.create()
-    assert Page.objects.count() == pages_count + 1
-
-
-@pytest.mark.django_db
 def test_image_chooser_block():
     value = wagtail_factories.ImageChooserBlockFactory()
     image = Image.objects.last()
 
     assert value == image
-
-
-@pytest.mark.django_db
-def test_image_chooser_block_strategy():
-    images_count = Image.objects.count()
-
-    # Image isn't saved in database when the strategy is build
-    wagtail_factories.ImageChooserBlockFactory.build()
-    assert Image.objects.count() == images_count
-
-    # Image is saved in database when the strategy is create
-    wagtail_factories.ImageChooserBlockFactory.create()
-    assert Image.objects.count() == images_count + 1
 
 
 @pytest.mark.django_db
@@ -221,13 +195,21 @@ def test_document_chooser_block():
 
 
 @pytest.mark.django_db
-def test_document_chooser_block_strategy():
-    documents_count = Document.objects.count()
+@pytest.mark.parametrize(
+    "Model, ModelChooserBlockFactory",
+    [
+        (Page, wagtail_factories.PageChooserBlockFactory),
+        (Image, wagtail_factories.ImageChooserBlockFactory),
+        (Document, wagtail_factories.DocumentChooserBlockFactory),
+    ],
+)
+def test_chooser_block_strategy(Model, ModelChooserBlockFactory):
+    objects_count = Model.objects.count()
 
-    # Document isn't saved in database when the strategy is build
-    wagtail_factories.DocumentChooserBlockFactory.build()
-    assert Document.objects.count() == documents_count
+    # Object isn't saved in database when the strategy is build
+    ModelChooserBlockFactory.build()
+    assert Model.objects.count() == objects_count
 
-    # Document is saved in database when the strategy is create
-    wagtail_factories.DocumentChooserBlockFactory.create()
-    assert Document.objects.count() == documents_count + 1
+    # Object is saved in database when the strategy is create
+    ModelChooserBlockFactory.create()
+    assert Model.objects.count() == objects_count + 1
