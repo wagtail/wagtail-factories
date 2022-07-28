@@ -28,6 +28,10 @@ class MyTestPageFactory(wagtail_factories.PageFactory):
         model = models.MyTestPage
 
 
+class MyTestPageChooserBlockFactory(wagtail_factories.PageChooserBlockFactory):
+    page = factory.SubFactory(MyTestPageFactory)
+
+
 class MyTestPageGetOrCreateFactory(wagtail_factories.PageFactory):
     class Meta:
         model = models.MyTestPage
@@ -45,7 +49,11 @@ class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
                 wagtail_factories.IntegerBlockFactory
             ),
             "struct": factory.SubFactory(MyBlockFactory),
+            "page": factory.SubFactory(MyTestPageChooserBlockFactory),
             "image": factory.SubFactory(wagtail_factories.ImageChooserBlockFactory),
+            "document": factory.SubFactory(
+                wagtail_factories.DocumentChooserBlockFactory
+            ),
         }
     )
 

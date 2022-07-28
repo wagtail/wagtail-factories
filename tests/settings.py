@@ -79,3 +79,6 @@ TEMPLATES = [
         },
     }
 ]
+
+
+WAGTAILDOCS_SERVE_METHOD = "direct"

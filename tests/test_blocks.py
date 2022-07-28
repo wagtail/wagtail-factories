@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 import pytest
+from wagtail.documents.models import Document
 from wagtail.images.models import Image
 
 import wagtail_factories
@@ -8,9 +9,11 @@ from tests.testapp.factories import MyBlockFactory, MyTestPageWithStreamFieldFac
 
 try:
     from wagtail.blocks import StructValue
+    from wagtail.models import Page
 except ImportError:
     # Wagtail<3.0
     from wagtail.core.blocks import StructValue
+    from wagtail.core.models import Page
 
 
 @pytest.mark.django_db
@@ -99,9 +102,17 @@ def test_custom_page_streamfield_data_complex():
         body__1__struct__item__value=100,
         body__1__struct__image__image=None,
         body__3__image__image__title="Blub",
+        body__4__page__page__title="Bulb",
+        body__5__document__document__title="Bubl",
     )
     assert Image.objects.count() == 1
     image = Image.objects.first()
+
+    assert Page.objects.filter(title="Bulb").exists()
+    linked_page = Page.objects.get(title="Bulb")
+
+    assert Document.objects.count() == 1
+    document = Document.objects.first()
 
     assert page.body[0].block_type == "char_array"
     assert page.body[0].value == ["foo", "bar"]
@@ -125,6 +136,12 @@ def test_custom_page_streamfield_data_complex():
 
     assert page.body[3].block_type == "image"
     assert page.body[3].value == image
+
+    assert page.body[4].block_type == "page"
+    assert page.body[4].value == linked_page.specific
+
+    assert page.body[5].block_type == "document"
+    assert page.body[5].value == document
 
     content = str(page.body)
     assert "block-image" in content
@@ -154,8 +171,45 @@ def test_custom_page_streamfield_default_blocks():
 
 
 @pytest.mark.django_db
+def test_page_chooser_block():
+    value = wagtail_factories.PageChooserBlockFactory()
+    page = Page.objects.last()
+
+    assert value == page
+
+
+@pytest.mark.django_db
 def test_image_chooser_block():
     value = wagtail_factories.ImageChooserBlockFactory()
     image = Image.objects.last()
 
     assert value == image
+
+
+@pytest.mark.django_db
+def test_document_chooser_block():
+    value = wagtail_factories.DocumentChooserBlockFactory()
+    document = Document.objects.last()
+
+    assert value == document
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "Model, ModelChooserBlockFactory",
+    [
+        (Page, wagtail_factories.PageChooserBlockFactory),
+        (Image, wagtail_factories.ImageChooserBlockFactory),
+        (Document, wagtail_factories.DocumentChooserBlockFactory),
+    ],
+)
+def test_chooser_block_strategy(Model, ModelChooserBlockFactory):
+    objects_count = Model.objects.count()
+
+    # Object isn't saved in database when the strategy is build
+    ModelChooserBlockFactory.build()
+    assert Model.objects.count() == objects_count
+
+    # Object is saved in database when the strategy is create
+    ModelChooserBlockFactory.create()
+    assert Model.objects.count() == objects_count + 1
