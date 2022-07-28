@@ -14,7 +14,7 @@ docs_require = [
 tests_require = [
     "pytest==6.2.5",
     "pytest-django==4.5.0",
-    "pytest-cov==3.0.0",
+    "pytest-cov==3.1.0",
     "pytest-pythonpath==0.7.3",
     "psycopg2>=2.3.1",
     "coverage==6.0",
@@ -31,7 +31,7 @@ with open("README.rst") as fh:
 
 setup(
     name="wagtail_factories",
-    version="3.0.0",
+    version="3.1.0",
     description="Factory boy classes for wagtail",
     long_description=long_description,
     author="Michael van Tellingen",
