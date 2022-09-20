@@ -3,6 +3,7 @@ import logging
 import factory
 from django.utils.text import slugify
 from factory import errors, utils
+from factory.base import FactoryOptions, OptionDefault
 from factory.declarations import ParameteredAttribute
 from wagtail.images import get_image_model
 
@@ -131,12 +132,23 @@ class PageFactoryMetaClass(FactoryMetaClass):
         return new_class
 
 
+class PageFactoryOptions(FactoryOptions):
+    def _build_default_options(self):
+        return super()._build_default_options() + [
+            OptionDefault("autotest", True, inherit=False),
+        ]
+
+
 class PageFactory(MP_NodeFactory, metaclass=PageFactoryMetaClass):
+
     title = "Test page"
     slug = factory.LazyAttribute(lambda obj: slugify(obj.title))
 
+    _options_class = PageFactoryOptions
+
     class Meta:
         model = Page
+        autotest = False
 
 
 class CollectionMemberFactory(DjangoModelFactory):
