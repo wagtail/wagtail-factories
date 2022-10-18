@@ -82,3 +82,6 @@ TEMPLATES = [
 
 
 WAGTAILDOCS_SERVE_METHOD = "direct"
+
+if WAGTAIL_VERSION >= (3, 0):
+    WAGTAILADMIN_BASE_URL = "http://example.com"
