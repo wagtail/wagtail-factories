@@ -34,18 +34,31 @@ jobs:
         experimental: [false]
         include:
           - python-version: {version: '3.10', tox: 310}
-          - django: 41
-          - wagtail: 'main'
-          - factoryboy: [32]
-          - experimental: true
+            django: 41
+            wagtail: 'main'
+            factoryboy: [32]
+            experimental: true
+          - python-version: {version: 3.9, tox: 39}
+            django: 41
+            wagtail: 'main'
+            factoryboy: [32]
+            experimental: true
         exclude:
           - wagtail: 215
             django: 40
           - wagtail: 215
             django: 41
+          - wagtail: 216
+            django: 41
+          - wagtail: 30
+            django: 32
+          - wagtail: 30
+            django: 41
           - python-version: {version: 3.7, tox: 37}
             django: 40
           - python-version: {version: 3.7, tox: 37}
+            django: 41
+          - python-version: {version: 3.8, tox: 38}
             django: 41
 
     steps:
