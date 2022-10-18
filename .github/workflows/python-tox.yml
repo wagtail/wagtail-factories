@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-    continue-on-error: ${{ matrix.experimental }}
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -66,3 +65,5 @@ jobs:
         TOX_ENV: "py${{ matrix.python-version.tox }}-django${{ matrix.django }}-wagtail${{ matrix.wagtail }}-factoryboy${{ matrix.factoryboy }}"
       run: |
         tox -e $TOX_ENV
+
+    continue-on-error: ${{ matrix.experimental }}
