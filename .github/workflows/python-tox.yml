@@ -31,18 +31,6 @@ jobs:
         django: [32, 40, 41]
         wagtail: [215, 216, 30, 40]
         factoryboy: [32]
-        experimental: [false]
-        include:
-          - python-version: {version: '3.10', tox: 310}
-            django: 41
-            wagtail: 'main'
-            factoryboy: [32]
-            experimental: true
-          - python-version: {version: 3.9, tox: 39}
-            django: 41
-            wagtail: 'main'
-            factoryboy: [32]
-            experimental: true
         exclude:
           - wagtail: 215
             django: 40
@@ -76,6 +64,5 @@ jobs:
         TEST_DB_USER: wagtail_factories
         TEST_DB_PASSWORD: secret
         TOX_ENV: "py${{ matrix.python-version.tox }}-django${{ matrix.django }}-wagtail${{ matrix.wagtail }}-factoryboy${{ matrix.factoryboy }}"
-      continue-on-error: ${{ matrix.experimental }}
       run: |
         tox -e $TOX_ENV
