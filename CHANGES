@@ -1,3 +1,7 @@
+Unreleased
+==========
+- Add support for Wagtail 4.0 
+
 3.1.0
 =====
 - Add PageChooserBlock and DocumentChooserBlock
