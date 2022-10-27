@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
+    name: name: build (Python ${{ matrix.python-version }}, Django ${{ matrix.django-version }}, Wagtail ${{ matrix.wagtail-version }}, FactoryBoy ${{ matrix.factoryboy-version }})
     runs-on: ubuntu-latest
     services:
       postgres:
