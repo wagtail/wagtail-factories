@@ -28,10 +28,10 @@ jobs:
         wagtail-version: ["2.15", "2.16", "3.0"]
         factoryboy-version: ["3.2"]
         exclude:
-          - wagtail: "2.15"
-            django: "4.0"
+          - wagtail-version: "2.15"
+            django-version: "4.0"
           - python-version: "3.7"
-            django: "4.0"
+            django-version: "4.0"
 
     steps:
     - uses: actions/checkout@v1
