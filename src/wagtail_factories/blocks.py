@@ -7,6 +7,7 @@ from wagtail.images.blocks import ImageChooserBlock
 
 try:
     from wagtail import blocks
+    from wagtail.blocks import list_block
 except ImportError:
     # Wagtail<3.0
     from wagtail.core import blocks
@@ -122,6 +123,7 @@ class ListBlockFactory(factory.SubFactory):
 
     def evaluate(self, instance, step, extra):
         subfactory = self.get_factory()
+        block_model = subfactory._meta.model
 
         result = defaultdict(dict)
         for key, value in extra.items():
@@ -139,7 +141,8 @@ class ListBlockFactory(factory.SubFactory):
             retval.append(
                 step.recurse(subfactory, index_params, force_sequence=force_sequence)
             )
-        return retval
+
+        return list_block.ListValue(list_block.ListBlock(block_model()), values=retval)
 
 
 class StructBlockFactory(factory.Factory):
