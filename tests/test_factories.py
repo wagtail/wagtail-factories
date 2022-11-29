@@ -1,12 +1,12 @@
 import pytest
+from wagtail import VERSION as wagtail_version
 
 import wagtail_factories
 from tests.testapp.factories import MyTestPageFactory, MyTestPageGetOrCreateFactory
 
-try:
+if wagtail_version >= (3, 0):
     from wagtail.models import Page, Site
-except ImportError:
-    # Wagtail<3.0
+else:
     from wagtail.core.models import Page, Site
 
 
@@ -93,6 +93,10 @@ def test_custom_page_streamfield():
     assert len(page.body) == 0
 
 
+@pytest.mark.skipif(
+    wagtail_version >= (4, 1),
+    reason="Cannot assign a naive list to a ListBlock value if using ReferenceIndex",
+)
 @pytest.mark.django_db
 def test_custom_page_streamfield_data():
     root_page = wagtail_factories.PageFactory(parent=None)

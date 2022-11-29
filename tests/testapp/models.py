@@ -29,7 +29,7 @@ class MyBlock(blocks.StructBlock):
     title = blocks.CharBlock(max_length=100)
     item = MyBlockItem()
     items = blocks.ListBlock(MyBlockItem)
-    image = ImageChooserBlock()
+    image = ImageChooserBlock(required=False)
 
 
 class SimpleStructBlock(blocks.StructBlock):

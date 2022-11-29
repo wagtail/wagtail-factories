@@ -1,24 +1,40 @@
 from collections import OrderedDict
 
 import pytest
+from wagtail import VERSION as wagtail_version
 from wagtail.documents.models import Document
 from wagtail.images.models import Image
 
 import wagtail_factories
-from tests.testapp.factories import MyBlockFactory, MyTestPageWithStreamFieldFactory
+from tests.testapp.factories import (
+    MyBlockFactory,
+    MyBlockItemFactory,
+    MyTestPageWithStreamFieldFactory,
+)
 
-try:
+if wagtail_version >= (3, 0):
     from wagtail.blocks import StructValue
     from wagtail.models import Page
-except ImportError:
-    # Wagtail<3.0
+else:
     from wagtail.core.blocks import StructValue
     from wagtail.core.models import Page
 
 
+def eq_list_block_values(p, q):
+    """
+    Direct comparison of ListValue instances fails under current versions of Wagtail (<= 4.1),
+    so do a pairwise comparison of the bound blocks' values.
+
+    With Wagtail >= 2.16 we will get ListValues, prior to that just lists.
+    """
+    if wagtail_version >= (2, 16):
+        return all(map(lambda x, y: x.value == y.value, p.bound_blocks, q.bound_blocks))
+    return p == q
+
+
 @pytest.mark.django_db
 def test_list_block_factory():
-    value = MyBlockFactory(
+    computed = MyBlockFactory(
         items__0__label="label-1",
         items__0__value=1,
         items__1__label="label-2",
@@ -26,66 +42,88 @@ def test_list_block_factory():
         image__image=None,
     )
 
-    assert value == StructValue(
-        None,
-        [
-            ("title", "my title"),
-            ("item", OrderedDict([("label", "my-label"), ("value", 100)])),
-            (
-                "items",
-                [
-                    StructValue(None, [("label", "label-1"), ("value", 1)]),
-                    StructValue(None, [("label", "label-2"), ("value", 2)]),
-                ],
-            ),
-            ("image", None),
-        ],
+    list_item_block = MyBlockItemFactory._meta.model()
+
+    expected = MyBlockFactory._meta.model().clean(
+        OrderedDict(
+            [
+                ("title", "my title"),
+                ("item", OrderedDict([("label", "my-label"), ("value", 100)])),
+                (
+                    "items",
+                    [
+                        StructValue(
+                            list_item_block, [("label", "label-1"), ("value", 1)]
+                        ),
+                        StructValue(
+                            list_item_block, [("label", "label-2"), ("value", 2)]
+                        ),
+                    ],
+                ),
+            ]
+        )
     )
+    assert eq_list_block_values(computed["items"], expected["items"])
 
 
 @pytest.mark.django_db
 def test_block_factory():
-    value = MyBlockFactory(image__image__title="blub")
-
-    assert value == OrderedDict(
-        [
-            ("title", "my title"),
-            ("item", OrderedDict([("label", "my-label"), ("value", 100)])),
-            ("items", []),
-            ("image", Image.objects.first()),
-        ]
+    computed = MyBlockFactory(image__image__title="blub")
+    expected = MyBlockFactory._meta.model().clean(
+        OrderedDict(
+            [
+                ("title", "my title"),
+                ("item", OrderedDict([("label", "my-label"), ("value", 100)])),
+                ("items", []),
+                ("image", Image.objects.first()),
+            ]
+        )
     )
-
-    assert value["image"].title == "blub"
+    computed_list_value = computed.pop("items")
+    expected_list_value = expected.pop("items")
+    assert eq_list_block_values(computed_list_value, expected_list_value)
+    assert computed == expected
+    assert computed["image"].title == "blub"
 
 
 def test_block_factory_build():
-    value = MyBlockFactory.build(image__image__title="blub")
+    computed = MyBlockFactory.build(image__image__title="blub")
 
-    image = value.pop("image")
+    image = computed.pop("image")
     assert image.title == "blub"
 
-    assert value == OrderedDict(
-        [
-            ("title", "my title"),
-            ("item", OrderedDict([("label", "my-label"), ("value", 100)])),
-            ("items", []),
-        ]
+    expected = MyBlockFactory._meta.model().clean(
+        OrderedDict(
+            [
+                ("title", "my title"),
+                ("item", OrderedDict([("label", "my-label"), ("value", 100)])),
+                ("items", []),
+            ]
+        )
     )
+
+    computed_list_value = computed.pop("items")
+    expected_list_value = expected.pop("items")
+    assert eq_list_block_values(computed_list_value, expected_list_value)
+    assert computed == expected
 
 
 @pytest.mark.django_db
 def test_block_factory_subkwarg():
-    value = MyBlockFactory(item__label="my-label", item__value=20, image__image=None)
-
-    assert value == OrderedDict(
-        [
-            ("title", "my title"),
-            ("item", OrderedDict([("label", "my-label"), ("value", 20)])),
-            ("items", []),
-            ("image", None),
-        ]
+    computed = MyBlockFactory(item__label="my-label", item__value=20, image__image=None)
+    expected = MyBlockFactory._meta.model().clean(
+        OrderedDict(
+            [
+                ("title", "my title"),
+                ("item", OrderedDict([("label", "my-label"), ("value", 20)])),
+                ("items", []),
+                ("image", None),
+            ]
+        )
     )
+    computed.pop("items")
+    expected.pop("items")
+    assert computed == expected
 
 
 @pytest.mark.django_db
@@ -115,24 +153,34 @@ def test_custom_page_streamfield_data_complex():
     document = Document.objects.first()
 
     assert page.body[0].block_type == "char_array"
-    assert page.body[0].value == ["foo", "bar"]
+    assert page.body[2].block_type == "int_array"
+    if wagtail_version >= (2, 16):
+        assert [x.value for x in page.body[0].value.bound_blocks] == ["foo", "bar"]
+        assert [x.value for x in page.body[2].value.bound_blocks] == [100]
+    else:
+        assert page.body[0].value == ["foo", "bar"]
+        assert page.body[2].value == [100]
 
     assert page.body[1].block_type == "struct"
-    assert page.body[1].value == StructValue(
-        None,
-        [
-            ("title", "My Title"),
-            (
-                "item",
-                StructValue(None, [("label", "my-label"), ("value", 100)]),
-            ),
-            ("items", []),
-            ("image", None),
-        ],
+    computed_struct = page.body[1].value
+    expected_struct = MyBlockFactory._meta.model().clean(
+        StructValue(
+            None,
+            [
+                ("title", "My Title"),
+                (
+                    "item",
+                    StructValue(None, [("label", "my-label"), ("value", 100)]),
+                ),
+                ("items", []),
+                ("image", None),
+            ],
+        )
     )
-
-    assert page.body[2].block_type == "int_array"
-    assert page.body[2].value == [100]
+    assert eq_list_block_values(
+        computed_struct.pop("items"), expected_struct.pop("items")
+    )
+    assert computed_struct == expected_struct
 
     assert page.body[3].block_type == "image"
     assert page.body[3].value == image

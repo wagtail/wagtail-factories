@@ -2,13 +2,13 @@ from collections import defaultdict
 
 import factory
 from factory.declarations import ParameteredAttribute
+from wagtail import VERSION as wagtail_version
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.images.blocks import ImageChooserBlock
 
-try:
+if wagtail_version >= (3, 0):
     from wagtail import blocks
-except ImportError:
-    # Wagtail<3.0
+else:
     from wagtail.core import blocks
 
 from wagtail_factories.builder import (
@@ -121,8 +121,6 @@ class ListBlockFactory(factory.SubFactory):
         return self.evaluate(None, None, kwargs)
 
     def evaluate(self, instance, step, extra):
-        subfactory = self.get_factory()
-
         result = defaultdict(dict)
         for key, value in extra.items():
             if key.isdigit():
@@ -132,14 +130,18 @@ class ListBlockFactory(factory.SubFactory):
                 if prefix and prefix.isdigit():
                     result[int(prefix)][label] = value
 
-        retval = []
-
+        subfactory = self.get_factory()
         force_sequence = step.sequence if self.FORCE_SEQUENCE else None
-        for index, index_params in sorted(result.items()):
-            retval.append(
-                step.recurse(subfactory, index_params, force_sequence=force_sequence)
-            )
-        return retval
+        values = [
+            step.recurse(subfactory, params, force_sequence=force_sequence)
+            for _, params in sorted(result.items())
+        ]
+
+        if wagtail_version >= (2, 16):
+            list_block_def = blocks.list_block.ListBlock(subfactory._meta.model())
+            return blocks.list_block.ListValue(list_block_def, values)
+        else:
+            return values
 
 
 class StructBlockFactory(factory.Factory):
