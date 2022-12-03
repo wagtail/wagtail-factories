@@ -12,10 +12,12 @@ except ImportError:
     # Wagtail<3.0
     from wagtail.core.models import Collection, Page, Site
 
+from factory.base import FactoryMetaClass
 from factory.django import DjangoModelFactory
 from wagtail.documents import get_document_model
 
 __all__ = [
+    "get_page_factories",
     "CollectionFactory",
     "ImageFactory",
     "PageFactory",
@@ -23,6 +25,13 @@ __all__ = [
     "DocumentFactory",
 ]
 logger = logging.getLogger(__file__)
+
+
+PAGE_FACTORIES = []
+
+
+def get_page_factories():
+    return PAGE_FACTORIES
 
 
 class ParentNodeFactory(ParameteredAttribute):
@@ -115,7 +124,14 @@ class CollectionFactory(MP_NodeFactory):
         model = Collection
 
 
-class PageFactory(MP_NodeFactory):
+class PageFactoryMetaClass(FactoryMetaClass):
+    def __new__(mcs, class_name, bases, attrs):
+        new_class = super().__new__(mcs, class_name, bases, attrs)
+        PAGE_FACTORIES.append(new_class)
+        return new_class
+
+
+class PageFactory(MP_NodeFactory, metaclass=PageFactoryMetaClass):
     title = "Test page"
     slug = factory.LazyAttribute(lambda obj: slugify(obj.title))
 
