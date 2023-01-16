@@ -2,7 +2,11 @@ import pytest
 from wagtail import VERSION as wagtail_version
 
 import wagtail_factories
-from tests.testapp.factories import MyTestPageFactory, MyTestPageGetOrCreateFactory
+from tests.testapp.factories import (
+    MyTestPageFactory,
+    MyTestPageGetOrCreateFactory,
+    MyTestPageWithStreamFieldFactory,
+)
 
 if wagtail_version >= (3, 0):
     from wagtail.models import Page, Site
@@ -170,3 +174,12 @@ def test_document_add_to_collection():
         collection__parent=root_collection, collection__name="new"
     )
     assert document.collection.name == "new"
+
+
+def test_get_page_facories():
+    result = wagtail_factories.get_page_factories()
+    assert result == [
+        MyTestPageFactory,
+        MyTestPageGetOrCreateFactory,
+        MyTestPageWithStreamFieldFactory,
+    ]
