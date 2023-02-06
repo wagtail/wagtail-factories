@@ -1,9 +1,11 @@
 from collections import OrderedDict
 
 import pytest
-from wagtail import VERSION as wagtail_version
+
+from wagtail.blocks import StructValue
 from wagtail.documents.models import Document
 from wagtail.images.models import Image
+from wagtail.models import Page
 
 import wagtail_factories
 from tests.testapp.factories import (
@@ -12,12 +14,7 @@ from tests.testapp.factories import (
     MyTestPageWithStreamFieldFactory,
 )
 
-if wagtail_version >= (3, 0):
-    from wagtail.blocks import StructValue
-    from wagtail.models import Page
-else:
-    from wagtail.core.blocks import StructValue
-    from wagtail.core.models import Page
+
 
 
 def eq_list_block_values(p, q):
@@ -27,9 +24,8 @@ def eq_list_block_values(p, q):
 
     With Wagtail >= 2.16 we will get ListValues, prior to that just lists.
     """
-    if wagtail_version >= (2, 16):
-        return all(map(lambda x, y: x.value == y.value, p.bound_blocks, q.bound_blocks))
-    return p == q
+
+    return all(map(lambda x, y: x.value == y.value, p.bound_blocks, q.bound_blocks))
 
 
 @pytest.mark.django_db
@@ -154,12 +150,9 @@ def test_custom_page_streamfield_data_complex():
 
     assert page.body[0].block_type == "char_array"
     assert page.body[2].block_type == "int_array"
-    if wagtail_version >= (2, 16):
-        assert [x.value for x in page.body[0].value.bound_blocks] == ["foo", "bar"]
-        assert [x.value for x in page.body[2].value.bound_blocks] == [100]
-    else:
-        assert page.body[0].value == ["foo", "bar"]
-        assert page.body[2].value == [100]
+    assert [x.value for x in page.body[0].value.bound_blocks] == ["foo", "bar"]
+    assert [x.value for x in page.body[2].value.bound_blocks] == [100]
+    
 
     assert page.body[1].block_type == "struct"
     computed_struct = page.body[1].value
