@@ -1,10 +1,6 @@
 from django.test import TestCase
 
-try:
-    from wagtail import blocks
-except ImportError:
-    # Wagtail<3.0
-    from wagtail.core import blocks
+from wagtail import blocks
 
 import wagtail_factories
 from tests.testapp.stream_block_factories import (

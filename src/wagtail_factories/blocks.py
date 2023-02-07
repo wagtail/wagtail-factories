@@ -2,12 +2,9 @@ from collections import defaultdict
 
 import factory
 from factory.declarations import ParameteredAttribute
-
 from wagtail import blocks
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.images.blocks import ImageChooserBlock
-
-
 
 from wagtail_factories.builder import (
     ListBlockStepBuilder,

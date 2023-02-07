@@ -5,11 +5,7 @@ from django.db import migrations, models
 
 import tests.testapp.models
 
-try:
-    from wagtail import blocks, fields
-except ImportError:
-    # Wagtail<3.0
-    from wagtail.core import blocks, fields
+from wagtail import blocks, fields
 
 import wagtail.images.blocks as image_blocks
 
