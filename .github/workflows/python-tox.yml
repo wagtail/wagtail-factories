@@ -37,8 +37,10 @@ jobs:
             django: 40
           - python-version: {version: 3.7, tox: 37}
             django: 41
-          - python-version: {version: 3.8, tox: 38}
-            django: 41
+          - python-version: {version: '3.11', tox: 311}
+            django: 40
+          - python-version: {version: '3.11', tox: 311}
+            django: 32
 
     steps:
     - uses: actions/checkout@v3
