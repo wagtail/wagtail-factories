@@ -4,6 +4,7 @@ import pytest
 from wagtail import VERSION as wagtail_version
 from wagtail.documents.models import Document
 from wagtail.images.models import Image
+from wagtail.rich_text import RichText
 
 import wagtail_factories
 from tests.testapp.factories import (
@@ -13,10 +14,10 @@ from tests.testapp.factories import (
 )
 
 if wagtail_version >= (3, 0):
-    from wagtail.blocks import StructValue
+    from wagtail.blocks import StructValue, RichTextBlock
     from wagtail.models import Page
 else:
-    from wagtail.core.blocks import StructValue
+    from wagtail.core.blocks import StructValue, RichTextBlock
     from wagtail.core.models import Page
 
 
@@ -142,6 +143,7 @@ def test_custom_page_streamfield_data_complex():
         body__3__image__image__title="Blub",
         body__4__page__page__title="Bulb",
         body__5__document__document__title="Bubl",
+        body__6__richtext__value=RichText("<p>This is some <strong>richtext</strong></p>"),
     )
     assert Image.objects.count() == 1
     image = Image.objects.first()

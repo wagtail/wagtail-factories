@@ -29,6 +29,7 @@ __all__ = [
     "PageChooserBlockFactory",
     "ImageChooserBlockFactory",
     "DocumentChooserBlockFactory",
+    "RichTextBlockFactory",
 ]
 
 
@@ -247,3 +248,9 @@ class DocumentChooserBlockFactory(ChooserBlockFactory):
     @classmethod
     def _create(cls, model_class, document):
         return document
+
+
+class RichTextBlockFactory(BlockFactory):
+    
+    class Meta:
+        model = blocks.RichTextBlock

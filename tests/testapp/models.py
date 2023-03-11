@@ -56,6 +56,7 @@ class MyTestPage(Page):
             ("page", blocks.PageChooserBlock()),
             ("image", ImageChooserBlock()),
             ("document", DocumentChooserBlock()),
+            ("richtext", blocks.RichTextBlock())
         ]
     )
 
