@@ -41,6 +41,7 @@ class MyTestPage(Page):
             ("page", blocks.PageChooserBlock()),
             ("image", ImageChooserBlock()),
             ("document", DocumentChooserBlock()),
+            ("richtext", blocks.RichTextBlock()),
         ],
         use_json_field=True,
     )
