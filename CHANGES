@@ -1,5 +1,14 @@
 Unreleased
 ==========
+
+4.1.0
+=====
+- Add support Wagtail 5.0
+- Drop support for Wagtail < 4.1
+
+4.0.0
+=====
+- Fix ListBlock compatibility with Wagtail 4.1
 - Add support for Wagtail 4.0 
 
 3.1.0
