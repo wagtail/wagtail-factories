@@ -1,5 +1,4 @@
 from django.test import TestCase
-
 from wagtail import blocks
 
 import wagtail_factories
