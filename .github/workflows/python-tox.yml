@@ -30,7 +30,7 @@ jobs:
           - {version: '3.10', tox: 310}
           - {version: '3.11', tox: 311}
         django: [32, 40, 41]
-        wagtail: [41, 42]
+        wagtail: [41, 42, 50]
         factoryboy: [32]
         exclude:
           - python-version: {version: 3.7, tox: 37}
