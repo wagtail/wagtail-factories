@@ -19,7 +19,7 @@ tests_require = [
     "psycopg2>=2.3.1",
     "coverage==6.0",
     "isort==5.10.0",
-    "flake8==4.0.0",
+    "flake8==4.1.0",
     "flake8-blind-except==0.1.1",
     "flake8-debugger==4.1.2",
 ]
@@ -31,7 +31,7 @@ with open("README.rst") as fh:
 
 setup(
     name="wagtail_factories",
-    version="4.0.0",
+    version="4.1.0",
     description="Factory boy classes for wagtail",
     long_description=long_description,
     author="Michael van Tellingen",
