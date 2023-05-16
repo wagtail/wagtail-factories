@@ -1,4 +1,5 @@
 import pytest
+from wagtail import blocks
 from wagtail.models import Page, Site
 
 import wagtail_factories
@@ -88,18 +89,24 @@ def test_custom_page_streamfield():
     assert len(page.body) == 0
 
 
-@pytest.mark.skip(
-    reason="Cannot assign a naive list to a ListBlock value if using ReferenceIndex"
-)
 @pytest.mark.django_db
 def test_custom_page_streamfield_data():
     root_page = wagtail_factories.PageFactory(parent=None)
+    values = ["bla-1", "bla-2"]
     page = MyTestPageFactory(
-        parent=root_page, body=[("char_array", ["bla-1", "bla-2"])]
+        parent=root_page,
+        body=[
+            (
+                "char_array",
+                blocks.list_block.ListValue(
+                    blocks.ListBlock(blocks.CharBlock()), values=values
+                ),
+            )
+        ],
     )
 
     assert page.body[0].block_type == "char_array"
-    assert page.body[0].value == ["bla-1", "bla-2"]
+    assert list(page.body[0].value) == values
 
 
 @pytest.mark.django_db
