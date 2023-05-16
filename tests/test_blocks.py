@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
 import pytest
-
 from wagtail.blocks import StructValue
 from wagtail.documents.models import Document
 from wagtail.images.models import Image
@@ -13,8 +12,6 @@ from tests.testapp.factories import (
     MyBlockItemFactory,
     MyTestPageWithStreamFieldFactory,
 )
-
-
 
 
 def eq_list_block_values(p, q):
@@ -152,7 +149,6 @@ def test_custom_page_streamfield_data_complex():
     assert page.body[2].block_type == "int_array"
     assert [x.value for x in page.body[0].value.bound_blocks] == ["foo", "bar"]
     assert [x.value for x in page.body[2].value.bound_blocks] == [100]
-    
 
     assert page.body[1].block_type == "struct"
     computed_struct = page.body[1].value

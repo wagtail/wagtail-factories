@@ -1,10 +1,8 @@
 import pytest
-
+from wagtail.models import Page, Site
 
 import wagtail_factories
 from tests.testapp.factories import MyTestPageFactory, MyTestPageGetOrCreateFactory
-
-from wagtail.models import Page, Site
 
 
 @pytest.mark.django_db
@@ -90,7 +88,9 @@ def test_custom_page_streamfield():
     assert len(page.body) == 0
 
 
-@pytest.mark.skip(reason="Cannot assign a naive list to a ListBlock value if using ReferenceIndex")
+@pytest.mark.skip(
+    reason="Cannot assign a naive list to a ListBlock value if using ReferenceIndex"
+)
 @pytest.mark.django_db
 def test_custom_page_streamfield_data():
     root_page = wagtail_factories.PageFactory(parent=None)
