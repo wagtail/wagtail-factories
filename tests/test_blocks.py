@@ -1,8 +1,7 @@
 from collections import OrderedDict
 
 import pytest
-import wagtail_factories
-from wagtail.blocks import StructValue
+from wagtail.blocks import CharBlock, StructBlock, StructValue
 from wagtail.documents.models import Document
 from wagtail.images.models import Image
 from wagtail.models import Page
@@ -250,3 +249,26 @@ def test_chooser_block_strategy(Model, ModelChooserBlockFactory):
     # Object is saved in database when the strategy is create
     ModelChooserBlockFactory.create()
     assert Model.objects.count() == objects_count + 1
+
+
+def test_custom_struct_value_used():
+    BAR_DEFAULT = "baz"
+
+    class CustomStructValue(StructValue):
+        def foo(self):
+            return self["bar"]
+
+    class CustomStructBlock(StructBlock):
+        bar = CharBlock()
+
+        class Meta:
+            value_class = CustomStructValue
+
+    class CustomStructBlockFactory(wagtail_factories.StructBlockFactory):
+        bar = BAR_DEFAULT
+
+        class Meta:
+            model = CustomStructBlock
+
+    instance = CustomStructBlockFactory.build()
+    assert instance.foo() == BAR_DEFAULT
