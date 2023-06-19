@@ -5,10 +5,8 @@ from __future__ import unicode_literals
 import django.db.models.deletion
 from django.db import migrations, models
 
-try:
-    from wagtail.wagtailcore import blocks, fields
-except ImportError:
-    from wagtail.core import blocks, fields
+
+from wagtail import blocks, fields
 
 
 class Migration(migrations.Migration):

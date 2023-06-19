@@ -10,7 +10,7 @@ CACHES = {
     }
 }
 
-ROOT_URLCONF = 'wagtail.tests.urls'
+ROOT_URLCONF = 'wagtail.test.urls'
 
 SECRET_KEY = 'Gx8sMKAtnA69TR9lyAlLuSnozUv3kxdscHkpwEjatZRVQQ0laMY69KL4XPxvr3KY'
 
@@ -81,7 +81,7 @@ else:
         'wagtail.documents',
         'wagtail.admin',
         'wagtail.api.v2',
-        'wagtail.core',
+        'wagtail',
     ] + INSTALLED_APPS
 
 
