@@ -4,8 +4,9 @@ from setuptools import find_packages, setup
 
 install_requires = [
     'factory-boy>=2.8.0',
-    'wagtail>=1.12',
+    'wagtail>=5.0',
     'flatdict>=3.0.1',
+    "Django==3.2.19",
 ]
 
 docs_require = [
@@ -13,8 +14,8 @@ docs_require = [
 ]
 
 tests_require = [
-    'pytest==3.0.6',
-    'pytest-django==3.1.2',
+    'pytest==6.2.2',
+    'pytest-django==4.1.0',
     'pytest-cov==2.4.0',
     'pytest-pythonpath==0.7.1',
     'psycopg2>=2.3.1',
