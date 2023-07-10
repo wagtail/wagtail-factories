@@ -6,7 +6,7 @@ install_requires = [
     'factory-boy>=2.8.0',
     'wagtail>=5.0',
     'flatdict>=3.0.1',
-    "Django==3.2.19",
+    "Django==3.2.20",
 ]
 
 docs_require = [
