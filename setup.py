@@ -18,10 +18,7 @@ tests_require = [
     "pytest-pythonpath==0.7.3",
     "psycopg2>=2.3.1",
     "coverage==6.0",
-    "isort==5.10.0",
-    "flake8==4.0.0",
-    "flake8-blind-except==0.1.1",
-    "flake8-debugger==4.1.2",
+    "ruff==0.0.284",
 ]
 
 with open("README.rst") as fh:

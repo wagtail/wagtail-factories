@@ -1,12 +1,12 @@
 from collections import OrderedDict
 
 import pytest
+import wagtail_factories
 from wagtail.blocks import StructValue
 from wagtail.documents.models import Document
 from wagtail.images.models import Image
 from wagtail.models import Page
 
-import wagtail_factories
 from tests.testapp.factories import (
     MyBlockFactory,
     MyBlockItemFactory,

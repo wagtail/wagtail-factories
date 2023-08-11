@@ -1,8 +1,8 @@
 import pytest
+import wagtail_factories
 from wagtail import blocks
 from wagtail.models import Page, Site
 
-import wagtail_factories
 from tests.testapp.factories import MyTestPageFactory, MyTestPageGetOrCreateFactory
 
 

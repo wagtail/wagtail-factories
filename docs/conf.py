@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # wagtail-factories documentation build configuration file, created by
 # sphinx-quickstart on Sat Aug 27 19:39:59 2016.
@@ -20,7 +19,6 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import pkg_resources
 
 # -- General configuration ------------------------------------------------
 
@@ -51,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'wagtail-factories'
-copyright = u'2016, <a href="https://www.mvantellingen.nl/">Michael van Tellingen</a>'
+copyright = '2016, <a href="https://www.mvantellingen.nl/">Michael van Tellingen</a>'
 author = 'Michael van Tellingen'
 
 # The version info for the project you're documenting, acts as replacement for
