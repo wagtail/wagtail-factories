@@ -24,7 +24,6 @@ jobs:
       max-parallel: 4
       matrix:
         python-version:
-          - {version: 3.7, tox: 37}
           - {version: 3.8, tox: 38}
           - {version: 3.9, tox: 39}
           - {version: '3.10', tox: 310}
@@ -33,10 +32,6 @@ jobs:
         wagtail: [41, 42, 50]
         factoryboy: [32]
         exclude:
-          - python-version: {version: 3.7, tox: 37}
-            django: 40
-          - python-version: {version: 3.7, tox: 37}
-            django: 41
           - python-version: {version: '3.11', tox: 311}
             django: 40
           - python-version: {version: '3.11', tox: 311}
