@@ -84,7 +84,9 @@ class MP_NodeFactory(DjangoModelFactory):
             if field not in kwargs:
                 raise errors.FactoryError(
                     "django_get_or_create - "
-                    "Unable to find initialization value for '{}' in factory {}".format(field, cls.__name__)
+                    "Unable to find initialization value for '{}' in factory {}".format(
+                        field, cls.__name__
+                    )
                 )
             lookup_fields[field] = kwargs[field]
 

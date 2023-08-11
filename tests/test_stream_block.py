@@ -81,7 +81,10 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
         assert page.body[0].value["inner_stream"][0].value is None
 
         assert page.body[1].value["inner_stream"][0].block_type == "struct_block"
-        assert page.body[1].value["inner_stream"][0].value["title"] == "lazy function foobar"
+        assert (
+            page.body[1].value["inner_stream"][0].value["title"]
+            == "lazy function foobar"
+        )
 
     def test_page_with_deeply_nested_stream_block_in_list_block(self):
         page = PageWithStreamBlockInListBlockFactory(
@@ -96,7 +99,9 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
         )
         assert page.body[0].value[0].value["boolean"] is True
         assert page.body[0].value[0].value["text"][:4] == "True"
-        assert page.body[0].value[0].value["text"][4:] == str(page.body[0].value[0].value["number"])
+        assert page.body[0].value[0].value["text"][4:] == str(
+            page.body[0].value[0].value["number"]
+        )
 
     def test_factory_with_anonymous_stream_block_in_tree(self):
         # The inner_stream child block is defined as an "anonymous" StreamBlock (i.e. declared
