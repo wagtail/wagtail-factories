@@ -12,6 +12,7 @@ select = [
     "B",    # flake8-bugbear
     "BLE",  # flake8-blind-except
     "C4",   # flake8-comprehensions
+    "PT",   # flake8-pytest-style
     "S",    # flake8-bandit
     "T10",  # flake8-debugger
     "T20",  # flake8-print

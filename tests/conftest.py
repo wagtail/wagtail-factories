@@ -11,6 +11,6 @@ def pytest_configure():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def custom_settings(tmpdir_factory):
+def _custom_settings(tmpdir_factory):
     overrides = override_settings(MEDIA_ROOT=str(tmpdir_factory.mktemp("media")))
     overrides.enable()

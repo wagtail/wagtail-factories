@@ -25,7 +25,7 @@ def eq_list_block_values(p, q):
     return all(map(lambda x, y: x.value == y.value, p.bound_blocks, q.bound_blocks))
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_list_block_factory():
     computed = MyBlockFactory(
         items__0__label="label-1",
@@ -59,7 +59,7 @@ def test_list_block_factory():
     assert eq_list_block_values(computed["items"], expected["items"])
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_block_factory():
     computed = MyBlockFactory(image__image__title="blub")
     expected = MyBlockFactory._meta.model().clean(
@@ -101,7 +101,7 @@ def test_block_factory_build():
     assert computed == expected
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_block_factory_subkwarg():
     computed = MyBlockFactory(item__label="my-label", item__value=20, image__image=None)
     expected = MyBlockFactory._meta.model().clean(
@@ -119,7 +119,7 @@ def test_block_factory_subkwarg():
     assert computed == expected
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_custom_page_streamfield_data_complex():
     assert Image.objects.count() == 0
 
@@ -184,7 +184,7 @@ def test_custom_page_streamfield_data_complex():
     assert "block-image" in content
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_custom_page_streamfield_default_blocks():
     assert Image.objects.count() == 0
 
@@ -207,7 +207,7 @@ def test_custom_page_streamfield_default_blocks():
     assert content.count("block-image") == 2
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_page_chooser_block():
     value = wagtail_factories.PageChooserBlockFactory()
     page = Page.objects.last()
@@ -215,7 +215,7 @@ def test_page_chooser_block():
     assert value == page
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_image_chooser_block():
     value = wagtail_factories.ImageChooserBlockFactory()
     image = Image.objects.last()
@@ -223,7 +223,7 @@ def test_image_chooser_block():
     assert value == image
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_document_chooser_block():
     value = wagtail_factories.DocumentChooserBlockFactory()
     document = Document.objects.last()
@@ -231,9 +231,9 @@ def test_document_chooser_block():
     assert value == document
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @pytest.mark.parametrize(
-    "Model, ModelChooserBlockFactory",
+    ("Model", "ModelChooserBlockFactory"),
     [
         (Page, wagtail_factories.PageChooserBlockFactory),
         (Image, wagtail_factories.ImageChooserBlockFactory),
