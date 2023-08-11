@@ -58,3 +58,8 @@ class StreamBlockFactoryOptions(BlockFactoryOptions):
             return self.block_def
         elif self.model is not None:
             return self.model()
+
+    def _build_default_options(self):
+        options = super()._build_default_options()
+        options.append(OptionDefault("defaults", {}))
+        return options

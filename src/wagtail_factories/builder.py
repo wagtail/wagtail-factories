@@ -38,8 +38,16 @@ class ListBlockStepBuilder(BaseBlockStepBuilder):
 
 class StreamBlockStepBuilder(BaseBlockStepBuilder):
     def __init__(self, factory_meta, extras, strategy):
+        # Merge defaults declared on the StreamBlockFactory's Meta class with
+        # extras, which is (optional) defaults declared in the StreamFieldFactory
+        # instantiation, merged with extras passed at PageFactory instantiation.
+        # If there are conflicting keys, we give the following priority:
+        # 1. extras passed at PageFactory instantiation
+        # 2. defaults passed at StreamFieldFactory instantiation
+        # 4. defaults declared on StreamBlockFactory Meta class
+        merged_params = {**factory_meta.defaults, **extras}
         indexed_block_names, extra_declarations = self.get_block_declarations(
-            factory_meta, extras
+            factory_meta, merged_params
         )
         new_factory_class = self.create_factory_class(factory_meta, indexed_block_names)
         super().__init__(new_factory_class._meta, extra_declarations, strategy)

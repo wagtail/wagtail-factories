@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import Optional
 
 import factory
 from factory.declarations import ParameteredAttribute
@@ -85,8 +86,8 @@ class StreamFieldFactory(ParameteredAttribute):
 
     """
 
-    def __init__(self, block_types, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, block_types, defaults: Optional[dict]=None):
+        super().__init__(**(defaults or {}))
         if isinstance(block_types, dict):
             # Old style definition, dict mapping block name -> block factory
             self.stream_block_factory = type(
