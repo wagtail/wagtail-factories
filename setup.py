@@ -21,9 +21,9 @@ tests_require = [
     "ruff==0.0.284",
 ]
 
-with open("README.rst") as fh:
+with open("README.md") as fh:
     long_description = re.sub(
-        "^.. start-no-pypi.*^.. end-no-pypi", "", fh.read(), flags=re.M | re.S
+        r"^## Status.*\n(## Installation)", r"\1", fh.read(), flags=re.M | re.S
     )
 
 setup(

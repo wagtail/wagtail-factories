@@ -4,7 +4,7 @@ recursive-exclude * *
 
 graft src/wagtail_factories
 
-include README.rst
+include README.md
 include CHANGES
 include setup.py
 
