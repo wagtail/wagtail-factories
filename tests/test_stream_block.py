@@ -30,44 +30,44 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
             parent=self.root_page,
             body__0__struct_block__title="foo",
         )
-        self.assertEqual(page.body[0].block_type, "struct_block")
-        self.assertEqual(page.body[0].value["title"], "foo")
+        assert page.body[0].block_type == "struct_block"
+        assert page.body[0].value["title"] == "foo"
 
     def test_stream_block_with_struct_block_lazy_attrs(self):
         page = PageWithStreamBlockFactory(
             parent=self.root_page,
             body__0="struct_block",
         )
-        self.assertEqual(page.body[0].block_type, "struct_block")
-        self.assertEqual(page.body[0].value["title"], "lazy function foobar")
+        assert page.body[0].block_type == "struct_block"
+        assert page.body[0].value["title"] == "lazy function foobar"
 
     def test_page_with_stream_block_default_value(self):
         page = PageWithStreamBlockFactory(
             parent=self.root_page,
             body__0="struct_block",
         )
-        self.assertEqual(page.body[0].value["title"], "lazy function foobar")
+        assert page.body[0].value["title"] == "lazy function foobar"
 
     def test_page_with_nested_stream_block(self):
         page = PageWithNestedStreamBlockFactory(
             parent=self.root_page,
             body__0__inner_stream__0__struct_block__title="foo",
         )
-        self.assertEqual(page.body[0].value[0].value["title"], "foo")
+        assert page.body[0].value[0].value["title"] == "foo"
 
     def test_page_with_nested_stream_block_default_value(self):
         page = PageWithNestedStreamBlockFactory(
             parent=self.root_page,
             body__0__inner_stream__0="struct_block",
         )
-        self.assertEqual(page.body[0].value[0].value["title"], "lazy function foobar")
+        assert page.body[0].value[0].value["title"] == "lazy function foobar"
 
     def test_page_with_deeply_nested_stream_block(self):
         page = PageWithStreamBlockInStructBlockFactory(
             parent=self.root_page,
             body__0__struct_block__inner_stream__0__struct_block__title="foo",
         )
-        self.assertEqual(page.body[0].value["inner_stream"][0].value["title"], "foo")
+        assert page.body[0].value["inner_stream"][0].value["title"] == "foo"
 
     def test_page_with_deeply_nested_stream_block_defaults(self):
         page = PageWithStreamBlockInStructBlockFactory(
@@ -76,34 +76,27 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
             body__1__struct_block__inner_stream__0="struct_block",
         )
 
-        self.assertEqual(page.body[0].value["inner_stream"][0].block_type, "char_block")
+        assert page.body[0].value["inner_stream"][0].block_type == "char_block"
         # Default value for the CharBlock is None
-        self.assertIsNone(page.body[0].value["inner_stream"][0].value)
+        assert page.body[0].value["inner_stream"][0].value is None
 
-        self.assertEqual(
-            page.body[1].value["inner_stream"][0].block_type, "struct_block"
-        )
-        self.assertEqual(
-            page.body[1].value["inner_stream"][0].value["title"], "lazy function foobar"
-        )
+        assert page.body[1].value["inner_stream"][0].block_type == "struct_block"
+        assert page.body[1].value["inner_stream"][0].value["title"] == "lazy function foobar"
 
     def test_page_with_deeply_nested_stream_block_in_list_block(self):
         page = PageWithStreamBlockInListBlockFactory(
             parent=self.root_page,
             body__0__list_block__0__0__struct_block__title="foo",
         )
-        self.assertEqual(page.body[0].value[0][0].value["title"], "foo")
+        assert page.body[0].value[0][0].value["title"] == "foo"
 
     def test_computed_values_on_struct_block_in_nested_stream(self):
         page = PageWithSimpleStructBlockNestedFactory(
             body__0__inner_stream__0="simple_struct_block"
         )
-        self.assertEqual(page.body[0].value[0].value["boolean"], True)
-        self.assertEqual(page.body[0].value[0].value["text"][:4], "True")
-        self.assertEqual(
-            page.body[0].value[0].value["text"][4:],
-            str(page.body[0].value[0].value["number"]),
-        )
+        assert page.body[0].value[0].value["boolean"] is True
+        assert page.body[0].value[0].value["text"][:4] == "True"
+        assert page.body[0].value[0].value["text"][4:] == str(page.body[0].value[0].value["number"])
 
     def test_factory_with_anonymous_stream_block_in_tree(self):
         # The inner_stream child block is defined as an "anonymous" StreamBlock (i.e. declared
@@ -116,26 +109,26 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
             body__0__inner_stream__0__simple_struct_block__number=number,
             body__0__inner_stream__0__simple_struct_block__boolean=boolean,
         )
-        self.assertEqual(page.body[0].value[0].block_type, "simple_struct_block")
-        self.assertEqual(page.body[0].value[0].value["text"], text)
-        self.assertEqual(page.body[0].value[0].value["number"], number)
-        self.assertEqual(page.body[0].value[0].value["boolean"], boolean)
+        assert page.body[0].value[0].block_type == "simple_struct_block"
+        assert page.body[0].value[0].value["text"] == text
+        assert page.body[0].value[0].value["number"] == number
+        assert page.body[0].value[0].value["boolean"] == boolean
 
     def test_sub_factory_defaults(self):
         page = PageWithSimpleStructBlockNestedDefaultsFactory(
             body__0__inner_stream__0="simple_struct_block",
         )
-        self.assertEqual(page.body[0].value[0].value["text"], "default text")
-        self.assertEqual(page.body[0].value[0].value["number"], 11)
-        self.assertEqual(page.body[0].value[0].value["boolean"], False)
+        assert page.body[0].value[0].value["text"] == "default text"
+        assert page.body[0].value[0].value["number"] == 11
+        assert page.body[0].value[0].value["boolean"] is False
 
     def test_sub_factory_deep_defaults(self):
         page = PageWithSimpleStructBlockNestedDeepDefaultsFactory(
             body__0="inner_stream",
         )
-        self.assertEqual(page.body[0].value[0].value["text"], "deep text")
-        self.assertEqual(page.body[0].value[0].value["number"], 111)
-        self.assertEqual(page.body[0].value[1].value["text"], "deep text 2")
+        assert page.body[0].value[0].value["text"] == "deep text"
+        assert page.body[0].value[0].value["number"] == 111
+        assert page.body[0].value[1].value["text"] == "deep text 2"
 
 
 class EmptyStreamValueTestCase(PageTreeTestCase):
@@ -144,15 +137,15 @@ class EmptyStreamValueTestCase(PageTreeTestCase):
 
     def test_page_without_stream_field_params(self):
         page = PageWithStreamBlockFactory(parent=self.root_page)
-        self.assertEqual(len(page.body), 0)
-        self.assertIsInstance(page.body, blocks.StreamValue)
+        assert len(page.body) == 0
+        assert isinstance(page.body, blocks.StreamValue)
 
     def test_nested_stream_block_default_value(self):
         page = PageWithNestedStreamBlockFactory(
             parent=self.root_page, body__0="inner_stream"
         )
-        self.assertEqual(len(page.body[0].value), 0)
-        self.assertIsInstance(page.body[0].value, blocks.StreamValue)
+        assert len(page.body[0].value) == 0
+        assert isinstance(page.body[0].value, blocks.StreamValue)
 
 
 class StreamFieldFactoryErrorsTestCase(PageTreeTestCase):
