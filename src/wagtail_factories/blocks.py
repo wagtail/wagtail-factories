@@ -35,9 +35,9 @@ class StreamBlockFactory(factory.Factory):
     def _generate(cls, strategy, params):
         if cls._meta.abstract and not hasattr(cls, "__generate_abstract__"):
             raise factory.errors.FactoryError(
-                "Cannot generate instances of abstract factory %(f)s; "
-                "Ensure %(f)s.Meta.model is set and %(f)s.Meta.abstract "
-                "is either not set or False." % dict(f=cls.__name__)
+                "Cannot generate instances of abstract factory {f}; "
+                "Ensure {f}.Meta.model is set and {f}.Meta.abstract "
+                "is either not set or False.".format(**{"f": cls.__name__})
             )
         step = cls._builder_class(cls._meta, params, strategy)
         return step.build()
