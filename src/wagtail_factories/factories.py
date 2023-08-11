@@ -76,8 +76,7 @@ class MP_NodeFactory(DjangoModelFactory):
         manager = cls._get_manager(model_class)
         assert "defaults" not in cls._meta.django_get_or_create, (
             "'defaults' is a reserved keyword for get_or_create "
-            "(in %s._meta.django_get_or_create=%r)"
-            % (cls, cls._meta.django_get_or_create)
+            f"(in {cls}._meta.django_get_or_create={cls._meta.django_get_or_create!r})"
         )
 
         lookup_fields = {}
@@ -85,8 +84,7 @@ class MP_NodeFactory(DjangoModelFactory):
             if field not in kwargs:
                 raise errors.FactoryError(
                     "django_get_or_create - "
-                    "Unable to find initialization value for '%s' in factory %s"
-                    % (field, cls.__name__)
+                    "Unable to find initialization value for '{}' in factory {}".format(field, cls.__name__)
                 )
             lookup_fields[field] = kwargs[field]
 
