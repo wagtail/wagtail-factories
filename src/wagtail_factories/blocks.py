@@ -86,8 +86,8 @@ class StreamFieldFactory(ParameteredAttribute):
 
     """
 
-    def __init__(self, block_types, defaults: Optional[dict] = None):
-        super().__init__(**(defaults or {}))
+    def __init__(self, block_types, default_block_values: Optional[dict] = None):
+        super().__init__(**(default_block_values or {}))
         if isinstance(block_types, dict):
             # Old style definition, dict mapping block name -> block factory
             self.stream_block_factory = type(

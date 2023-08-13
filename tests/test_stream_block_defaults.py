@@ -16,7 +16,7 @@ def page_factory_with_stream_field_defaults():
     class Factory(wagtail_factories.PageFactory):
         body = wagtail_factories.StreamFieldFactory(
             MyStreamBlockFactory,
-            defaults={
+            default_block_values={
                 "0__char_block": "Foo bar baz",
                 "1": "struct_block",
                 "2__struct_block__title": "overridden title",
@@ -53,7 +53,7 @@ def page_factory_with_stream_block_meta_defaults():
 
         class Meta:
             model = MyStreamBlock
-            defaults = {
+            default_block_values = {
                 "0__char_block": "meta default text",
                 "1__struct_block__title": "struct block title",
             }
@@ -61,7 +61,7 @@ def page_factory_with_stream_block_meta_defaults():
     class PageFactory(wagtail_factories.PageFactory):
         body = wagtail_factories.StreamFieldFactory(
             BlockFactory,
-            defaults={
+            default_block_values={
                 "0__char_block": "overridden text",
             },
         )

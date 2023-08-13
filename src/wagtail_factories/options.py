@@ -61,5 +61,5 @@ class StreamBlockFactoryOptions(BlockFactoryOptions):
 
     def _build_default_options(self):
         options = super()._build_default_options()
-        options.append(OptionDefault("defaults", {}))
+        options.append(OptionDefault("default_block_values", {}))
         return options

@@ -45,7 +45,7 @@ class StreamBlockStepBuilder(BaseBlockStepBuilder):
         # 1. extras passed at PageFactory instantiation
         # 2. defaults passed at StreamFieldFactory instantiation
         # 4. defaults declared on StreamBlockFactory Meta class
-        merged_params = {**factory_meta.defaults, **extras}
+        merged_params = {**factory_meta.default_block_values, **extras}
         indexed_block_names, extra_declarations = self.get_block_declarations(
             factory_meta, merged_params
         )
