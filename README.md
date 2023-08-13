@@ -1,7 +1,16 @@
 # wagtail-factories
 
-
 Factory boy classes for Wagtail CMS
+
+- [Status](#status)
+- [Installation](#installation)
+- [Usage](#usage)
+  * [Using StreamBlockFactory](#using-streamblockfactory)
+  * [Alternative StreamFieldFactory declaration syntax](#alternative-streamfieldfactory-declaration-syntax)
+  * [Providing default values for StreamBlock and StreamField factories](#providing-default-values-for-streamblock-and-streamfield-factories)
+- [Developing wagtail-factories](#developing-wagtail-factories)
+  * [Testing](#running-the-tests)
+  * [Formatting](#formatting)
 
 ## Status
 
@@ -178,3 +187,74 @@ class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
 
 This requirement does *not* apply to `ListBlockFactory`, which is a
 subclass of `SubFactory`.
+
+### Providing default values for StreamBlock and StreamField factories
+
+Default values for stream fields can be provided in two ways. The
+first way is to provide per-stream-block-factory defaults, on a given
+`StreamBlockFactory`'s `Meta` class:
+
+``` python
+class MyStreamBlockFactory(wagtail_factories.StreamBlockFactory):
+    text = wagtail_factories.CharBlockFactory()
+
+    class Meta:
+        default_block_values = {
+            "0__text": "some default text"
+        }
+```
+
+In this example, every `StreamValue` created by `MyStreamBlockFactory`
+will have the text "some default text" as the value of its first
+element, unless it is overridden elsewhere.
+
+Default values can also be provided as an argument to
+`StreamFieldFactory`, as shown in the following example:
+
+``` python
+class MyPageFactory(wagtail_factories.PageFactory):
+    body = wagtail_factories.StreamFieldFactory(
+        MyStreamBlockFactory,
+        default_block_values={
+            "0__text": "some default text"
+        },
+    )
+```
+
+The following precedence is given to values provided for stream field
+factories, highest precedence first:
+
+1. values provided by the parent factory, e.g. via parameters to a
+   `PageFactory` instantiation;
+2. `default_block_values` passed as a parameter to a
+   `StreamFieldFactory` instantiation; and
+3. `default_block_values` declared on a `StreamBlockFactory`
+   subclass's `Meta` class.
+
+## Developing wagtail-factories
+
+Install the dev requirements:
+
+``` shell
+pip install -e .[docs,test]
+```
+
+### Running the tests
+
+``` shell
+DJANGO_SETTINGS_MODULE=tests.settings pytest
+```
+
+### Formatting
+
+Format code with `black`:
+
+``` shell
+black src tests
+```
+
+Perform linting and additional formatting with `ruff`:
+
+``` shell
+ruff check . --fix
+```
