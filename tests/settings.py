@@ -82,3 +82,5 @@ TEMPLATES = [
 WAGTAILDOCS_SERVE_METHOD = "direct"
 
 WAGTAILADMIN_BASE_URL = "http://example.com"
+
+STATIC_URL = "/static/"
