@@ -1,5 +1,7 @@
 Unreleased
 ==========
+- Update for Wagtail 5.1
+- Drop support for Django 3.7
 
 4.1.0
 =====
