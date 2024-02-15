@@ -38,7 +38,6 @@ class MyTestPageGetOrCreateFactory(wagtail_factories.PageFactory):
 
 
 class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
-
     body = wagtail_factories.StreamFieldFactory(
         {
             "char_array": wagtail_factories.ListBlockFactory(

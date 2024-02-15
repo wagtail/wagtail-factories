@@ -1,3 +1,4 @@
+import pytest
 import wagtail_factories
 from django.test import TestCase
 from wagtail import blocks
@@ -81,7 +82,10 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
         assert page.body[0].value["inner_stream"][0].value is None
 
         assert page.body[1].value["inner_stream"][0].block_type == "struct_block"
-        assert page.body[1].value["inner_stream"][0].value["title"] == "lazy function foobar"
+        assert (
+            page.body[1].value["inner_stream"][0].value["title"]
+            == "lazy function foobar"
+        )
 
     def test_page_with_deeply_nested_stream_block_in_list_block(self):
         page = PageWithStreamBlockInListBlockFactory(
@@ -96,7 +100,9 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
         )
         assert page.body[0].value[0].value["boolean"] is True
         assert page.body[0].value[0].value["text"][:4] == "True"
-        assert page.body[0].value[0].value["text"][4:] == str(page.body[0].value[0].value["number"])
+        assert page.body[0].value[0].value["text"][4:] == str(
+            page.body[0].value[0].value["number"]
+        )
 
     def test_factory_with_anonymous_stream_block_in_tree(self):
         # The inner_stream child block is defined as an "anonymous" StreamBlock (i.e. declared
@@ -156,9 +162,7 @@ class StreamFieldFactoryErrorsTestCase(PageTreeTestCase):
         )
         for params, missing_index in test_values:
             with self.subTest(params=params):
-                with self.assertRaisesRegex(
-                    InvalidDeclaration, f"missing required index {missing_index}"
-                ):
+                with pytest.raises(InvalidDeclaration, match=f"missing required index {missing_index}"):
                     PageWithStreamBlockFactory(**params)
 
     def test_raises_duplicate_declaration(self):
@@ -177,11 +181,9 @@ class StreamFieldFactoryErrorsTestCase(PageTreeTestCase):
         )
         for params, msg in test_values:
             with self.subTest(params=params):
-                with self.assertRaisesRegex(DuplicateDeclaration, msg):
+                with pytest.raises(DuplicateDeclaration, match=msg):
                     PageWithStreamBlockFactory(**params)
 
     def test_raises_unknown_child_block(self):
-        with self.assertRaisesRegex(
-            UnknownChildBlockFactory, "No factory defined for block 'foobar'"
-        ):
+        with pytest.raises(UnknownChildBlockFactory, match="No factory defined for block 'foobar'"):
             PageWithStreamBlockFactory(body__0="foobar")
