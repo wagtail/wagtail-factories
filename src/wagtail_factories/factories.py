@@ -20,7 +20,6 @@ logger = logging.getLogger(__file__)
 
 
 class ParentNodeFactory(ParameteredAttribute):
-
     EXTEND_CONTAINERS = True
     FORCE_SEQUENCE = False
     UNROLL_CONTEXT_BEFORE_EVALUATION = False
@@ -42,7 +41,6 @@ class ParentNodeFactory(ParameteredAttribute):
 
 
 class MP_NodeFactory(DjangoModelFactory):
-
     parent = ParentNodeFactory()
 
     @classmethod
@@ -84,7 +82,9 @@ class MP_NodeFactory(DjangoModelFactory):
             if field not in kwargs:
                 raise errors.FactoryError(
                     "django_get_or_create - "
-                    "Unable to find initialization value for '{}' in factory {}".format(field, cls.__name__)
+                    "Unable to find initialization value for '{}' in factory {}".format(
+                        field, cls.__name__
+                    )
                 )
             lookup_fields[field] = kwargs[field]
 
