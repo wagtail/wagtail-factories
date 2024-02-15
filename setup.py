@@ -17,7 +17,7 @@ tests_require = [
     "pytest-cov==3.0.0",
     "pytest-pythonpath==0.7.3",
     "coverage==6.0",
-    "ruff==0.0.284",
+    "ruff==0.2.1",
 ]
 
 with open("README.md") as fh:
