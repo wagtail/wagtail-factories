@@ -162,7 +162,9 @@ class StreamFieldFactoryErrorsTestCase(PageTreeTestCase):
         )
         for params, missing_index in test_values:
             with self.subTest(params=params):
-                with pytest.raises(InvalidDeclaration, match=f"missing required index {missing_index}"):
+                with pytest.raises(
+                    InvalidDeclaration, match=f"missing required index {missing_index}"
+                ):
                     PageWithStreamBlockFactory(**params)
 
     def test_raises_duplicate_declaration(self):
@@ -185,5 +187,7 @@ class StreamFieldFactoryErrorsTestCase(PageTreeTestCase):
                     PageWithStreamBlockFactory(**params)
 
     def test_raises_unknown_child_block(self):
-        with pytest.raises(UnknownChildBlockFactory, match="No factory defined for block 'foobar'"):
+        with pytest.raises(
+            UnknownChildBlockFactory, match="No factory defined for block 'foobar'"
+        ):
             PageWithStreamBlockFactory(body__0="foobar")
