@@ -5,7 +5,6 @@ target-version = "py38"
 [lint]
 ignore = [
     "E501", # line too long
-    "S101", # flake8-bandit Use of assert detected
 ]
 
 extend-select = [
@@ -21,6 +20,11 @@ extend-select = [
     "T20",  # flake8-print
     "UP",   # pyupgrade
     "W",    # pycodestyle warnings
+]
+
+[lint.extend-per-file-ignores]
+"tests/test_*.py" = [
+    "S101", # flake8-bandit Use of assert detected
 ]
 
 [lint.isort]
