@@ -56,7 +56,6 @@ class MP_NodeFactory(DjangoModelFactory):
             instance = cls._get_or_create(model_class, *args, parent=parent, **kwargs)
         else:
             instance = cls._create_instance(model_class, parent, kwargs)
-            assert instance.pk
         return instance
 
     @classmethod
@@ -72,10 +71,11 @@ class MP_NodeFactory(DjangoModelFactory):
     def _get_or_create(cls, model_class, *args, **kwargs):
         """Create an instance of the model through objects.get_or_create."""
         manager = cls._get_manager(model_class)
-        assert "defaults" not in cls._meta.django_get_or_create, (
-            "'defaults' is a reserved keyword for get_or_create "
-            f"(in {cls}._meta.django_get_or_create={cls._meta.django_get_or_create!r})"
-        )
+        if "defaults" in cls._meta.django_get_or_create:
+            raise RuntimeError(
+                "'defaults' is a reserved keyword for get_or_create "
+                f"(in {cls}._meta.django_get_or_create={cls._meta.django_get_or_create!r})"
+            )
 
         lookup_fields = {}
         for field in cls._meta.django_get_or_create:
