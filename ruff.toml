@@ -8,7 +8,7 @@ ignore = [
     "S101", # flake8-bandit Use of assert detected
 ]
 
-select = [
+extend-select = [
     "E",    # pycodestyle errors
     "F",    # pyflakes
     "I",    # isort
