@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 import pytest
+import wagtail_factories
 from wagtail.blocks import CharBlock, StructBlock, StructValue
 from wagtail.documents.models import Document
 from wagtail.images.models import Image
