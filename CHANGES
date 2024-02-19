@@ -6,6 +6,7 @@ Unreleased
 - Add support for Django 5
 - Add support for Wagtail 6
 - Add support for Python 3.12
+- Add support for StructBlocks with custom StructValue classes
 
 4.1.0
 =====
