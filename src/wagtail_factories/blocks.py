@@ -243,6 +243,5 @@ class DocumentChooserBlockFactory(ChooserBlockFactory):
 
 
 class RichTextBlockFactory(BlockFactory):
-    
     class Meta:
         model = blocks.RichTextBlock
