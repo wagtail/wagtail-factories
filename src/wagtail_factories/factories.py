@@ -5,6 +5,7 @@ from django.utils.text import slugify
 from factory import errors, utils
 from factory.declarations import ParameteredAttribute
 from factory.django import DjangoModelFactory
+from wagtail.contrib.redirects.models import Redirect
 from wagtail.documents import get_document_model
 from wagtail.images import get_image_model
 from wagtail.models import Collection, Page, Site
@@ -144,3 +145,31 @@ class DocumentFactory(CollectionMemberFactory):
 
     title = "A document"
     file = factory.django.FileField()
+
+
+class RedirectFactory(DjangoModelFactory):
+    old_path = factory.Faker("slug")
+    site = factory.SubFactory(SiteFactory)
+    redirect_page = factory.SubFactory(PageFactory)
+    redirect_link = factory.Faker("url")
+    is_permanent = factory.Faker("boolean")
+
+    class Meta:
+        model = Redirect
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """
+        Override _create() to ensure that Redirect.clean() is run
+        in order to normalise `old_path`.
+        """
+        obj = model_class(*args, **kwargs)
+        try:
+            obj.clean()
+        except:
+            raise RuntimeError(
+                "Error occured when validating the `Redirect` object "
+                "created by this factory."
+                )
+        obj.save()
+        return obj
