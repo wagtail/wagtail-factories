@@ -8,16 +8,15 @@ install_requires = [
 ]
 
 docs_require = [
-    "sphinx>=1.4.0",
+    "sphinx>=7.3.7",
 ]
 
 tests_require = [
-    "pytest==6.2.5",
-    "pytest-django==4.5.0",
-    "pytest-cov==3.0.0",
-    "pytest-pythonpath==0.7.3",
-    "coverage==6.0",
-    "ruff==0.2.1",
+    "pytest==8.2.1",
+    "pytest-django==4.8.0",
+    "pytest-cov==5.0.0",
+    "coverage==7.5.1",
+    "ruff==0.4.4",
 ]
 
 with open("README.md") as fh:
