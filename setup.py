@@ -26,9 +26,10 @@ with open("README.md") as fh:
 
 setup(
     name="wagtail_factories",
-    version="4.2.0",
+    version="4.2.1",
     description="Factory boy classes for wagtail",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Michael van Tellingen",
     author_email="michaelvantellingen@gmail.com",
     url="https://github.com/wagtail/wagtail-factories/",
