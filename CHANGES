@@ -1,5 +1,12 @@
 Unreleased
 ==========
+
+4.2.1
+=====
+- Update setup.py for PyPI compatibility
+
+4.2.0
+=====
 - Update for Wagtail > 5.2
 - Drop support for Django < 4.2
 - Drop support for Wagtail < 5.2
