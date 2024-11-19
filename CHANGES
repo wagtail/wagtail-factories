@@ -4,6 +4,7 @@ Unreleased
 - Update for Wagtail 6.3
 - Add support for Python 3.13
 - Drop support for Wagtal 6.0 and 6.1
+- Drop support for Python 3.8
 
 4.2.1
 =====

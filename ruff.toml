@@ -1,6 +1,6 @@
 exclude = ["dist","build","venv",".venv",".tox",".git"]
 line-length = 88
-target-version = "py38"
+target-version = "py39"
 
 [lint]
 ignore = [
