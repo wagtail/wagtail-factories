@@ -1,6 +1,10 @@
 Unreleased
 ==========
 
+- Update for Wagtail 6.3
+- Add support for Python 3.13
+- Drop support for Wagtal 6.0 and 6.1
+
 4.2.1
 =====
 - Update setup.py for PyPI compatibility
