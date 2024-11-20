@@ -52,6 +52,7 @@ class MyTestPageWithStreamFieldFactory(wagtail_factories.PageFactory):
             "document": factory.SubFactory(
                 wagtail_factories.DocumentChooserBlockFactory
             ),
+            "richtext": factory.SubFactory(wagtail_factories.RichTextBlockFactory),
         }
     )
 
