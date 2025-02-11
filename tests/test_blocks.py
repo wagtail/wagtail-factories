@@ -253,6 +253,13 @@ def test_image_block_with_alt_text():
 
 
 @pytest.mark.django_db
+def test_image_block_with_no_image():
+    value = wagtail_factories.ImageBlockFactory(image=None)
+
+    assert value is None
+
+
+@pytest.mark.django_db()
 @pytest.mark.parametrize(
     ("Model", "ModelChooserBlockFactory"),
     [
