@@ -4,7 +4,7 @@ import factory
 from factory.declarations import ParameteredAttribute
 from wagtail import blocks
 from wagtail.documents.blocks import DocumentChooserBlock
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.blocks import ImageBlock, ImageChooserBlock
 
 from wagtail_factories.builder import (
     ListBlockStepBuilder,
@@ -24,6 +24,7 @@ __all__ = [
     "PageChooserBlockFactory",
     "ImageChooserBlockFactory",
     "DocumentChooserBlockFactory",
+    "ImageBlockFactory",
 ]
 
 
@@ -239,3 +240,24 @@ class DocumentChooserBlockFactory(ChooserBlockFactory):
     @classmethod
     def _create(cls, model_class, document):
         return document
+
+
+class ImageBlockFactory(StructBlockFactory):
+    image = factory.SubFactory(ImageChooserBlockFactory)
+    decorative = factory.Faker("boolean")
+    alt_text = factory.Sequence(lambda n: f"Alt text {n}")
+
+    class Meta:
+        model = ImageBlock
+
+    @classmethod
+    def _construct_struct_value(cls, block_class, params):
+        if image := params.get("image"):
+            decorative = params.get("decorative")
+            alt_text = params.get("alt_text")
+
+            # If the image is decorative, set alt_text to an empty string
+            image.contextual_alt_text = ("" if decorative else alt_text)
+            image.decorative = decorative
+
+        return image

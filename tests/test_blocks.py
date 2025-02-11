@@ -232,6 +232,27 @@ def test_document_chooser_block():
 
 
 @pytest.mark.django_db
+def test_image_block_decorative():
+    value = wagtail_factories.ImageBlockFactory(decorative=True)
+    image = Image.objects.last()
+
+    assert value.pk == image.pk
+    assert value.decorative
+    assert value.contextual_alt_text == ""
+
+
+@pytest.mark.django_db
+def test_image_block_with_alt_text():
+    value = wagtail_factories.ImageBlockFactory(decorative=False)
+    image = Image.objects.last()
+
+    assert value.pk == image.pk
+    assert not value.decorative
+    assert isinstance(value.contextual_alt_text, str)
+    assert value.contextual_alt_text.startswith("Alt text")
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ("Model", "ModelChooserBlockFactory"),
     [
