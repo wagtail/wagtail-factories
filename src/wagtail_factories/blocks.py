@@ -3,8 +3,9 @@ from collections import defaultdict
 import factory
 from factory.declarations import ParameteredAttribute
 from wagtail import blocks
+from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.documents.blocks import DocumentChooserBlock
-from wagtail.images.blocks import ImageBlock, ImageChooserBlock
+from wagtail.images.blocks import ImageChooserBlock
 
 from wagtail_factories.builder import (
     ListBlockStepBuilder,
@@ -24,8 +25,12 @@ __all__ = [
     "PageChooserBlockFactory",
     "ImageChooserBlockFactory",
     "DocumentChooserBlockFactory",
-    "ImageBlockFactory",
 ]
+
+if WAGTAIL_63_OR_HIGHER := (WAGTAIL_VERSION >= (6, 3)):
+    from wagtail.images.blocks import ImageBlock
+
+    __all__.append("ImageBlockFactory")
 
 
 class StreamBlockFactory(factory.Factory):
@@ -242,22 +247,24 @@ class DocumentChooserBlockFactory(ChooserBlockFactory):
         return document
 
 
-class ImageBlockFactory(StructBlockFactory):
-    image = factory.SubFactory(ImageChooserBlockFactory)
-    decorative = factory.Faker("boolean")
-    alt_text = factory.Sequence(lambda n: f"Alt text {n}")
+# Only define ImageBlockFactory if Wagtail 6.3 or higher is installed
+if WAGTAIL_63_OR_HIGHER:
+    class ImageBlockFactory(StructBlockFactory):
+        image = factory.SubFactory(ImageChooserBlockFactory)
+        decorative = factory.Faker("boolean")
+        alt_text = factory.Sequence(lambda n: f"Alt text {n}")
 
-    class Meta:
-        model = ImageBlock
+        class Meta:
+            model = ImageBlock
 
-    @classmethod
-    def _construct_struct_value(cls, block_class, params):
-        if image := params.get("image"):
-            decorative = params.get("decorative")
-            alt_text = params.get("alt_text")
+        @classmethod
+        def _construct_struct_value(cls, block_class, params):
+            if image := params.get("image"):
+                decorative = params.get("decorative")
+                alt_text = params.get("alt_text")
 
-            # If the image is decorative, set alt_text to an empty string
-            image.contextual_alt_text = ("" if decorative else alt_text)
-            image.decorative = decorative
+                # If the image is decorative, set alt_text to an empty string
+                image.contextual_alt_text = ("" if decorative else alt_text)
+                image.decorative = decorative
 
-        return image
+            return image

@@ -5,6 +5,7 @@ from wagtail.blocks import CharBlock, StructBlock, StructValue
 from wagtail.documents.models import Document
 from wagtail.images.models import Image
 from wagtail.models import Page
+from wagtail_factories.blocks import WAGTAIL_63_OR_HIGHER
 
 import wagtail_factories
 from tests.testapp.factories import (
@@ -231,6 +232,7 @@ def test_document_chooser_block():
     assert value == document
 
 
+@pytest.mark.skipif(not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+")
 @pytest.mark.django_db
 def test_image_block_decorative():
     value = wagtail_factories.ImageBlockFactory(decorative=True)
@@ -241,6 +243,7 @@ def test_image_block_decorative():
     assert value.contextual_alt_text == ""
 
 
+@pytest.mark.skipif(not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+")
 @pytest.mark.django_db
 def test_image_block_with_alt_text():
     value = wagtail_factories.ImageBlockFactory(decorative=False)
@@ -252,6 +255,7 @@ def test_image_block_with_alt_text():
     assert value.contextual_alt_text.startswith("Alt text")
 
 
+@pytest.mark.skipif(not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+")
 @pytest.mark.django_db
 def test_image_block_with_no_image():
     value = wagtail_factories.ImageBlockFactory(image=None)
