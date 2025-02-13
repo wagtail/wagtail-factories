@@ -259,9 +259,9 @@ if WAGTAIL_63_OR_HIGHER:
 
         @classmethod
         def _construct_struct_value(cls, block_class, params):
-            if image := params.get("image"):
-                decorative = params.get("decorative")
-                alt_text = params.get("alt_text")
+            if image := params["image"]:
+                decorative = params["decorative"]
+                alt_text = params["alt_text"]
 
                 # If the image is decorative, set alt_text to an empty string
                 image.contextual_alt_text = ("" if decorative else alt_text)
