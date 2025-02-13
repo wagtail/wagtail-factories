@@ -90,6 +90,8 @@ class PageWithSimpleStructBlockNestedDeepDefaultsFactory(wagtail_factories.PageF
 class MyStreamBlockFactory(wagtail_factories.StreamBlockFactory):
     struct_block = factory.SubFactory(StructBlockWithLazyAttrFactory)
     char_block = factory.SubFactory(wagtail_factories.CharBlockFactory)
+    image_chooser_block = factory.SubFactory(wagtail_factories.ImageChooserBlockFactory)
+    image_block = factory.SubFactory(wagtail_factories.ImageBlockFactory)
 
     class Meta:
         model = models.MyStreamBlock

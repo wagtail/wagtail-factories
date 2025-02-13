@@ -1,6 +1,13 @@
 import pytest
 from django.test import TestCase
 from wagtail import blocks
+from wagtail.images.models import Image
+from wagtail_factories.blocks import WAGTAIL_63_OR_HIGHER
+from wagtail_factories.builder import (
+    DuplicateDeclaration,
+    InvalidDeclaration,
+    UnknownChildBlockFactory,
+)
 
 import wagtail_factories
 from tests.testapp.stream_block_factories import (
@@ -17,6 +24,9 @@ from wagtail_factories.builder import (
     InvalidDeclaration,
     UnknownChildBlockFactory,
 )
+
+if WAGTAIL_63_OR_HIGHER:
+    from wagtail.images.blocks import ImageBlock
 
 
 class PageTreeTestCase(TestCase):
@@ -135,6 +145,32 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
         assert page.body[0].value[0].value["text"] == "deep text"
         assert page.body[0].value[0].value["number"] == 111
         assert page.body[0].value[1].value["text"] == "deep text 2"
+
+    def test_page_with_image_chooser_stream_block(self):
+        page = PageWithStreamBlockFactory(
+            parent=self.root_page,
+            body__0="image_chooser_block",
+        )
+        assert page.body[0].value == Image.objects.last()
+
+    @pytest.mark.skipif(not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+")
+    def test_page_with_image_stream_block(self):
+        page = PageWithStreamBlockFactory(
+            parent=self.root_page,
+            body__0__image_block__decorative=False,
+        )
+        assert isinstance(page.body[0].block, ImageBlock)
+        assert page.body[0].value.pk == Image.objects.last().pk
+        assert not page.body[0].value.decorative
+
+    @pytest.mark.skipif(not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+")
+    def test_page_with_image_stream_block_no_image(self):
+        page = PageWithStreamBlockFactory(
+            parent=self.root_page,
+            body__0__image_block__image=None,
+        )
+        assert isinstance(page.body[0].block, ImageBlock)
+        assert page.body[0].value is None
 
 
 class EmptyStreamValueTestCase(PageTreeTestCase):
