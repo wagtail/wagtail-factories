@@ -1,10 +1,17 @@
 Unreleased
 ==========
 
+Wagtail 6.4 maintenance
 - Update for Wagtail 6.3
 - Add support for Python 3.13
 - Drop support for Wagtal 6.0 and 6.1
 - Drop support for Python 3.8
+
+Wagtail 7.0 maintenance
+- Add testing for wagtail 7.0
+- Add testing for Django 5.2
+- Drop support and testing for wagtail 5.2 and 6.2
+- Drop support and testing Django 5.0
 
 4.2.1
 =====
