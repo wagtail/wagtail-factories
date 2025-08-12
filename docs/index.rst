@@ -27,3 +27,4 @@ Developer Documentation
    :maxdepth: 2
 
    architecture
+   streamfield-internals
