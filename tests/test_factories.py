@@ -1,33 +1,33 @@
 import pytest
-import wagtail_factories
 from wagtail import blocks
 from wagtail.models import Page, Site
 
+import wagtail_factories
 from tests.testapp.factories import MyTestPageFactory, MyTestPageGetOrCreateFactory
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_page_no_args_or_kwargs():
     page = wagtail_factories.PageFactory(parent=None)
     assert page.title == "Test page"
     assert page.slug == "test-page"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_page_build_no_args_or_kwargs():
     page = wagtail_factories.PageFactory.build(parent=None)
     assert page.title == "Test page"
     assert page.slug == "test-page"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_page_build_no_parent():
     page = wagtail_factories.PageFactory.build()
     assert page.title == "Test page"
     assert page.slug == "test-page"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_page_multiple_roots():
     # Make sure the default root pages are removed created by wagtail
     # migrations
@@ -40,7 +40,7 @@ def test_page_multiple_roots():
     assert Page.get_root_nodes().count() == 3
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_page_multiple_nested():
     root = wagtail_factories.PageFactory(parent=None)
     page_1 = wagtail_factories.PageFactory(parent=root, slug="page-1")
@@ -59,7 +59,7 @@ def test_page_multiple_nested():
     assert len(page_2.get_children()) == 4
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_page_multiple_nested_structure_at_once():
     Page.objects.all().delete()
 
@@ -81,7 +81,7 @@ def test_page_multiple_nested_structure_at_once():
     assert page.get_parent().get_parent().get_parent() is None
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_custom_page_streamfield():
     root_page = wagtail_factories.PageFactory(parent=None)
     page = MyTestPageFactory(parent=root_page)
@@ -89,7 +89,7 @@ def test_custom_page_streamfield():
     assert len(page.body) == 0
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_custom_page_streamfield_data():
     root_page = wagtail_factories.PageFactory(parent=None)
     values = ["bla-1", "bla-2"]
@@ -109,13 +109,13 @@ def test_custom_page_streamfield_data():
     assert list(page.body[0].value) == values
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_site_no_args_or_kwargs():
     site = wagtail_factories.SiteFactory()
     assert site.root_page.depth == 1
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_site_multiple_no_args_or_kwargs():
     Site.objects.all().delete()
 
@@ -126,13 +126,13 @@ def test_site_multiple_no_args_or_kwargs():
     assert Site.objects.count() == 4
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_image_no_args_or_kwargs():
     image = wagtail_factories.ImageFactory()
     assert image.collection.name == "Test collection"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_image_add_to_collection():
     root_collection = wagtail_factories.CollectionFactory(parent=None)
 
@@ -142,7 +142,7 @@ def test_image_add_to_collection():
     assert image.collection.name == "new"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_get_or_create():
     root_page = wagtail_factories.PageFactory(parent=None)
     page_1 = MyTestPageGetOrCreateFactory(
@@ -155,7 +155,7 @@ def test_get_or_create():
     assert page_1.pk == page_2.pk
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_get_or_create_with_root():
     root_page = wagtail_factories.PageFactory(parent=None)
     page_1 = MyTestPageGetOrCreateFactory(slug="foobar", parent=root_page)
@@ -164,7 +164,7 @@ def test_get_or_create_with_root():
     assert page_1.pk == page_2.pk
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_document_add_to_collection():
     root_collection = wagtail_factories.CollectionFactory(parent=None)
     document = wagtail_factories.DocumentFactory(
