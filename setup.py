@@ -3,7 +3,7 @@ import re
 from setuptools import find_packages, setup
 
 install_requires = [
-    "factory-boy>=3.2",
+    "factory-boy>=3.2,<4",
     "wagtail>=6.3",
 ]
 

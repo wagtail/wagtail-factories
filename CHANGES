@@ -1,5 +1,7 @@
 Unreleased
 ==========
+- Drop support for Wagtail 6.4
+
 Wagtail 7.0 maintenance
 - Add testing for wagtail 7.0
 - Add testing for Django 5.2
