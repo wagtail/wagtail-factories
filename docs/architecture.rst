@@ -142,3 +142,5 @@ Custom factory classes can be created by extending the provided base classes::
             model = MyCustomStructBlock
 
 This allows adaptation to domain-specific Wagtail block types while maintaining all the deep object declaration capabilities.
+
+For detailed technical information about the StreamField system internals, see :doc:`streamfield-internals`.
