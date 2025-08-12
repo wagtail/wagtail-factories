@@ -132,6 +132,9 @@ html_theme_options = {
     "travis_button": True,
     "codecov_button": True,
     "analytics_id": "UA-75907833-5",
+    "show_related": True,
+    "navigation_with_keys": True,
+    "includehidden": True,
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -184,6 +187,8 @@ html_static_path = ["_static"]
 # html_sidebars = {}
 html_sidebars = {
     "*": [
+        "searchbox.html",
+        "globaltoc.html",
         "sidebar-intro.html",
     ]
 }
