@@ -15,7 +15,7 @@ tests_require = [
     "pytest==8.4.1",
     "pytest-django==4.11.1",
     "pytest-cov==6.2.1",
-    "coverage==7.5.1",
+    "coverage==7.10.3",
     "ruff==0.12.8",
 ]
 
