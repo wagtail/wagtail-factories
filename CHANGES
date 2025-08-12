@@ -2,6 +2,7 @@ Unreleased
 ==========
 - Add support for Wagtail 7.1
 - Drop support for Wagtail 6.4
+- Update ruff to 0.12.8
 
 Wagtail 7.0 maintenance
 - Add testing for wagtail 7.0

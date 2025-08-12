@@ -16,7 +16,7 @@ tests_require = [
     "pytest-django==4.8.0",
     "pytest-cov==5.0.0",
     "coverage==7.5.1",
-    "ruff==0.4.4",
+    "ruff==0.12.8",
 ]
 
 with open("README.md") as fh:
