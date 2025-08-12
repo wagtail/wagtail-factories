@@ -1,13 +1,8 @@
 import pytest
-import wagtail_factories
 from django.test import TestCase
 from wagtail import blocks
-from wagtail_factories.builder import (
-    DuplicateDeclaration,
-    InvalidDeclaration,
-    UnknownChildBlockFactory,
-)
 
+import wagtail_factories
 from tests.testapp.stream_block_factories import (
     PageWithNestedStreamBlockFactory,
     PageWithSimpleStructBlockNestedDeepDefaultsFactory,
@@ -16,6 +11,11 @@ from tests.testapp.stream_block_factories import (
     PageWithStreamBlockFactory,
     PageWithStreamBlockInListBlockFactory,
     PageWithStreamBlockInStructBlockFactory,
+)
+from wagtail_factories.builder import (
+    DuplicateDeclaration,
+    InvalidDeclaration,
+    UnknownChildBlockFactory,
 )
 
 
