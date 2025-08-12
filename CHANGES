@@ -1,5 +1,6 @@
 Unreleased
 ==========
+- Add support for Wagtail 7.1
 - Drop support for Wagtail 6.4
 
 Wagtail 7.0 maintenance
