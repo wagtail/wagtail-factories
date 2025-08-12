@@ -30,22 +30,51 @@ Before diving into the StreamField system, it's helpful to understand these Fact
 The big picture: how it all works together
 ===========================================
 
-The StreamField factory system translates user declarations into Wagtail block structures:
+The StreamField factory system translates user declarations into Wagtail block structures. Here's a complete example to illustrate the process:
+
+**Factory definitions**:
+
+.. code-block:: python
+
+    # Define the block structure
+    class MyStreamBlockFactory(StreamBlockFactory):
+        text_block = factory.SubFactory(CharBlockFactory)
+        struct_block = factory.SubFactory(MyStructBlockFactory)
+        
+        class Meta:
+            model = MyStreamBlock
+    
+    class MyStructBlockFactory(StructBlockFactory):
+        title = "Default Title"
+        content = "Default Content"
+        
+        class Meta:
+            model = MyStructBlock
+    
+    # Use in page factory
+    class MyPageFactory(factory.Factory):
+        body = StreamFieldFactory(MyStreamBlockFactory)
+        
+        class Meta:
+            model = MyPage
+
+**Usage and transformation**:
 
 .. code-block:: text
 
-    Input:  body__0__struct_block__title="Hello"
-    Output: StreamValue with proper Wagtail block structure
+    Input:  MyPageFactory(body__0__struct_block__title="Hello World")
+    Output: MyPage with StreamValue containing StructBlock("Hello World", "Default Content")
 
 This translation happens in three phases:
 
 **Phase 1: Parse the declaration syntax**
     Extract the structure from parameter names like ``body__0__struct_block__title``:
 
+    - StreamField name: ``body`` (matches the ``StreamFieldFactory`` attribute in ``MyPageFactory``)
     - Index: ``0`` (first item in stream)
-    - Block type: ``struct_block``
-    - Field path: ``title``
-    - Value: ``"Hello"``
+    - Block type: ``struct_block`` (matches ``MyStreamBlockFactory.struct_block``)
+    - Field path: ``title`` (field within ``MyStructBlockFactory``)
+    - Value: ``"Hello World"``
 
 **Phase 2: Generate a Factory class dynamically**
     Create a new ``StreamBlockFactory`` subclass that matches the requested structure:
@@ -54,7 +83,10 @@ This translation happens in three phases:
 
         # Generated factory equivalent to:
         class DynamicStreamFactory(StreamBlockFactory):
-            0.struct_block = SubFactory(StructBlockFactory)
+            0.struct_block = factory.SubFactory(StructBlockFactory)
+
+    .. note::
+       This is a conceptual illustration. The actual generated class uses attribute names with dots (``0.struct_block``) which aren't valid Python syntax but work through Factory Boy's internal mechanisms.
 
 **Phase 3: Let Factory Boy build the objects**
     Use Factory Boy's normal mechanisms to construct the final ``StreamValue``:
@@ -199,6 +231,16 @@ StreamBlockStepBuilder construction flow
 - Each sub-factory gets its own builder with filtered parameters
 - Deep nesting is supported through recursive ``SubFactory`` calls
 
+.. important::
+   **Multiple builder instances in complex nesting**
+   
+   When StreamBlocks contain other StreamBlocks (either directly or through ListBlocks), the system creates multiple ``StreamBlockStepBuilder`` instances:
+   
+   - Each level of StreamBlock nesting gets its own builder instance
+   - ListBlocks containing StreamBlocks trigger additional builder creation
+   - Each builder processes one level of the parameter hierarchy
+   - This recursive pattern scales to arbitrary nesting depths
+
 Block definition propagation
 -----------------------------
 
@@ -214,25 +256,177 @@ A sophisticated system ensures nested StreamBlocks have proper block definitions
 
 This allows anonymous StreamBlocks (declared inline) to construct proper ``StreamValue`` objects.
 
-Parameter flow through the system
-==================================
+Parameter flow and delegation
+=============================
 
-Understanding how parameters flow through the system is essential for debugging and extending functionality.
+The builder system creates the factory structure, but how do parameters actually flow through this structure at runtime? This section explains the delegation mechanism that connects user input to the final constructed objects.
 
-Example flow: ``body__0__struct_block__title="Hello"``
--------------------------------------------------------
+Understanding how parameters flow through the recursive builder system is essential for debugging and extending functionality. The key insight is that each level strips its own prefix and delegates remaining parameters to child builders.
 
-1. **Entry**: ``StreamFieldFactory.evaluate()`` receives parameters
-2. **Delegation**: Parameters passed to ``StreamBlockFactory(**extra)``
-3. **Builder creation**: ``StreamBlockStepBuilder(factory_meta, extras, strategy)``
-4. **Declaration parsing**:
+Parameter stripping and delegation process
+------------------------------------------
 
-   - Extract: index=0, name="struct_block", params=["title"]
-   - Transform: ``"0.struct_block__title": "Hello"``
+Each ``ParameteredAttribute`` (like ``StreamFieldFactory``) receives parameters and:
 
-5. **Factory generation**: Create dynamic factory with ``"0.struct_block": SubFactory(...)``
-6. **Construction**: Factory Boy builds the structure recursively
-7. **Value assembly**: Final ``StreamValue`` with proper Wagtail block structure
+1. **Filters its own parameters** by prefix matching
+2. **Strips its prefix** from matching parameters  
+3. **Delegates stripped parameters** to its target factory
+
+**Example: ``body__0__struct_block__title="Hello"``**
+
+.. code-block:: text
+
+    Level 1: MyPageFactory
+    ├── Receives: body__0__struct_block__title="Hello"
+    ├── StreamFieldFactory "body" matches prefix
+    ├── Strips "body__" → delegates: 0__struct_block__title="Hello"
+    
+    Level 2: StreamBlockFactory  
+    ├── Receives: 0__struct_block__title="Hello"
+    ├── Builder parses: index=0, block="struct_block", params=["title"]
+    ├── Creates SubFactory for StructBlockFactory
+    ├── Delegates: title="Hello"
+    
+    Level 3: StructBlockFactory
+    ├── Receives: title="Hello"
+    ├── Sets struct field directly
+    └── Returns: StructValue with title="Hello"
+
+Why the stripping happens
+-------------------------
+
+.. important::
+   **Parameter namespace isolation**
+   
+   Each factory level needs to process only its relevant parameters. Without prefix stripping:
+   
+   - ``StreamBlockFactory`` would receive ``body__0__title`` - but "body" is meaningless at the block level
+   - ``StructBlockFactory`` would receive ``body__0__struct_block__title`` - all the prefixes are irrelevant
+   
+   Stripping creates clean parameter namespaces: ``title="Hello"`` is exactly what ``StructBlockFactory`` expects.
+
+Recursive delegation examples
+-----------------------------
+
+**Simple nesting**: ``body__0__struct_block__title="Hello"``
+
+.. code-block:: text
+
+    MyPageFactory(body__0__struct_block__title="Hello")
+    │
+    ├─ StreamFieldFactory.evaluate()
+    │  └─ receives: {"body__0__struct_block__title": "Hello"}
+    │  └─ filters for "body__" prefix
+    │  └─ delegates: {"0__struct_block__title": "Hello"}
+    │
+    ├─ StreamBlockFactory via StreamBlockStepBuilder  
+    │  └─ receives: {"0__struct_block__title": "Hello"}
+    │  └─ parses: index=0, block="struct_block", field="title"
+    │  └─ creates: SubFactory(StructBlockFactory, title="Hello")
+    │
+    └─ StructBlockFactory
+       └─ receives: {"title": "Hello"}
+       └─ creates: StructValue(title="Hello")
+
+**Deep nesting**: ``body__0__struct__inner_stream__1__char_block="text"``
+
+.. code-block:: text
+
+    MyPageFactory(body__0__struct__inner_stream__1__char_block="text")
+    │
+    ├─ StreamFieldFactory "body"
+    │  └─ strips "body__" → delegates: "0__struct__inner_stream__1__char_block"
+    │
+    ├─ StreamBlockStepBuilder (level 1)
+    │  └─ parses: index=0, block="struct", remaining="inner_stream__1__char_block"
+    │  └─ creates: SubFactory(StructBlockFactory, inner_stream__1__char_block="text")
+    │
+    ├─ StructBlockFactory  
+    │  └─ receives: {"inner_stream__1__char_block": "text"}
+    │  └─ has inner_stream = StreamFieldFactory(...)
+    │  └─ delegates: {"1__char_block": "text"}
+    │
+    ├─ StreamBlockStepBuilder (level 2)
+    │  └─ parses: index=1, block="char_block", remaining=""
+    │  └─ creates: SubFactory(CharBlockFactory, value="text") 
+    │
+    └─ CharBlockFactory
+       └─ receives: {"value": "text"} (or direct assignment)
+       └─ creates: CharBlock with value "text"
+
+**ListBlock with nested StreamBlock**: ``body__0__list_block__0__0__struct_block__title="foo"``
+
+Based on verified execution tracing, this complex flow involves multiple builder instances:
+
+.. code-block:: text
+
+    Level 1: StreamFieldFactory.evaluate()
+    └─ receives: {'0__list_block__0__0__struct_block__title': 'foo'}
+    
+    Level 2: StreamBlockStepBuilder (outer)
+    └─ parses: index=0, block='list_block'
+    └─ delegates: {'0__0__struct_block__title': 'foo'} to ListBlockFactory
+    
+    Level 3: ListBlockFactory.evaluate()  
+    └─ groups by list index: result[0] = {'0__struct_block__title': 'foo'}
+    └─ calls step.recurse() → creates child StreamBlockFactory
+    
+    Level 4: StreamBlockStepBuilder (inner)
+    └─ receives: {'0__struct_block__title': 'foo'}
+    └─ parses: index=0, block='struct_block'
+    └─ creates: StructBlockFactory with title='foo'
+
+.. note::
+   The actual parameter flow is more complex than initially documented. ListBlocks containing StreamBlocks create **two separate** ``StreamBlockStepBuilder`` instances, not just nested factory calls.
+
+Implementation details
+----------------------
+
+**StreamFieldFactory parameter delegation**:
+
+.. code-block:: python
+
+    def evaluate(self, instance, step, extra):
+        # The 'extra' parameter already contains parameters filtered by Factory Boy
+        # for this StreamFieldFactory (e.g., all parameters starting with "body__")
+        # with the "body__" prefix already stripped by Factory Boy's mechanisms
+        return self.stream_block_factory(**extra)
+
+.. important::
+   **Factory Boy handles prefix stripping automatically**
+   
+   The ``ParameteredAttribute`` mechanism performs prefix filtering **before** our code runs:
+   
+   1. **User calls**: ``MyPageFactory(body__0__struct_block__title="foo")``
+   2. **Factory Boy processes**: Identifies ``body__`` prefix matches ``StreamFieldFactory`` 
+   3. **Factory Boy strips**: Removes ``body__`` prefix from matching parameters
+   4. **Our code receives**: ``StreamFieldFactory.evaluate()`` gets ``{'0__struct_block__title': 'foo'}``
+   
+   This timing is crucial - our parameter parsing code never sees the original full parameter names.
+
+**Builder parameter parsing**:
+
+.. code-block:: python
+
+    def get_block_declarations(self, factory_meta, extras):
+        # At this level, prefixes are already stripped
+        # "0__struct_block__title" becomes index=0, block="struct_block", params=["title"]
+        for k, v in extras.items():
+            if not k.isdigit():
+                i, name, *params = k.split("__", maxsplit=2)
+                # params becomes ["title"] for nested delegation
+                if params:
+                    nested_key = "__".join(params)  # "title"
+                    # This gets passed to the SubFactory
+
+Critical flow points
+--------------------
+
+1. **Entry point filtering**: Each ``StreamFieldFactory`` only processes its own parameters
+2. **Prefix stripping**: Essential for clean delegation to child factories
+3. **Recursive parsing**: Each builder level handles one level of nesting
+4. **Parameter transformation**: Keys get transformed for Factory Boy compatibility (``0.struct_block__title``)
+5. **Factory Boy delegation**: Standard ``SubFactory`` mechanisms handle the final construction
 
 Complex flow example
 ---------------------
@@ -244,6 +438,9 @@ For ``body__0__struct__inner_stream__1__char_block="text"``:
 3. StructBlockFactory creates inner StreamFieldFactory for ``inner_stream``
 4. Inner factory parses ``1__char_block="text"``
 5. Recursive construction builds the full hierarchy
+
+.. note::
+   **Verification**: The parameter flows documented in this section have been verified through live debugging of actual factory execution. See :doc:`parameter-flow-investigation` for detailed tracing results that confirm these documented behaviors.
 
 Block factory behavior
 =======================
@@ -301,14 +498,18 @@ StructBlockFactory
 ListBlockFactory
 -----------------
 
-**Primary role**: Handles ListBlock construction with indexed item access
+**Primary role**: Constructs ListBlock values with indexed item access
 
-**Declaration patterns**:
+**Declaration syntax**:
 
-- ``items__0__label="foo"`` - Set label of first item
-- ``items__1="value"`` - Set value of second item directly
+- ``items__0__label="foo"`` - Set field in first StructBlock item
+- ``char_array__0="hello"`` - Set first item in CharBlock list  
+- ``list_block__0__0__struct_block__title="foo"`` - ListBlock containing StreamBlocks
 
-**Construction process**:
+.. note::
+   ListBlock items use consecutive integers only - no block names for list items. When ListBlocks contain StreamBlocks, inner blocks do have names.
+
+**Implementation**:
 
 .. code-block:: python
 
@@ -319,8 +520,51 @@ ListBlockFactory
                 result[int(key)]["value"] = value
             else:
                 prefix, label = key.split("__", maxsplit=1)
-                result[int(prefix)][label] = value
-        # Build each item and create ListValue
+                if prefix and prefix.isdigit():
+                    result[int(prefix)][label] = value
+
+        subfactory = self.get_factory()
+        force_sequence = step.sequence if self.FORCE_SEQUENCE else None
+        values = [
+            step.recurse(subfactory, params, force_sequence=force_sequence)
+            for _, params in sorted(result.items())
+        ]
+
+        list_block_def = blocks.list_block.ListBlock(subfactory._meta.model())
+        return blocks.list_block.ListValue(list_block_def, values)
+
+**Complex case: StreamBlocks in ListBlocks**
+
+For ``body__0__list_block__0__0__struct_block__title="foo"``:
+
+.. code-block:: text
+
+    Level 1: StreamFieldFactory.evaluate()  
+    └─ receives: {'0__list_block__0__0__struct_block__title': 'foo'}
+    └─ (Factory Boy already stripped 'body__' prefix)
+
+    Level 2: First StreamBlockStepBuilder.get_block_declarations()
+    └─ receives: {'0__list_block__0__0__struct_block__title': 'foo'}  
+    └─ parses: index=0, block='list_block'
+    └─ delegates: {'0__0__struct_block__title': 'foo'} to ListBlockFactory
+
+    Level 3: ListBlockFactory.evaluate()
+    └─ groups by list index: result[0] = {'0__struct_block__title': 'foo'}
+    └─ delegates to child StreamBlockFactory: {'0__struct_block__title': 'foo'}
+
+    Level 4: Second StreamBlockStepBuilder.get_block_declarations()  
+    └─ receives: {'0__struct_block__title': 'foo'}
+    └─ parses: index=0, block='struct_block' 
+    └─ creates: SubFactory(StructBlockFactory, title='foo')
+
+    Level 5: StructBlockFactory._build()
+    └─ receives: {'title': 'foo'}
+    └─ creates: StructValue with title='foo'
+
+Result: ``page.body[0].value[0][0].value["title"] == "foo"``
+
+.. note::
+   **Multiple builder instances**: Complex nesting creates multiple ``StreamBlockStepBuilder`` instances. The first handles the outer StreamBlock, the second handles the nested StreamBlock within the ListBlock. This recursive pattern continues for deeper nesting levels.
 
 StreamFieldFactory (ParameteredAttribute)
 ------------------------------------------
@@ -331,7 +575,9 @@ StreamFieldFactory (ParameteredAttribute)
 
 - Supports both dict-based and class-based StreamBlock factory definitions
 - Delegates to a ``StreamBlockFactory`` subclass for actual construction
-- Handles two initialization patterns:
+- **Automatic block definition setup**: When initialized with a class-based factory, automatically instantiates the model to provide block definitions
+
+**Initialization patterns**:
 
 .. code-block:: python
 
@@ -340,8 +586,130 @@ StreamFieldFactory (ParameteredAttribute)
         "block_name": BlockFactory,
     })
 
-    # Class-based (recommended)
+    # Class-based (recommended)  
     body = StreamFieldFactory(MyStreamBlockFactory)
+
+**Block definition instantiation**:
+
+When using class-based factories, ``StreamFieldFactory.__init__`` automatically sets up block definitions:
+
+.. code-block:: python
+
+    def __init__(self, block_types, **kwargs):
+        # ... validation logic ...
+        elif isinstance(block_types, type) and issubclass(block_types, StreamBlockFactory):
+            # Automatic block definition instantiation
+            block_types._meta.block_def = block_types._meta.model()
+            self.stream_block_factory = block_types
+
+This automatic instantiation ensures that:
+
+- Block definitions are available for proper ``StreamValue`` construction
+- Nested ``SubFactory`` calls receive the correct child block definitions
+- The factory system can validate block names and structure at runtime
+
+Factory configuration system
+=============================
+
+The options system provides a configuration layer for factory behavior, extending Factory Boy's standard options with Wagtail-specific features.
+
+BlockFactoryOptions
+-------------------
+
+**File**: ``src/wagtail_factories/options.py`` (lines 5-28)
+
+Base options class for all block factories:
+
+.. code-block:: python
+
+    class BlockFactoryOptions(FactoryOptions):
+        def _build_default_options(self):
+            options = super()._build_default_options()
+            options.append(OptionDefault("block_def", None))
+            return options
+
+**Key features**:
+
+- **``block_def`` option**: Stores the Wagtail block definition for proper ``StreamValue`` construction
+- **``get_block_definition()``**: Provides access to block definitions, either from ``block_def`` or by instantiating the ``model``
+
+StreamBlockFactoryOptions
+-------------------------
+
+**File**: ``src/wagtail_factories/options.py`` (lines 30-61)
+
+Specialized options for StreamBlock factories with advanced parameter filtering:
+
+.. code-block:: python
+
+    class StreamBlockFactoryOptions(BlockFactoryOptions):
+        def prepare_arguments(self, attributes):
+            def get_block_name(key):
+                # Keys at this point will be like <index>.<block_name>
+                return key.split(".")[1]
+
+            kwargs = dict(attributes)
+            kwargs = self.factory._adjust_kwargs(**kwargs)
+
+            # Filter out excluded, parameter, and SKIP declarations
+            filtered_kwargs = {}
+            for k, v in kwargs.items():
+                block_name = get_block_name(k)
+                if (
+                    block_name not in self.exclude
+                    and block_name not in self.parameters  
+                    and v is not declarations.SKIP
+                ):
+                    filtered_kwargs[k] = v
+
+            return (), filtered_kwargs
+
+**Key features**:
+
+- **Parameter filtering**: Removes excluded and skipped block declarations
+- **Block name extraction**: Parses ``index.block_name`` format to identify which blocks are being used
+- **Factory adjustment hooks**: Supports custom parameter processing through ``_adjust_kwargs``
+
+Block definition management
+---------------------------
+
+The options system manages how block definitions are passed through the factory hierarchy:
+
+.. code-block:: python
+
+    def get_block_definition(self):
+        if self.block_def is not None:
+            return self.block_def  # Explicitly set
+        elif self.model is not None:
+            return self.model()    # Auto-instantiate from model
+
+This enables two patterns:
+
+**Explicit block definition**:
+
+.. code-block:: python
+
+    class MyStreamBlockFactory(StreamBlockFactory):
+        class Meta:
+            model = MyStreamBlock
+            block_def = MyStreamBlock()  # Explicit
+
+**Auto-instantiation** (more common):
+
+.. code-block:: python
+
+    class MyStreamBlockFactory(StreamBlockFactory):  
+        class Meta:
+            model = MyStreamBlock  # Auto-instantiated when needed
+
+.. important::
+   **Why block definitions matter**
+   
+   Wagtail block definitions are required to construct proper ``StreamValue`` objects. Without them, the system falls back to returning raw data structures. The options system ensures block definitions are available throughout the factory hierarchy by:
+   
+   - Auto-instantiating models when needed
+   - Propagating definitions through ``SubFactory`` chains  
+   - Providing consistent access via ``get_block_definition()``
 
 Error handling and validation
 ==============================
@@ -445,7 +813,7 @@ Integration patterns
 .. code-block:: python
 
     class MyStreamBlockFactory(StreamBlockFactory):
-        text = CharBlockFactory
+        text = factory.SubFactory(CharBlockFactory)
         image = factory.SubFactory(ImageChooserBlockFactory)
         custom = factory.SubFactory(MyCustomBlockFactory)  # Add your custom block
 
