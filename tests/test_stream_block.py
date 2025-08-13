@@ -2,12 +2,6 @@ import pytest
 from django.test import TestCase
 from wagtail import blocks
 from wagtail.images.models import Image
-from wagtail_factories.blocks import WAGTAIL_63_OR_HIGHER
-from wagtail_factories.builder import (
-    DuplicateDeclaration,
-    InvalidDeclaration,
-    UnknownChildBlockFactory,
-)
 
 import wagtail_factories
 from tests.testapp.stream_block_factories import (
@@ -19,6 +13,7 @@ from tests.testapp.stream_block_factories import (
     PageWithStreamBlockInListBlockFactory,
     PageWithStreamBlockInStructBlockFactory,
 )
+from wagtail_factories.blocks import WAGTAIL_63_OR_HIGHER
 from wagtail_factories.builder import (
     DuplicateDeclaration,
     InvalidDeclaration,
@@ -153,7 +148,9 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
         )
         assert page.body[0].value == Image.objects.last()
 
-    @pytest.mark.skipif(not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+")
+    @pytest.mark.skipif(
+        not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+"
+    )
     def test_page_with_image_stream_block(self):
         page = PageWithStreamBlockFactory(
             parent=self.root_page,
@@ -163,7 +160,9 @@ class PageWithStreamBlockTestCase(PageTreeTestCase):
         assert page.body[0].value.pk == Image.objects.last().pk
         assert not page.body[0].value.decorative
 
-    @pytest.mark.skipif(not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+")
+    @pytest.mark.skipif(
+        not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+"
+    )
     def test_page_with_image_stream_block_no_image(self):
         page = PageWithStreamBlockFactory(
             parent=self.root_page,
