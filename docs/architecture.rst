@@ -48,7 +48,7 @@ This builds on Factory Boy's familiar relationship traversal syntax, adding supp
 
 - Block indexes (``0``, ``1``) to specify position in StreamField
 - Block type selection (``carousel``, ``text_block``)
-- Nested field paths within blocks (``items__0__label``)
+- Nested field paths within blocks (``items__0__label``, ``content``)
 
 The key difference is that Factory Boy's relationship syntax refers to static model relationships known at class definition time, while StreamField factories handle dynamic structures only known at runtime.
 
