@@ -21,8 +21,7 @@ Usage
 
     class MyCarouselItemFactory(wagtail_factories.StructBlockFactory):
         label = 'my-label'
-        image = factory.SubFactory(
-            wagtail_factories.ImageChooserBlockFactory)
+        image = factory.SubFactory(wagtail_factories.ImageChooserBlockFactory)
 
         class Meta:
             model = models.MyBlockItem
