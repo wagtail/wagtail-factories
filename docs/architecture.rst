@@ -78,7 +78,7 @@ Class-based factory definition
 StreamField factories are defined using class-based syntax that mirrors Wagtail's block definitions::
 
     class MyStreamBlockFactory(StreamBlockFactory):
-        text = CharBlockFactory
+        text = factory.SubFactory(CharBlockFactory)
         image = factory.SubFactory(ImageChooserBlockFactory)
         carousel = factory.SubFactory(CarouselBlockFactory)
 
