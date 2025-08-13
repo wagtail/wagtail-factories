@@ -16,7 +16,7 @@ wagtail-factories extends Factory Boy to create test data for Wagtail CMS models
     Specialized factories for Wagtail's block system (``StreamBlockFactory``, ``StructBlockFactory``, ``ListBlockFactory``)
 
 **Builder Layer**
-    Internal machinery that constructs complex nested structures, particularly for StreamField content
+    Internal machinery that constructs complex nested structures, particularly for StreamField content. This layer handles the complex challenge of bridging Factory Boy's flat parameter structure with Wagtail's dynamic nested blocks.
 
 Design Principles
 =================
@@ -30,17 +30,27 @@ wagtail-factories is built as an extension to Factory Boy, not a replacement. Th
 - Follows Factory Boy's patterns for extending and customizing behavior
 - Leverages Factory Boy's ``StepBuilder`` system for complex object construction
 
-Deep Object Declaration
------------------------
+Declaration Syntax for Nested Structures
+------------------------------------------
 
-The signature feature is support for "deep object declaration" syntax::
+wagtail-factories extends Factory Boy's existing double-underscore syntax for relationships. Where Factory Boy supports::
+
+    UserFactory(profile__bio="Software developer")
+
+wagtail-factories extends this pattern to support indexed, nested StreamField structures::
 
     MyPageFactory(
         body__0__carousel__items__0__label='Slide 1',
         body__1__text_block__content='Hello world'
     )
 
-This allows declarative construction of deeply nested StreamField content without requiring pre-built factory instances.
+This builds on Factory Boy's familiar relationship traversal syntax, adding support for:
+
+- Block indexes (``0``, ``1``) to specify position in StreamField
+- Block type selection (``carousel``, ``text_block``) 
+- Nested field paths within blocks (``items__0__label``)
+
+The key difference is that Factory Boy's relationship syntax refers to static model relationships known at class definition time, while StreamField factories handle dynamic structures only known at runtime.
 
 Wagtail Block System Mapping
 -----------------------------
@@ -141,6 +151,11 @@ Custom factory classes can be created by extending the provided base classes::
         class Meta:
             model = MyCustomStructBlock
 
-This allows adaptation to domain-specific Wagtail block types while maintaining all the deep object declaration capabilities.
+This allows adaptation to domain-specific Wagtail block types while maintaining all the declaration syntax capabilities.
 
-For detailed technical information about the StreamField system internals, see :doc:`streamfield-internals`.
+Next Steps
+==========
+
+**For users**: This architectural overview provides sufficient background to use wagtail-factories effectively.
+
+**For contributors**: If you need to modify or extend the StreamField factory system, see :doc:`streamfield-internals` for detailed technical implementation details including Factory Boy integration mechanisms, parameter parsing, and builder system architecture.
