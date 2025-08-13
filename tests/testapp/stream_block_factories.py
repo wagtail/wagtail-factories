@@ -1,7 +1,6 @@
 import factory
 
 import wagtail_factories
-from wagtail_factories.blocks import WAGTAIL_63_OR_HIGHER
 
 from . import models
 from .factories import MyBlockFactory
@@ -92,9 +91,7 @@ class MyStreamBlockFactory(wagtail_factories.StreamBlockFactory):
     struct_block = factory.SubFactory(StructBlockWithLazyAttrFactory)
     char_block = factory.SubFactory(wagtail_factories.CharBlockFactory)
     image_chooser_block = factory.SubFactory(wagtail_factories.ImageChooserBlockFactory)
-
-    if WAGTAIL_63_OR_HIGHER:
-        image_block = factory.SubFactory(wagtail_factories.ImageBlockFactory)
+    image_block = factory.SubFactory(wagtail_factories.ImageBlockFactory)
 
     class Meta:
         model = models.MyStreamBlock
