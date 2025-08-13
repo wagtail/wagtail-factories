@@ -4,7 +4,7 @@ import factory
 from factory.declarations import ParameteredAttribute
 from wagtail import blocks
 from wagtail.documents.blocks import DocumentChooserBlock
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.blocks import ImageBlock, ImageChooserBlock
 
 from wagtail_factories.builder import (
     ListBlockStepBuilder,
@@ -26,8 +26,6 @@ __all__ = [
     "DocumentChooserBlockFactory",
     "ImageBlockFactory",
 ]
-
-from wagtail.images.blocks import ImageBlock
 
 
 class StreamBlockFactory(factory.Factory):
