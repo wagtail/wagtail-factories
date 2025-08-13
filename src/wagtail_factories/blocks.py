@@ -2,8 +2,8 @@ from collections import defaultdict
 
 import factory
 from factory.declarations import ParameteredAttribute
-from wagtail import blocks
 from wagtail import VERSION as WAGTAIL_VERSION
+from wagtail import blocks
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.images.blocks import ImageChooserBlock
 
@@ -249,6 +249,7 @@ class DocumentChooserBlockFactory(ChooserBlockFactory):
 
 # Only define ImageBlockFactory if Wagtail 6.3 or higher is installed
 if WAGTAIL_63_OR_HIGHER:
+
     class ImageBlockFactory(StructBlockFactory):
         image = factory.SubFactory(ImageChooserBlockFactory)
         decorative = factory.Faker("boolean")
@@ -264,7 +265,7 @@ if WAGTAIL_63_OR_HIGHER:
                 alt_text = params["alt_text"]
 
                 # If the image is decorative, set alt_text to an empty string
-                image.contextual_alt_text = ("" if decorative else alt_text)
+                image.contextual_alt_text = "" if decorative else alt_text
                 image.decorative = decorative
 
             return image

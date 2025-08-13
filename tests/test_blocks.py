@@ -5,7 +5,6 @@ from wagtail.blocks import CharBlock, StructBlock, StructValue
 from wagtail.documents.models import Document
 from wagtail.images.models import Image
 from wagtail.models import Page
-from wagtail_factories.blocks import WAGTAIL_63_OR_HIGHER
 
 import wagtail_factories
 from tests.testapp.factories import (
@@ -13,6 +12,7 @@ from tests.testapp.factories import (
     MyBlockItemFactory,
     MyTestPageWithStreamFieldFactory,
 )
+from wagtail_factories.blocks import WAGTAIL_63_OR_HIGHER
 
 
 def eq_list_block_values(p, q):
@@ -263,7 +263,7 @@ def test_image_block_with_no_image():
     assert value is None
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ("Model", "ModelChooserBlockFactory"),
     [

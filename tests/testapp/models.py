@@ -3,6 +3,7 @@ from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.fields import StreamField
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.models import Page
+
 from wagtail_factories.blocks import WAGTAIL_63_OR_HIGHER
 
 if WAGTAIL_63_OR_HIGHER:
