@@ -1,5 +1,6 @@
 Unreleased
 ==========
+- Add ImageBlockFactory
 - Add support for Wagtail 7.1
 - Drop support for Wagtail 6.4
 - Update ruff to 0.12.8
@@ -19,7 +20,6 @@ Wagtail 6.4 maintenance
 - Add support for Python 3.13
 - Drop support for Wagtal 6.0 and 6.1
 - Drop support for Python 3.8
-- Add ImageBlockFactory
 
 4.2.1
 =====
