@@ -13,11 +13,14 @@ StreamField factories extend Factory Boy in complex ways that require deep integ
 
 The following Factory Boy concepts are central to how StreamField factories work:
 
+**Declarations**
+    In Factory Boy, declarations are the attributes you define in factory classes that specify how to generate values. For example, ``title = "Hello"`` or ``name = factory.Faker('name')`` are declarations. They define the blueprint for creating object attributes.
+
 **StepBuilder**
     Factory Boy's mechanism for constructing objects step-by-step. When you call ``MyFactory(param="value")``, Factory Boy creates a StepBuilder that processes each parameter and builds the final object. StreamField factories need custom StepBuilders because Factory Boy's default builder can't parse indexed parameters like ``body__0__struct_block__title``.
 
 **DeclarationSet**
-    Factory Boy's internal storage for factory declarations. When you define ``title = "Hello"`` in a factory class, it gets stored in a DeclarationSet. The keys in this set must be valid Python identifiers. This constraint forces StreamField factories to transform keys like ``body__0__struct`` into dot-notation like ``0.struct`` to avoid Factory Boy errors.
+    Factory Boy's internal storage for factory declarations - essentially a dictionary that maps declaration names to their values. When you define ``title = "Hello"`` in a factory class, it gets stored in a DeclarationSet with "title" as the key. Normally, the keys in this set must be valid Python identifiers when defined in factory classes. However, Factory Boy's internal mechanisms can handle non-identifier keys like ``0.struct_block`` when they're added programmatically at runtime, which is how StreamField factories work around the identifier constraint.
 
 **Strategy propagation**
     How Factory Boy passes the build vs create decision through nested factories. When you call ``MyFactory.build()``, all nested ``SubFactory`` calls should also use ``build()``. When you call ``MyFactory.create()``, nested factories should ``create()`` and save to the database. StreamField factories must preserve this mechanism through multiple levels of dynamic nesting.
@@ -26,7 +29,12 @@ The following Factory Boy concepts are central to how StreamField factories work
     Factory Boy delays executing ``LazyAttribute`` and ``LazyFunction`` declarations until the object is actually being built. This allows values to depend on other fields or the current build context. The StreamField system preserves lazy evaluation by generating Factory classes dynamically rather than bypassing Factory Boy entirely.
 
 **ParameteredAttribute**
-    A Factory Boy mechanism that allows factory attributes to accept parameters. This is how ``StreamFieldFactory`` receives parameters like ``body__0__struct__title="foo"`` and delegates them to the appropriate block factories.
+    A Factory Boy mechanism that allows factory attributes to accept parameters at call time. This is how ``StreamFieldFactory`` receives parameters like ``body__0__struct__title="foo"`` and delegates them to the appropriate block factories.
+
+**Declaration timing**
+    Factory Boy splits factory class attributes into pre-declarations (processed during object instantiation) and post-declarations (processed after object instantiation). Pre-declarations include standard attributes like ``title = "Hello"`` and ``SubFactory`` calls. Post-declarations include ``PostGeneration`` hooks for complex operations like method calls or relationship building. StreamField factories work entirely within the pre-declaration phase - all parameter parsing and dynamic factory generation happens during normal object construction, preserving Factory Boy's lazy evaluation and strategy propagation.
+
+For detailed information about Factory Boy's internal mechanisms, see the `Factory Boy internals documentation <https://factoryboy.readthedocs.io/en/stable/internals.html>`_.
 
 The big picture: how it all works together
 ===========================================
