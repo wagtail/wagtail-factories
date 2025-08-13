@@ -4,28 +4,29 @@ StreamField internals guide
 
 This guide provides detailed technical documentation for contributors working on the StreamField block factory system. It covers the internal mechanisms, declaration syntax parsing, builder architecture, and block factory behavior.
 
-.. note::
-   This documentation assumes familiarity with Wagtail's block system, Factory Boy basics, and the conceptual overview in :doc:`architecture`.
+This documentation assumes familiarity with Wagtail's block system, Factory Boy basics, and the conceptual overview in :doc:`architecture`.
 
 Factory Boy internals primer
 =============================
 
-Before diving into the StreamField system, it's helpful to understand these Factory Boy concepts that are central to the implementation:
+StreamField factories extend Factory Boy in complex ways that require deep integration with its internal mechanisms. Understanding these Factory Boy internals is essential because the StreamField system must work within Factory Boy's constraints while handling dynamic nested structures that Factory Boy wasn't designed for.
+
+The following Factory Boy concepts are central to how StreamField factories work:
 
 **StepBuilder**
-    Factory Boy's mechanism for constructing objects step-by-step. When you call ``MyFactory(param="value")``, Factory Boy creates a StepBuilder that processes each parameter and builds the final object. StepBuilder classes can be customized to handle complex construction logic.
+    Factory Boy's mechanism for constructing objects step-by-step. When you call ``MyFactory(param="value")``, Factory Boy creates a StepBuilder that processes each parameter and builds the final object. StreamField factories need custom StepBuilders because Factory Boy's default builder can't parse indexed parameters like ``body__0__struct_block__title``.
 
 **DeclarationSet**
-    Factory Boy's internal storage for factory declarations. When you define ``title = "Hello"`` in a factory class, it gets stored in a DeclarationSet. The keys in this set must be valid Python identifiers, which is why wagtail-factories needs key transformation.
+    Factory Boy's internal storage for factory declarations. When you define ``title = "Hello"`` in a factory class, it gets stored in a DeclarationSet. The keys in this set must be valid Python identifiers. This constraint forces StreamField factories to transform keys like ``body__0__struct`` into dot-notation like ``0.struct`` to avoid Factory Boy errors.
 
 **Strategy propagation**
-    How Factory Boy passes the build vs create decision through nested factories. When you call ``MyFactory.build()``, all nested ``SubFactory`` calls should also use ``build()``. When you call ``MyFactory.create()``, nested factories should ``create()`` and save to the database.
+    How Factory Boy passes the build vs create decision through nested factories. When you call ``MyFactory.build()``, all nested ``SubFactory`` calls should also use ``build()``. When you call ``MyFactory.create()``, nested factories should ``create()`` and save to the database. StreamField factories must preserve this mechanism through multiple levels of dynamic nesting.
 
 **Lazy evaluation**
-    Factory Boy delays executing ``LazyAttribute`` and ``LazyFunction`` declarations until the object is actually being built. This allows values to depend on other fields or the current build context.
+    Factory Boy delays executing ``LazyAttribute`` and ``LazyFunction`` declarations until the object is actually being built. This allows values to depend on other fields or the current build context. The StreamField system preserves lazy evaluation by generating Factory classes dynamically rather than bypassing Factory Boy entirely.
 
 **ParameteredAttribute**
-    A Factory Boy mechanism that allows factory attributes to accept parameters. ``StreamFieldFactory`` is a ``ParameteredAttribute`` that accepts block declarations and delegates to appropriate block factories.
+    A Factory Boy mechanism that allows factory attributes to accept parameters. This is how ``StreamFieldFactory`` receives parameters like ``body__0__struct__title="foo"`` and delegates them to the appropriate block factories.
 
 The big picture: how it all works together
 ===========================================
@@ -85,8 +86,7 @@ This translation happens in three phases:
         class DynamicStreamFactory(StreamBlockFactory):
             0.struct_block = factory.SubFactory(StructBlockFactory)
 
-    .. note::
-       This is a conceptual illustration. The actual generated class uses attribute names with dots (``0.struct_block``) which aren't valid Python syntax but work through Factory Boy's internal mechanisms.
+    This is a conceptual illustration. The actual generated class uses attribute names with dots (``0.struct_block``) to create unique keys for Factory Boy's DeclarationSet - this prevents Factory Boy from misinterpreting numeric indexes as factory fields.
 
 **Phase 3: Let Factory Boy build the objects**
     Use Factory Boy's normal mechanisms to construct the final ``StreamValue``:
@@ -98,19 +98,23 @@ This translation happens in three phases:
 
 This approach preserves Factory Boy's features while handling the nested structure that Wagtail StreamBlocks require.
 
+Now that you understand the three-phase transformation process, let's examine why this approach was chosen and what challenges it solves.
+
 Implementation background
 ==========================
 
 The StreamField factory system is complex because it bridges two incompatible paradigms: Factory Boy's flat parameter structure and Wagtail's dynamic nested blocks.
 
-Factory Boy expects parameters like ``title="Hello"`` that map directly to object attributes. StreamField factories need to handle ``body__0__struct_block__title="Hello"`` - indexed, nested declarations that describe dynamic structures unknown until runtime.
+Factory Boy expects parameters like ``title="Hello"`` that map directly to object attributes, or ``user__email="test@example.com"`` for static relationships. StreamField factories extend this pattern to handle ``body__0__struct_block__title="Hello"`` - indexed, nested declarations that describe dynamic structures unknown until runtime.
 
 Early implementations bypassed Factory Boy entirely but lost features like lazy evaluation and build/create strategies. The current approach generates Factory classes dynamically based on user parameters, preserving Factory Boy integration while handling the structural complexity.
+
+The next step is understanding how user parameters are parsed and transformed into the structures that Factory Boy can work with.
 
 Declaration syntax and parsing
 ===============================
 
-The StreamField factory system supports a sophisticated declaration syntax that allows deep nesting and precise control over block construction. Understanding how this syntax is parsed is crucial for maintaining and extending the system.
+The StreamField factory system supports a declaration syntax that allows deep nesting and control over block construction. Understanding how this syntax is parsed is crucial for maintaining and extending the system.
 
 Core syntax patterns
 ---------------------
@@ -161,11 +165,16 @@ Parameters like ``body__0__struct_block__title="foo"`` undergo this transformati
 3. **Transform**: ``"0.struct_block__title"`` (note the dot separator)
 4. **Store**: ``extra_declarations["0.struct_block__title"] = "foo"``
 
-The dot-separated format (``0.struct_block__title``) is crucial because:
+The dot-separated format (``0.struct_block__title``) is crucial because we are creating declarations for dynamically generated factory classes, not just processing parameters:
 
-- It creates unique, hashable keys for Factory Boy's DeclarationSet
-- The dot prevents Factory Boy from treating "0" as an unknown declaration
-- It maintains hierarchical structure needed for nested construction
+**Unique hashable keys for repeated block usage**:
+    When a StreamBlock contains multiple instances of the same block type (e.g., ``0__struct_block``, ``1__struct_block``), each needs a unique key in Factory Boy's DeclarationSet. The format ``0.struct_block`` and ``1.struct_block`` creates distinct, hashable identifiers that Factory Boy can store and retrieve correctly.
+
+**Factory Boy DeclarationSet compatibility**:
+    Factory Boy uses a DeclarationSet to store factory attributes like ``title = "Hello"``. Each key must be unique and hashable. Using ``0.struct_block__title`` as the key allows the system to associate parameters with the correct generated factory field during dynamic factory creation.
+
+**Prevents Factory Boy field interpretation errors**:
+    If we used ``0__struct_block__title`` directly, Factory Boy would interpret ``0`` as a field declaration on the current factory class and try to process it as an unknown attribute. The dot separator (``0.struct_block``) prevents this by creating a single, valid identifier that Factory Boy treats as one declaration rather than trying to parse the numeric prefix.
 
 Complex declaration examples
 -----------------------------
@@ -175,6 +184,7 @@ Complex declaration examples
     body__0__struct_block__inner_stream__1__char_block="text"
 
 Represents:
+
 - StreamField ``body``
 - Index 0: StructBlock ``struct_block``
 - Field ``inner_stream``: Nested StreamBlock
@@ -185,6 +195,7 @@ Represents:
     body__0__list_block__0__0__struct_block__title="foo"
 
 Parameter breakdown:
+
 - First ``0``: StreamField index
 - ``list_block``: Block name
 - Second ``0``: ListBlock item index
@@ -194,18 +205,9 @@ Parameter breakdown:
 Builder system architecture
 ============================
 
-The builder system is the core machinery that transforms parsed declarations into Wagtail block structures.
+Factory Boy's built-in StepBuilder assumes static factory declarations known at class definition time - it expects factory classes to be defined with fixed attributes like ``title = "Hello"``. But StreamField factories need to handle dynamic structures where the required blocks and their indexes are only known when the factory is called with parameters like ``body__0__struct_block__title="foo"``.
 
-.. important::
-   **Why custom builders?**
-
-   Factory Boy's built-in StepBuilder assumes static factory declarations known at class definition time. StreamField factories need to handle dynamic structures where the required blocks and their indexes are only known when the factory is called.
-
-   Custom builders solve this by:
-
-   - Parsing indexed parameter syntax that Factory Boy doesn't understand
-   - Dynamically generating factory classes based on user parameters
-   - Preserving Factory Boy features like lazy evaluation and strategy propagation
+The builder system is the core machinery that solves this problem by dynamically generating factory classes at runtime. Custom builders parse the indexed parameter syntax that Factory Boy doesn't understand, generate appropriate factory structures, and preserve Factory Boy features like lazy evaluation and strategy propagation.
 
 StreamBlockStepBuilder construction flow
 ----------------------------------------
@@ -231,15 +233,7 @@ StreamBlockStepBuilder construction flow
 - Each sub-factory gets its own builder with filtered parameters
 - Deep nesting is supported through recursive ``SubFactory`` calls
 
-.. important::
-   **Multiple builder instances in complex nesting**
-   
-   When StreamBlocks contain other StreamBlocks (either directly or through ListBlocks), the system creates multiple ``StreamBlockStepBuilder`` instances:
-   
-   - Each level of StreamBlock nesting gets its own builder instance
-   - ListBlocks containing StreamBlocks trigger additional builder creation
-   - Each builder processes one level of the parameter hierarchy
-   - This recursive pattern scales to arbitrary nesting depths
+When nested StreamBlocks are encountered, the system creates multiple ``StreamBlockStepBuilder`` instances. Each level of StreamBlock nesting gets its own builder instance, with each builder processing one level of the parameter hierarchy. This recursive pattern scales to arbitrary nesting depths.
 
 Block definition propagation
 -----------------------------
@@ -256,23 +250,37 @@ A sophisticated system ensures nested StreamBlocks have proper block definitions
 
 This allows anonymous StreamBlocks (declared inline) to construct proper ``StreamValue`` objects.
 
-Parameter flow and delegation
-=============================
+With the builder architecture understood, we can now trace how parameters flow through the system at runtime to understand the complete delegation process.
 
-The builder system creates the factory structure, but how do parameters actually flow through this structure at runtime? This section explains the delegation mechanism that connects user input to the final constructed objects.
+How parameters flow through the system
+======================================
 
-Understanding how parameters flow through the recursive builder system is essential for debugging and extending functionality. The key insight is that each level strips its own prefix and delegates remaining parameters to child builders.
+The builder system creates the factory structure, but how do parameters actually flow through this structure at runtime? Understanding how parameters flow through the recursive builder system is essential for debugging and extending functionality.
+
+The key insight is that Factory Boy handles initial prefix filtering automatically, then each builder level strips its remaining prefix and delegates parameters to child factories. This creates clean parameter namespaces at each level while preserving Factory Boy's delegation mechanisms.
 
 Parameter stripping and delegation process
 ------------------------------------------
 
-Each ``ParameteredAttribute`` (like ``StreamFieldFactory``) receives parameters and:
+Factory Boy handles the initial parameter filtering automatically. The ``ParameteredAttribute`` mechanism performs prefix filtering before our code runs:
 
-1. **Filters its own parameters** by prefix matching
-2. **Strips its prefix** from matching parameters  
-3. **Delegates stripped parameters** to its target factory
+1. User calls ``MyPageFactory(body__0__struct_block__title="foo")``
+2. Factory Boy processes: Identifies ``body__`` prefix matches ``StreamFieldFactory``
+3. Factory Boy strips: Removes ``body__`` prefix from matching parameters  
+4. Our code receives: ``StreamFieldFactory.evaluate()`` gets ``{'0__struct_block__title': 'foo'}``
 
-**Example: ``body__0__struct_block__title="Hello"``**
+This timing is crucial - our parameter parsing code never sees the original full parameter names.
+
+StreamFieldFactory implementation:
+
+.. code-block:: python
+
+    def evaluate(self, instance, step, extra):
+        # The 'extra' parameter already contains parameters filtered by Factory Boy
+        # with the "body__" prefix already stripped by Factory Boy's mechanisms
+        return self.stream_block_factory(**extra)
+
+Example: ``body__0__struct_block__title="Hello"``
 
 .. code-block:: text
 
@@ -292,18 +300,19 @@ Each ``ParameteredAttribute`` (like ``StreamFieldFactory``) receives parameters 
     ├── Sets struct field directly
     └── Returns: StructValue with title="Hello"
 
-Why the stripping happens
--------------------------
+Parameter namespace isolation
+-------------------------------
 
-.. important::
-   **Parameter namespace isolation**
-   
-   Each factory level needs to process only its relevant parameters. Without prefix stripping:
-   
-   - ``StreamBlockFactory`` would receive ``body__0__title`` - but "body" is meaningless at the block level
-   - ``StructBlockFactory`` would receive ``body__0__struct_block__title`` - all the prefixes are irrelevant
-   
-   Stripping creates clean parameter namespaces: ``title="Hello"`` is exactly what ``StructBlockFactory`` expects.
+Each factory level needs to process only its relevant parameters. Without prefix stripping, ``StreamBlockFactory`` would receive ``body__0__title`` where "body" is meaningless at the block level, and ``StructBlockFactory`` would receive ``body__0__struct_block__title`` where all the prefixes are irrelevant. Stripping creates clean parameter namespaces: ``title="Hello"`` is exactly what ``StructBlockFactory`` expects.
+
+Critical flow points
+---------------------
+
+1. Entry point filtering: Factory Boy automatically filters parameters by prefix for each ``StreamFieldFactory``
+2. Prefix stripping: Essential for clean delegation to child factories  
+3. Recursive parsing: Each builder level handles one level of nesting
+4. Parameter transformation: Keys get transformed for Factory Boy compatibility (``0.struct_block__title``)
+5. Factory Boy delegation: Standard ``SubFactory`` mechanisms handle the final construction
 
 Recursive delegation examples
 -----------------------------
@@ -376,76 +385,11 @@ Based on verified execution tracing, this complex flow involves multiple builder
     └─ parses: index=0, block='struct_block'
     └─ creates: StructBlockFactory with title='foo'
 
-.. note::
-   The actual parameter flow is more complex than initially documented. ListBlocks containing StreamBlocks create **two separate** ``StreamBlockStepBuilder`` instances, not just nested factory calls.
-
-Implementation details
-----------------------
-
-**StreamFieldFactory parameter delegation**:
-
-.. code-block:: python
-
-    def evaluate(self, instance, step, extra):
-        # The 'extra' parameter already contains parameters filtered by Factory Boy
-        # for this StreamFieldFactory (e.g., all parameters starting with "body__")
-        # with the "body__" prefix already stripped by Factory Boy's mechanisms
-        return self.stream_block_factory(**extra)
-
-.. important::
-   **Factory Boy handles prefix stripping automatically**
-   
-   The ``ParameteredAttribute`` mechanism performs prefix filtering **before** our code runs:
-   
-   1. **User calls**: ``MyPageFactory(body__0__struct_block__title="foo")``
-   2. **Factory Boy processes**: Identifies ``body__`` prefix matches ``StreamFieldFactory`` 
-   3. **Factory Boy strips**: Removes ``body__`` prefix from matching parameters
-   4. **Our code receives**: ``StreamFieldFactory.evaluate()`` gets ``{'0__struct_block__title': 'foo'}``
-   
-   This timing is crucial - our parameter parsing code never sees the original full parameter names.
-
-**Builder parameter parsing**:
-
-.. code-block:: python
-
-    def get_block_declarations(self, factory_meta, extras):
-        # At this level, prefixes are already stripped
-        # "0__struct_block__title" becomes index=0, block="struct_block", params=["title"]
-        for k, v in extras.items():
-            if not k.isdigit():
-                i, name, *params = k.split("__", maxsplit=2)
-                # params becomes ["title"] for nested delegation
-                if params:
-                    nested_key = "__".join(params)  # "title"
-                    # This gets passed to the SubFactory
-
-Critical flow points
---------------------
-
-1. **Entry point filtering**: Each ``StreamFieldFactory`` only processes its own parameters
-2. **Prefix stripping**: Essential for clean delegation to child factories
-3. **Recursive parsing**: Each builder level handles one level of nesting
-4. **Parameter transformation**: Keys get transformed for Factory Boy compatibility (``0.struct_block__title``)
-5. **Factory Boy delegation**: Standard ``SubFactory`` mechanisms handle the final construction
-
-Complex flow example
----------------------
-
-For ``body__0__struct__inner_stream__1__char_block="text"``:
-
-1. First-level parsing creates ``struct`` at index 0
-2. ``inner_stream__1__char_block="text"`` passed to StructBlockFactory
-3. StructBlockFactory creates inner StreamFieldFactory for ``inner_stream``
-4. Inner factory parses ``1__char_block="text"``
-5. Recursive construction builds the full hierarchy
-
-.. note::
-   **Verification**: The parameter flows documented in this section have been verified through live debugging of actual factory execution. See :doc:`parameter-flow-investigation` for detailed tracing results that confirm these documented behaviors.
 
 Block factory behavior
 =======================
 
-Each block factory type has specific behavior patterns and construction logic.
+Different Wagtail block types have fundamentally different construction requirements and data structures. StreamBlock values are ordered lists with indexed access, StructBlock values are dictionaries with named field access, and ListBlock values are arrays of homogeneous items. Each block factory type has specific behavior patterns and construction logic to handle these different requirements while integrating with the overall parameter delegation system.
 
 StreamBlockFactory
 -------------------
@@ -764,7 +708,8 @@ Adding support for new block types
 
 To add support for a new Wagtail block type, follow this pattern:
 
-**1. Create a factory class extending the appropriate base**:
+Create a factory class extending the appropriate base
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -776,7 +721,8 @@ To add support for a new Wagtail block type, follow this pattern:
         class Meta:
             model = MyCustomBlock
 
-**2. For blocks requiring custom construction logic**:
+For blocks requiring custom construction logic
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -789,7 +735,8 @@ To add support for a new Wagtail block type, follow this pattern:
             # Custom construction logic here
             return model_class(**processed_kwargs)
 
-**3. For blocks that need special StepBuilder handling**:
+For blocks that need special StepBuilder handling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
