@@ -29,8 +29,7 @@ Usage
 
     class MyCarouselFactory(wagtail_factories.StructBlockFactory):
         title = "Carousel title"
-        items = wagtail_factories.ListBlockFactory(
-            MyCarouselItemFactory)
+        items = wagtail_factories.ListBlockFactory(MyCarouselItemFactory)
 
         class Meta:
             model = models.MyCarousel
