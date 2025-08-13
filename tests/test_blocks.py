@@ -12,7 +12,6 @@ from tests.testapp.factories import (
     MyBlockItemFactory,
     MyTestPageWithStreamFieldFactory,
 )
-from wagtail_factories.blocks import WAGTAIL_63_OR_HIGHER
 
 
 def eq_list_block_values(p, q):
@@ -232,7 +231,6 @@ def test_document_chooser_block():
     assert value == document
 
 
-@pytest.mark.skipif(not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+")
 @pytest.mark.django_db
 def test_image_block_decorative():
     value = wagtail_factories.ImageBlockFactory(decorative=True)
@@ -243,7 +241,6 @@ def test_image_block_decorative():
     assert value.contextual_alt_text == ""
 
 
-@pytest.mark.skipif(not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+")
 @pytest.mark.django_db
 def test_image_block_with_alt_text():
     value = wagtail_factories.ImageBlockFactory(decorative=False)
@@ -255,7 +252,6 @@ def test_image_block_with_alt_text():
     assert value.contextual_alt_text.startswith("Alt text")
 
 
-@pytest.mark.skipif(not WAGTAIL_63_OR_HIGHER, reason="ImageBlock requires Wagtail 6.3+")
 @pytest.mark.django_db
 def test_image_block_with_no_image():
     value = wagtail_factories.ImageBlockFactory(image=None)
