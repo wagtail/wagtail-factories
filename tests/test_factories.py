@@ -1,6 +1,7 @@
 import pytest
 from wagtail import blocks
 from wagtail.models import Page, Site
+from wagtail.contrib.redirects.models import Redirect
 
 import wagtail_factories
 from tests.testapp.factories import MyTestPageFactory, MyTestPageGetOrCreateFactory
@@ -171,3 +172,27 @@ def test_document_add_to_collection():
         collection__parent=root_collection, collection__name="new"
     )
     assert document.collection.name == "new"
+
+
+@pytest.mark.django_db()
+def test_redirect_factory():
+    """
+    Test that a `RedirectFactory` generates a `Redirect` object.
+    """
+    redirect = wagtail_factories.RedirectFactory()
+
+    assert type(redirect) is Redirect
+
+
+@pytest.mark.django_db()
+def test_redirect_factory_old_path_normalisation():
+    """
+    Test that `RedirectFactory` uses `Redirect.clean()` to normalise the
+    `old_path` value.
+    """
+
+    redirect = wagtail_factories.RedirectFactory(old_path="test-path/")
+
+    # Verify that `old_path` has been modified according to
+    # @https://github.com/wagtail/wagtail/blob/a09bba67cd58f519f3ae5bff32575e7ce9244031/wagtail/contrib/redirects/models.py#L141
+    assert redirect.old_path == "/test-path"
