@@ -16,6 +16,8 @@ Usage
 .. code-block:: python
 
     import wagtail_factories
+    from wagtail import models as wt_models
+
     from . import models
 
 
@@ -46,9 +48,12 @@ Usage
 
 
     def test_my_page():
-        root_page = wagtail_factories.PageFactory(parent=None)
+        root_page = wt_models.Page.get_first_root_node()
+        assert root_page is not None
+
         my_page = MyTestPageFactory(
             parent=root_page,
+            title="My great page",
             body__0__carousel__items__0__label='Slide 1',
             body__0__carousel__items__0__image__image__title='Image Slide 1',
             body__0__carousel__items__1__label='Slide 2',
@@ -56,3 +61,10 @@ Usage
             body__0__carousel__items__2__label='Slide 3',
             body__0__carousel__items__2__image__image__title='Image Slide 3',
         )
+
+        # Defaults defined on factory classes are propagated.
+        assert my_page.body[0].value["title"] == "Carousel title"
+
+        # Parameters are propagated.
+        assert my_page.title == "My great page"
+        assert my_page.body[0].value["items"][0].value["label"] == "Slide 1"

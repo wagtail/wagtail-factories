@@ -51,24 +51,26 @@ Factory definitions
 .. code-block:: python
 
     # Define the block structure
-    class MyStreamBlockFactory(StreamBlockFactory):
-        text_block = factory.SubFactory(CharBlockFactory)
-        struct_block = factory.SubFactory(MyStructBlockFactory)
-        
-        class Meta:
-            model = MyStreamBlock
-    
     class MyStructBlockFactory(StructBlockFactory):
         title = "Default Title"
         content = "Default Content"
-        
+
         class Meta:
             model = MyStructBlock
-    
+
+
+    class MyStreamBlockFactory(StreamBlockFactory):
+        text_block = factory.SubFactory(CharBlockFactory)
+        struct_block = factory.SubFactory(MyStructBlockFactory)
+
+        class Meta:
+            model = MyStreamBlock
+
+
     # Use in page factory
     class MyPageFactory(factory.Factory):
         body = StreamFieldFactory(MyStreamBlockFactory)
-        
+
         class Meta:
             model = MyPage
 
@@ -194,7 +196,7 @@ When a StreamBlock contains multiple instances of the same block type (e.g., ``0
 Factory Boy DeclarationSet compatibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Factory Boy uses a DeclarationSet to store factory attributes like ``title = "Hello"``. Each key must be unique and hashable. Using ``0.struct_block__title`` as the key allows the system to associate parameters with the correct generated factory field during dynamic factory creation.
+Factory Boy uses a DeclarationSet to store factory attributes like ``title = "Hello"``. Each key must be unique and hashable. Using ``0.struct_block__title`` as the key allows the system to associate parameters with the correct generated factory field during dynamic factory creation (see `Phase 2: Generate a Factory class dynamically`_).
 
 Prevents Factory Boy field interpretation errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -293,7 +295,7 @@ Factory Boy handles the initial parameter filtering automatically. The ``Paramet
 
 1. User calls ``MyPageFactory(body__0__struct_block__title="foo")``
 2. Factory Boy processes: Identifies ``body__`` prefix matches ``StreamFieldFactory``
-3. Factory Boy strips: Removes ``body__`` prefix from matching parameters  
+3. Factory Boy strips: Removes ``body__`` prefix from matching parameters
 4. Our code receives: ``StreamFieldFactory.evaluate()`` gets ``{'0__struct_block__title': 'foo'}``
 
 This timing is crucial - our parameter parsing code never sees the original full parameter names.
@@ -315,13 +317,13 @@ Example: ``body__0__struct_block__title="Hello"``
     ├── Receives: body__0__struct_block__title="Hello"
     ├── StreamFieldFactory "body" matches prefix
     ├── Strips "body__" → delegates: 0__struct_block__title="Hello"
-    
-    Level 2: StreamBlockFactory  
+
+    Level 2: StreamBlockFactory
     ├── Receives: 0__struct_block__title="Hello"
     ├── Builder parses: index=0, block="struct_block", params=["title"]
-    ├── Creates SubFactory for StructBlockFactory
+    ├── Delegates to SubFactory for StructBlockFactory
     ├── Delegates: title="Hello"
-    
+
     Level 3: StructBlockFactory
     ├── Receives: title="Hello"
     ├── Sets struct field directly
@@ -336,7 +338,7 @@ Critical flow points
 ---------------------
 
 1. Entry point filtering: Factory Boy automatically filters parameters by prefix for each ``StreamFieldFactory``
-2. Prefix stripping: Essential for clean delegation to child factories  
+2. Prefix stripping: Essential for clean delegation to child factories
 3. Recursive parsing: Each builder level handles one level of nesting
 4. Parameter transformation: Keys get transformed for Factory Boy compatibility (``0.struct_block__title``)
 5. Factory Boy delegation: Standard ``SubFactory`` mechanisms handle the final construction
@@ -358,10 +360,10 @@ Simple nesting
     │  └─ filters for "body__" prefix
     │  └─ delegates: {"0__struct_block__title": "Hello"}
     │
-    ├─ StreamBlockFactory via StreamBlockStepBuilder  
+    ├─ StreamBlockFactory via StreamBlockStepBuilder
     │  └─ receives: {"0__struct_block__title": "Hello"}
     │  └─ parses: index=0, block="struct_block", field="title"
-    │  └─ creates: SubFactory(StructBlockFactory, title="Hello")
+    │  └─ reuses: existing SubFactory(StructBlockFactory) with title="Hello"
     │
     └─ StructBlockFactory
        └─ receives: {"title": "Hello"}
@@ -381,16 +383,16 @@ Deep nesting
     │
     ├─ StreamBlockStepBuilder (level 1)
     │  └─ parses: index=0, block="struct", remaining="inner_stream__1__char_block"
-    │  └─ creates: SubFactory(StructBlockFactory, inner_stream__1__char_block="text")
+    │  └─ reuses: existing SubFactory(StructBlockFactory) with inner_stream__1__char_block="text"
     │
-    ├─ StructBlockFactory  
+    ├─ StructBlockFactory
     │  └─ receives: {"inner_stream__1__char_block": "text"}
     │  └─ has inner_stream = StreamFieldFactory(...)
     │  └─ delegates: {"1__char_block": "text"}
     │
     ├─ StreamBlockStepBuilder (level 2)
     │  └─ parses: index=1, block="char_block", remaining=""
-    │  └─ creates: SubFactory(CharBlockFactory, value="text") 
+    │  └─ reuses: existing SubFactory(CharBlockFactory) with value="text"
     │
     └─ CharBlockFactory
        └─ receives: {"value": "text"} (or direct assignment)
@@ -407,19 +409,19 @@ Based on verified execution tracing, this complex flow involves multiple builder
 
     Level 1: StreamFieldFactory.evaluate()
     └─ receives: {'0__list_block__0__0__struct_block__title': 'foo'}
-    
+
     Level 2: StreamBlockStepBuilder (outer)
     └─ parses: index=0, block='list_block'
     └─ delegates: {'0__0__struct_block__title': 'foo'} to ListBlockFactory
-    
-    Level 3: ListBlockFactory.evaluate()  
+
+    Level 3: ListBlockFactory.evaluate()
     └─ groups by list index: result[0] = {'0__struct_block__title': 'foo'}
-    └─ calls step.recurse() → creates child StreamBlockFactory
-    
+    └─ calls step.recurse() → creates child StreamBlockFactory dynamically
+
     Level 4: StreamBlockStepBuilder (inner)
     └─ receives: {'0__struct_block__title': 'foo'}
     └─ parses: index=0, block='struct_block'
-    └─ creates: StructBlockFactory with title='foo'
+    └─ reuses: existing StructBlockFactory with title='foo'
 
 
 Block factory behavior
@@ -497,7 +499,7 @@ Declaration syntax
 ~~~~~~~~~~~~~~~~~~
 
 - ``items__0__label="foo"`` - Set field in first StructBlock item
-- ``char_array__0="hello"`` - Set first item in CharBlock list  
+- ``char_array__0="hello"`` - Set first item in CharBlock list
 - ``list_block__0__0__struct_block__title="foo"`` - ListBlock containing StreamBlocks
 
 Implementation
@@ -550,7 +552,7 @@ Initialization patterns
         "block_name": BlockFactory,
     })
 
-    # Class-based (recommended)  
+    # Class-based (recommended)
     body = StreamFieldFactory(MyStreamBlockFactory)
 
 Block definition instantiation
@@ -623,7 +625,7 @@ Specialized options for StreamBlock factories with advanced parameter filtering:
                 block_name = get_block_name(k)
                 if (
                     block_name not in self.exclude
-                    and block_name not in self.parameters  
+                    and block_name not in self.parameters
                     and v is not declarations.SKIP
                 ):
                     filtered_kwargs[k] = v
@@ -663,21 +665,21 @@ Explicit block definition
             block_def = MyStreamBlock()  # Explicit
 
 Auto-instantiation (more common)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
-    class MyStreamBlockFactory(StreamBlockFactory):  
+    class MyStreamBlockFactory(StreamBlockFactory):
         class Meta:
             model = MyStreamBlock  # Auto-instantiated when needed
 
 .. important::
    **Why block definitions matter**
-   
+
    Wagtail block definitions are required to construct proper ``StreamValue`` objects. Without them, the system falls back to returning raw data structures. The options system ensures block definitions are available throughout the factory hierarchy by:
-   
+
    - Auto-instantiating models when needed
-   - Propagating definitions through ``SubFactory`` chains  
+   - Propagating definitions through ``SubFactory`` chains
    - Providing consistent access via ``get_block_definition()``
 
 Error handling and validation

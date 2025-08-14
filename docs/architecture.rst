@@ -9,7 +9,7 @@ System components
 
 wagtail-factories extends Factory Boy to create test data for Wagtail CMS models. The system consists of three main layers:
 
-**Factory layer**
+**Model factory layer**
     Core factory classes that extend Factory Boy's ``DjangoModelFactory`` for Wagtail-specific models (``PageFactory``, ``ImageFactory``, etc.)
 
 **Block factory layer**
@@ -85,7 +85,7 @@ StreamField factories are defined using class-based syntax that mirrors Wagtail'
         class Meta:
             model = MyStreamBlock
 
-This approach enables nested StreamBlocks, better IDE support, and cleaner factory composition.
+This approach enables nested StreamBlocks and clean, introspectable factory composition.
 
 .. note::
 
@@ -156,4 +156,8 @@ This allows adaptation to domain-specific Wagtail block types while maintaining 
 Next steps
 ==========
 
-**For contributors**: If you need to modify or extend the StreamField factory system, see :doc:`streamfield-internals` for detailed technical implementation details including Factory Boy integration mechanisms, parameter parsing, and builder system architecture.
+**For contributors**: If you need to modify or extend the StreamField factory system, see :doc:`streamfield-internals` for detailed technical implementation details, including:
+
+- Factory Boy integration mechanisms;
+- parameter parsing; and
+- builder system architecture.
