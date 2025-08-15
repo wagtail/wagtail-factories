@@ -17,5 +17,6 @@ Contents
    :maxdepth: 2
 
    quickstart
+   tutorials/getting-started-with-wagtail-factories
    architecture
    streamfield-internals
