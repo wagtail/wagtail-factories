@@ -26,7 +26,7 @@ with open("README.md") as fh:
 
 setup(
     name="wagtail_factories",
-    version="4.2.1",
+    version="4.3.0",
     description="Factory boy classes for wagtail",
     long_description=long_description,
     long_description_content_type="text/markdown",
