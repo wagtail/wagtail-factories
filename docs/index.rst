@@ -16,6 +16,6 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   getting-started
+   quickstart
    architecture
    streamfield-internals
