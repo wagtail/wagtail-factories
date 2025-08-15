@@ -12,4 +12,6 @@ dist/
 .cache
 .tox
 htmlcov
-docs/_build
+
+# Documentation builds
+docs/_build/
