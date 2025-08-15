@@ -1,5 +1,8 @@
 Unreleased
 ==========
+
+4.3.0
+=====
 - Add ImageBlockFactory
 - Add support for Wagtail 7.1
 - Drop support for Wagtail 6.4
