@@ -11,6 +11,13 @@ We'll learn about factories for Wagtail's models - factories for stream field bl
 
 We assume working familiarity with Wagtail, and a passing familiarity with factory boy.
 
+Set up a working environment
+----------------------------
+
+To follow this tutorial on your own machine, create a new Wagtail project `as described in the Wagtail docs <https://docs.wagtail.org/en/stable/getting_started/tutorial.html#install-and-run-wagtail>`_. The project name doesn't matter - we'll work entirely within the generated ``home`` app.
+
+This tutorial was developed using `uv <https://docs.astral.sh/uv/>`_ but does not depend on any of its functionality.
+
 Page models
 -----------
 
@@ -24,7 +31,7 @@ To get started, we'll create some basic page models. Wagtail gives us a ``HomePa
     class HomePage(Page):
         pass
 
-Add a ``BlogPage`` type with foreign keys to Wagtail's ``Page``, ``Image``, and ``Document``  models.
+Add a ``BlogPage`` type with foreign keys to Wagtail's ``Page``, ``Image``, and ``Document`` models, in ``home/models.py``.
 
 .. code:: python
 
@@ -67,7 +74,7 @@ With some models created, we are ready to create the corresponding factory class
 Page factories
 --------------
 
-First, we'll create a factory for the ``HomePage`` type.
+First, we'll create a factory for the ``HomePage`` type in ``home/factories.py``.
 
 .. code:: python
 
@@ -87,7 +94,7 @@ This one's simple. We can use it to create ``HomePage`` instances:
 
     HomePageFactory(title="My temporary home page")
 
-Let's create a ``BlogPageFactory`` with some more declarations.
+Let's also create a ``BlogPageFactory`` with some more declarations in ``home/factories.py``.
 
 .. code:: python
 
@@ -105,7 +112,10 @@ Let's create a ``BlogPageFactory`` with some more declarations.
         class Meta:
             model = BlogPage
 
-First, let's generate an instance without any specific parameters.
+Using our page factories
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now that we've defined some factories, we can try them out. Generate an instance without any specific parameters and inspect its attributes.
 
 .. code:: python
 
@@ -132,7 +142,7 @@ As has an image...
 
 ::
 
-    <WagtailImageFieldFile: original_images/example_p237eu7.jpg>
+    <WagtailImageFieldFile: original_images/example_6bp0ETK.jpg>
 
 
 ...a document...
@@ -143,7 +153,7 @@ As has an image...
 
 ::
 
-    <FieldFile: documents/example_y59xLMU.dat>
+    <FieldFile: documents/example_5Wppv1G.dat>
 
 
 ...and text.
@@ -169,7 +179,7 @@ A related page was also generated: we can inspect its attributes.
     5
 
 More control
-------------
+~~~~~~~~~~~~
 
 ``PageFactory`` subclasses are ultimately ``factory.django.DjangoModelFactory`` subclasses. This means that factory boy's full feature set is available to us, so we can specify the values of our instances, even spanning relationships.
 
@@ -187,7 +197,7 @@ More control
 See the `factory boy docs <https://factoryboy.readthedocs.io/en/stable/index.html>`_ for all the details.
 
 Image and file details
-~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^
 
 wagtail-factories uses factory boy's `FileField <https://factoryboy.readthedocs.io/en/stable/orms.html#factory.django.FileField>`_ and `ImageField <https://factoryboy.readthedocs.io/en/stable/orms.html#factory.django.ImageField>`_ for its ``DocumentFactory`` and ``ImageFactory``, respectively. As images and documents are important entities in a Content Management System, it may be desirable to control how they are created in our tests.
 
@@ -223,7 +233,7 @@ It may also be desirable to control aspects of generated image files, such as di
     image.width, image.height
 
 The page tree
-~~~~~~~~~~~~~
+^^^^^^^^^^^^^
 
 In the examples so far, we've shown isolated page instances that don't interact with one of Wagtail's key concepts: the page tree. By default, page instances created via a ``PageFactory`` subclass are not inserted into any existing page tree.
 
@@ -242,7 +252,7 @@ In practice, we'll often want to replicate a real website's page structure in ou
 
 ::
 
-    <PageQuerySet [<Page: Root>, <Page: My temporary home page>, <Page: Test page>, <Page: Test page>, <Page: Closely related page>, <Page: My new blog>, <Page: Test page>, <Page: Test page>, <Page: Test page>]>
+    <PageQuerySet [<Page: Root>, <Page: My temporary home page>, <Page: Test page>, <Page: Test page>, <Page: Closely related page>, <Page: My new blog>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, '...(remaining elements truncated)...']>
 
 
 However, if we're using Wagtail's provided migrations, `one is provided for us by default <https://github.com/wagtail/wagtail/blob/c78838f6ee89fd8e01101326fa08a36babafd88d/wagtail/migrations/0002_initial_data.py#L17-L25>`_, so we might like to retrieve and use it.
