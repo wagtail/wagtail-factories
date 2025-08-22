@@ -94,6 +94,11 @@ This one's simple. We can use it to create ``HomePage`` instances:
 
     HomePageFactory(title="My temporary home page")
 
+::
+
+    <HomePage: My temporary home page>
+
+
 Let's also create a ``BlogPageFactory`` with some more declarations in ``home/factories.py``.
 
 .. code:: python
@@ -123,6 +128,11 @@ Now that we've defined some factories, we can try them out. Generate an instance
 
     blog_page
 
+::
+
+    <BlogPage: Test page>
+
+
 A title has been generated.
 
 .. code:: python
@@ -142,7 +152,7 @@ As has an image...
 
 ::
 
-    <WagtailImageFieldFile: original_images/example_6bp0ETK.jpg>
+    <WagtailImageFieldFile: original_images/example_WGodNWK.jpg>
 
 
 ...a document...
@@ -153,7 +163,7 @@ As has an image...
 
 ::
 
-    <FieldFile: documents/example_5Wppv1G.dat>
+    <FieldFile: documents/example_HxlsHjf.dat>
 
 
 ...and text.
@@ -194,6 +204,11 @@ More control
 
     blog_2.splash_text
 
+::
+
+    'Closely related page is closely related'
+
+
 See the `factory boy docs <https://factoryboy.readthedocs.io/en/stable/index.html>`_ for all the details.
 
 Image and file details
@@ -216,6 +231,11 @@ Using the features provided by factory boy, it is possible to define parameters 
 
     doc.file.name, doc.file.read()
 
+::
+
+    ('documents/my-test-doc_zdU3J7g.txt', b'sample content')
+
+
 It may also be desirable to control aspects of generated image files, such as dimensions, colour, and file type.
 
 .. code:: python
@@ -232,6 +252,10 @@ It may also be desirable to control aspects of generated image files, such as di
 
     image.width, image.height
 
+::
+
+    (100, 25)
+
 The page tree
 ^^^^^^^^^^^^^
 
@@ -240,6 +264,11 @@ In the examples so far, we've shown isolated page instances that don't interact 
 .. code:: python
 
     BlogPageFactory().get_parent()
+
+::
+
+    None
+
 
 In practice, we'll often want to replicate a real website's page structure in our tests, for example creating a home page with some children. To mirror a proper Wagtail tree structure, we need a root page, which is an entry in the tree that is not visitable by users, has no parents, and is the ancestor of every page in the tree. This is easy to create using wagtail-factories - in fact, every time we create a page from a factory without an explicit ``parent`` parameter, we are creating one:
 
@@ -252,7 +281,7 @@ In practice, we'll often want to replicate a real website's page structure in ou
 
 ::
 
-    <PageQuerySet [<Page: Root>, <Page: My temporary home page>, <Page: Test page>, <Page: Test page>, <Page: Closely related page>, <Page: My new blog>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, <Page: Test page>, '...(remaining elements truncated)...']>
+    <PageQuerySet [<Page: Root>, <Page: My temporary home page>, <Page: Test page>, <Page: Test page>, <Page: Closely related page>, <Page: My new blog>, <Page: Test page>, <Page: Test page>]>
 
 
 However, if we're using Wagtail's provided migrations, `one is provided for us by default <https://github.com/wagtail/wagtail/blob/c78838f6ee89fd8e01101326fa08a36babafd88d/wagtail/migrations/0002_initial_data.py#L17-L25>`_, so we might like to retrieve and use it.
@@ -271,7 +300,7 @@ Surprisingly, our home page is still not routable. This is because it does not b
 
 ::
 
-    ('/', <Site: localhost [default]>)
+    (None, None)
 
 
 If we start our project with ``wagtail start``, Wagtail `creates an initial home page instance for us <https://github.com/wagtail/wagtail/blob/c78838f6ee89fd8e01101326fa08a36babafd88d/wagtail/project_template/home/migrations/0002_create_homepage.py#L11-L35>`_. We can use that instance in our tests.
@@ -309,6 +338,11 @@ However, for complete control over the created instances, we can create our own.
 
     home.url
 
+::
+
+    '/'
+
+
 We can then use our new home page as the parent of other pages, e.g. blog pages.
 
 .. code:: python
@@ -316,5 +350,10 @@ We can then use our new home page as the parent of other pages, e.g. blog pages.
     blog = BlogPageFactory(parent=home)
 
     blog.url
+
+::
+
+    '/test-page/'
+
 
 Whether or not to use Wagtail's default data, or create it all in your test setup, will depend on the specifics of your project.
