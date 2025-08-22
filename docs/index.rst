@@ -2,9 +2,15 @@
 Wagtail Factories
 =================
 
-This Django app provides Factory Boy factories for the Wagtail CMS.
+This library provides Factory Boy factories for the Wagtail CMS.
 
-Documentation is still in progress, but see the `tests`_ for more examples.
+Documentation is still in progress:
+
+- start with the :doc:`quickstart` guide;
+- continue with tutorials:
+    - :doc:`tutorials/getting-started-with-wagtail-factories`;
+    - :doc:`tutorials/working-with-blocks`; and
+- see the `tests`_ for more examples.
 
 For contributors working on wagtail-factories itself, see the :doc:`architecture` and :doc:`streamfield-internals` documentation.
 
@@ -16,6 +22,8 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   getting-started
+   quickstart
+   tutorials/getting-started-with-wagtail-factories
+   tutorials/working-with-blocks
    architecture
    streamfield-internals
