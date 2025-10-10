@@ -246,6 +246,7 @@ It may also be desirable to control aspects of generated image files, such as di
         file__width=100,
         file__height=25,
         file__format="PNG",
+        file__color="blue",
     )
 
     image.width, image.height

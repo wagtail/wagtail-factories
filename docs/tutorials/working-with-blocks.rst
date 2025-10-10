@@ -38,6 +38,7 @@ We need to define ``PetsBlock``, so create it and its sub-blocks in ``home/block
             ("calico", "Calico"),
             ("tabby", "Tabby"),
             ("orange", "Orange"),
+            ("tortoiseshell", "Tortoiseshell"),
         ]
 
 
