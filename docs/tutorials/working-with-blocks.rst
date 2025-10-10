@@ -156,7 +156,7 @@ We have:
 
 The ``Meta.model`` declaration is essential: wagtail-factories needs this to create values of the correct type. It should be the relevant block class.
 
-In this example, we're using the API exposed by ``factory.Faker``. This helps us to generate reasonable-looking defaults for fields we don't specify explicit values for when creating block instances.
+In the next example, we're using the API exposed by ``factory.Faker``. This helps us to generate reasonable-looking defaults for fields we don't specify explicit values for when creating block instances.
 
 .. code:: python
 
@@ -315,8 +315,8 @@ We can also use double-underscores to traverse the block definition tree, and sp
 
 .. code:: python
 
-    with_image = f.PetStoryBlockFactory(**{"0__image__decorative": True})
-    with_image[0].value.decorative
+    block_with_image = f.PetStoryBlockFactory(**{"0__image__decorative": True})
+    block_with_image[0].value.decorative
 
 ::
 
@@ -333,7 +333,7 @@ To specify multiple values for a particular nested block, we can add declaration
 
 .. code:: python
 
-    with_image = f.PetStoryBlockFactory(
+    block_with_image = f.PetStoryBlockFactory(
         **{
             "0__image__decorative": False,
             "0__image__alt_text": "An orange cat lying in the sun",
@@ -341,7 +341,7 @@ To specify multiple values for a particular nested block, we can add declaration
         }
     )
 
-    with_image[0].value.decorative, with_image[0].value.contextual_alt_text
+    block_with_image[0].value.decorative, with_image[0].value.contextual_alt_text
 
 ::
 
