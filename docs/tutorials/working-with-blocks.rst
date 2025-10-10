@@ -92,8 +92,8 @@ Create and run the migrations.
 
 .. code:: bash
 
-    uv run python manage.py makemigrations --noinput --no-color
-    uv run python manage.py migrate --noinput --no-color
+    python manage.py makemigrations
+    python manage.py migrate
 
 Block factories
 ---------------

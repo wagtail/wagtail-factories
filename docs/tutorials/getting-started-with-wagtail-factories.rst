@@ -16,8 +16,6 @@ Set up a working environment
 
 To follow this tutorial on your own machine, create a new Wagtail project `as described in the Wagtail docs <https://docs.wagtail.org/en/stable/getting_started/tutorial.html#install-and-run-wagtail>`_. The project name doesn't matter - we'll work entirely within the generated ``home`` app.
 
-This tutorial was developed using `uv <https://docs.astral.sh/uv/>`_ but does not depend on any of its functionality.
-
 Page models
 -----------
 
@@ -66,8 +64,8 @@ Create and run the migrations.
 
 .. code:: bash
 
-    uv run python manage.py makemigrations --noinput --no-color
-    uv run python manage.py migrate --noinput --no-color
+    python manage.py makemigrations
+    python manage.py migrate
 
 With some models created, we are ready to create the corresponding factory classes.
 
