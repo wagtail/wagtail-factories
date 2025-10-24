@@ -58,36 +58,6 @@ def test_list_block_factory():
 
 
 @pytest.mark.django_db
-def test_list_block_factory():
-    actual = MyBlockFactory(
-        items__0__label='label-1',
-        items__0__value=1,
-        items__1__label='label-2',
-        items__1__value=2,
-        image__image=None)
-
-    expected = StructValue(None, [
-        ('title', 'my title'),
-        ('item', OrderedDict([
-            ('label', 'my-label'),
-            ('value', 100),
-        ])),
-        ('items', [
-            StructValue(None, [
-                ('label', 'label-1'),
-                ('value', 1),
-            ]),
-            StructValue(None, [
-                ('label', 'label-2'),
-                ('value', 2),
-            ]),
-        ]),
-        ('image', None),
-    ])
-    eq_list_block_values(actual["items"], expected["items"])
-
-
-@pytest.mark.django_db
 def test_block_factory():
     value = MyBlockFactory(
         image__image__title='blub')
