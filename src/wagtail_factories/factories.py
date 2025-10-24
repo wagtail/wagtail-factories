@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-class MP_NodeFactory(factory.DjangoModelFactory):
+class MP_NodeFactory(factory.django.DjangoModelFactory):
 
     @classmethod
     def _build(cls, model_class, *args, **kwargs):
@@ -60,7 +60,7 @@ class PageFactory(MP_NodeFactory):
         model = Page
 
 
-class CollectionMemberFactory(factory.DjangoModelFactory):
+class CollectionMemberFactory(factory.django.DjangoModelFactory):
     collection = factory.SubFactory(CollectionFactory, parent=None)
 
 
@@ -73,7 +73,7 @@ class ImageFactory(CollectionMemberFactory):
     file = factory.django.ImageField()
 
 
-class SiteFactory(factory.DjangoModelFactory):
+class SiteFactory(factory.django.DjangoModelFactory):
     hostname = 'localhost'
     port = factory.Sequence(lambda n: 81 + n)
     site_name = 'Test site'
