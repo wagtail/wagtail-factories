@@ -7,6 +7,7 @@ from wagtail import blocks
 from wagtail.images.blocks import ImageChooserBlock
 
 from wagtail_factories.factories import ImageFactory
+from wagtail_factories.builders import ListBlockStepBuilder
 
 __all__ = [
     'CharBlockFactory',
@@ -68,27 +69,30 @@ class StreamFieldFactory(ParameteredAttribute):
 
 
 class ListBlockFactory(factory.SubFactory):
+    _builder_class = ListBlockStepBuilder
+
     def __call__(self, **kwargs):
-        return self.generate(None, kwargs)
+        return self.evaluate(None, None, kwargs)
 
-    def generate(self, step, params):
-        subfactory = self.get_factory()
-
+    def evaluate(self, instance, step, extra):
         result = defaultdict(dict)
-        for key, value in params.items():
+        for key, value in extra.items():
             if key.isdigit():
-                result[int(key)]['value'] = value
+                result[int(key)]["value"] = value
             else:
-                prefix, label = key.split('__', 2)
+                prefix, label = key.split("__", maxsplit=1)
                 if prefix and prefix.isdigit():
                     result[int(prefix)][label] = value
 
-        retval = []
-        for index, index_params in sorted(result.items()):
-            item = subfactory(**index_params)
-            retval.append(item)
+        subfactory = self.get_factory()
+        force_sequence = step.sequence if self.FORCE_SEQUENCE else None
+        values = [
+            step.recurse(subfactory, params, force_sequence=force_sequence)
+            for _, params in sorted(result.items())
+        ]
 
-        return retval
+        list_block_def = blocks.list_block.ListBlock(subfactory._meta.model())
+        return blocks.list_block.ListValue(list_block_def, values)
 
 
 class StreamBlockSubFactory(factory.SubFactory):

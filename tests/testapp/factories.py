@@ -6,7 +6,7 @@ from . import models
 
 
 class MyBlockItemFactory(wagtail_factories.StructBlockFactory):
-    label = 'my-label'
+    label = "my-label"
     value = 100
 
     class Meta:

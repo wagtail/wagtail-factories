@@ -9,19 +9,64 @@ from wagtail.blocks import StructValue, StreamValue
 from wagtail.images.models import Image
 
 import wagtail_factories
-from tests.testapp.factories import MyBlockFactory, MyTestPageWithStreamFieldFactory
+from tests.testapp.factories import MyBlockItemFactory, MyBlockFactory, MyTestPageWithStreamFieldFactory
+
+
+def eq_list_block_values(p, q):
+    """
+    Direct comparison of ListValue instances fails under current versions of Wagtail (<= 4.1),
+    so do a pairwise comparison of the bound blocks' values.
+
+    With Wagtail >= 2.16 we will get ListValues, prior to that just lists.
+    """
+
+    return all(map(lambda x, y: x.value == y.value, p.bound_blocks, q.bound_blocks))
 
 
 @pytest.mark.django_db
 def test_list_block_factory():
-    value = MyBlockFactory(
+    computed = MyBlockFactory(
+        items__0__label="label-1",
+        items__0__value=1,
+        items__1__label="label-2",
+        items__1__value=2,
+        image__image=None,
+    )
+
+    list_item_block = MyBlockItemFactory._meta.model()
+
+    expected = MyBlockFactory._meta.model().clean(
+        OrderedDict(
+            [
+                ("title", "my title"),
+                ("item", OrderedDict([("label", "my-label"), ("value", 100)])),
+                (
+                    "items",
+                    [
+                        StructValue(
+                            list_item_block, [("label", "label-1"), ("value", 1)]
+                        ),
+                        StructValue(
+                            list_item_block, [("label", "label-2"), ("value", 2)]
+                        ),
+                    ],
+                ),
+            ]
+        )
+    )
+    assert eq_list_block_values(computed["items"], expected["items"])
+
+
+@pytest.mark.django_db
+def test_list_block_factory():
+    actual = MyBlockFactory(
         items__0__label='label-1',
         items__0__value=1,
         items__1__label='label-2',
         items__1__value=2,
         image__image=None)
 
-    assert value == StructValue(None, [
+    expected = StructValue(None, [
         ('title', 'my title'),
         ('item', OrderedDict([
             ('label', 'my-label'),
@@ -39,6 +84,7 @@ def test_list_block_factory():
         ]),
         ('image', None),
     ])
+    eq_list_block_values(actual["items"], expected["items"])
 
 
 @pytest.mark.django_db
