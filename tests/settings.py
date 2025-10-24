@@ -34,56 +34,29 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'tests.testapp',
+
+    'wagtail.contrib.styleguide',
+    'wagtail.contrib.sitemaps',
+    'wagtail.contrib.routable_page',
+    'wagtail.contrib.frontend_cache',
+    'wagtail.contrib.search_promotions',
+    'wagtail.contrib.settings',
+    'wagtail.contrib.table_block',
+    'wagtail.contrib.forms',
+
+    'wagtail.search',
+    'wagtail.embeds',
+    'wagtail.images',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.admin',
+    'wagtail.api.v2',
+    'wagtail',
+
+    "wagtail_modeladmin"
 ]
-
-
-if WAGTAIL_VERSION < (2, 0):
-    INSTALLED_APPS = [
-        'wagtail.contrib.wagtailstyleguide',
-        'wagtail.contrib.wagtailsitemaps',
-        'wagtail.contrib.wagtailroutablepage',
-        'wagtail.contrib.wagtailfrontendcache',
-        'wagtail.contrib.wagtailapi',
-        'wagtail.contrib.wagtailsearchpromotions',
-        'wagtail.contrib.settings',
-        'wagtail.contrib.modeladmin',
-        'wagtail.contrib.table_block',
-        'wagtail.wagtailforms',
-        'wagtail.wagtailsearch',
-        'wagtail.wagtailembeds',
-        'wagtail.wagtailimages',
-        'wagtail.wagtailsites',
-        'wagtail.wagtailusers',
-        'wagtail.wagtailsnippets',
-        'wagtail.wagtaildocs',
-        'wagtail.wagtailadmin',
-        'wagtail.api.v2',
-        'wagtail.wagtailcore',
-    ] + INSTALLED_APPS
-else:
-    INSTALLED_APPS = [
-        'wagtail.contrib.styleguide',
-        'wagtail.contrib.sitemaps',
-        'wagtail.contrib.routable_page',
-        'wagtail.contrib.frontend_cache',
-        'wagtail.contrib.search_promotions',
-        'wagtail.contrib.settings',
-        'wagtail.contrib.modeladmin',
-        'wagtail.contrib.table_block',
-        'wagtail.contrib.forms',
-
-        'wagtail.search',
-        'wagtail.embeds',
-        'wagtail.images',
-        'wagtail.sites',
-        'wagtail.users',
-        'wagtail.snippets',
-        'wagtail.documents',
-        'wagtail.admin',
-        'wagtail.api.v2',
-        'wagtail',
-    ] + INSTALLED_APPS
-
 
 TEMPLATES = [
     {
