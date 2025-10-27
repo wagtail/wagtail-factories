@@ -59,20 +59,22 @@ def test_list_block_factory():
 
 @pytest.mark.django_db
 def test_block_factory():
-    value = MyBlockFactory(
-        image__image__title='blub')
-
-    assert value == OrderedDict([
-        ('title', 'my title'),
-        ('item', OrderedDict([
-            ('label', 'my-label'),
-            ('value', 100),
-        ])),
-        ('items', []),
-        ('image', Image.objects.first()),
-    ])
-
-    assert value['image'].title == 'blub'
+    computed = MyBlockFactory(image__image__title='blub')
+    expected = MyBlockFactory._meta.model().clean(
+        OrderedDict(
+            [
+                ("title", "my title"),
+                ("item", OrderedDict([("label", "my-label"), ("value", 100)])),
+                ("items", []),
+                ("image", Image.objects.first()),
+            ]
+        )
+    )
+    computed_list_value = computed.pop("items")
+    expected_list_value = expected.pop("items")
+    assert eq_list_block_values(computed_list_value, expected_list_value)
+    assert computed == expected
+    assert computed["image"].title == "blub"
 
 
 def test_block_factory_build():
