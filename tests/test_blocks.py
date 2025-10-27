@@ -78,20 +78,25 @@ def test_block_factory():
 
 
 def test_block_factory_build():
-    value = MyBlockFactory.build(
-        image__image__title='blub')
+    computed = MyBlockFactory.build(image__image__title="blub")
 
-    image = value.pop('image')
-    assert image.title == 'blub'
+    image = computed.pop("image")
+    assert image.title == "blub"
 
-    assert value == OrderedDict([
-        ('title', 'my title'),
-        ('item', OrderedDict([
-            ('label', 'my-label'),
-            ('value', 100),
-        ])),
-        ('items', []),
-    ])
+    expected = MyBlockFactory._meta.model().clean(
+        OrderedDict(
+            [
+                ("title", "my title"),
+                ("item", OrderedDict([("label", "my-label"), ("value", 100)])),
+                ("items", []),
+            ]
+        )
+    )
+
+    computed_list_value = computed.pop("items")
+    expected_list_value = expected.pop("items")
+    assert eq_list_block_values(computed_list_value, expected_list_value)
+    assert computed == expected
 
 
 
