@@ -3,20 +3,20 @@ import re
 from setuptools import find_packages, setup
 
 install_requires = [
-    "factory-boy>=3.2,<4",
-    "wagtail>=6.3",
+    "factory-boy>=3.3,<4",
+    "wagtail>=7.0",
 ]
 
 docs_require = [
-    "sphinx>=7.3.7",
+    "sphinx>=8.2.3",
 ]
 
 tests_require = [
-    "pytest==8.4.1",
+    "pytest==9.0.0",
     "pytest-django==4.11.1",
-    "pytest-cov==6.2.1",
-    "coverage==7.10.3",
-    "ruff==0.12.8",
+    "pytest-cov==7.0.0",
+    "coverage==7.11.3",
+    "ruff==0.14.4",
     "tox==4.32.0",
 ]
 
@@ -51,11 +51,11 @@ setup(
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Django",
@@ -63,7 +63,6 @@ setup(
         "Framework :: Django :: 5.1",
         "Framework :: Django :: 5.2",
         "Framework :: Wagtail",
-        "Framework :: Wagtail :: 6",
         "Framework :: Wagtail :: 7",
     ],
     zip_safe=False,
