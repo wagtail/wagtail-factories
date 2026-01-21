@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 install_requires = [
     "factory-boy>=3.3,<4",
-    "wagtail>=7.0",
+    "wagtail>=6.3",
 ]
 
 docs_require = [
@@ -63,6 +63,7 @@ setup(
         "Framework :: Django :: 5.1",
         "Framework :: Django :: 5.2",
         "Framework :: Wagtail",
+        "Framework :: Wagtail :: 6",
         "Framework :: Wagtail :: 7",
     ],
     zip_safe=False,
