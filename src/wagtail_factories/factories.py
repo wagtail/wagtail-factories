@@ -1,6 +1,7 @@
 import logging
 
 import factory
+import factory.fuzzy
 from django.utils.text import slugify
 from factory import errors, utils
 from factory.declarations import ParameteredAttribute
@@ -15,6 +16,7 @@ __all__ = [
     "PageFactory",
     "SiteFactory",
     "DocumentFactory",
+    "BaseViewRestrictionFactory",
 ]
 logger = logging.getLogger(__file__)
 
@@ -142,3 +144,23 @@ class DocumentFactory(CollectionMemberFactory):
 
     title = "A document"
     file = factory.django.FileField()
+
+
+from wagtail.models.view_restrictions import BaseViewRestriction
+
+
+
+class BaseViewRestrictionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = BaseViewRestriction
+
+    restriction_type = factory.fuzzy.FuzzyChoice(
+        BaseViewRestriction.RESTRICTION_CHOICES
+    )
+    password = factory.Faker("text", max_nb_chars=20)
+
+
+
+
+
+
