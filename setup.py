@@ -13,10 +13,10 @@ docs_require = [
 
 tests_require = [
     "pytest==9.0.3",
-    "pytest-django==4.11.1",
-    "pytest-cov==7.0.0",
-    "coverage==7.11.3",
-    "ruff==0.14.4",
+    "pytest-django==4.12.0",
+    "pytest-cov==7.1.0",
+    "coverage==7.13.5",
+    "ruff==0.15.12",
     "tox==4.32.0",
 ]
 
