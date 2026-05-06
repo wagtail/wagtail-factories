@@ -12,6 +12,11 @@ Unreleased
 - Drop support for Django 5.0 and 5.1 (end of life)
 - Drop support for Python 3.9 (end of life)
 - Replace ``setup.py sdist bdist_wheel`` with ``python -m build`` in the release workflow
+- Update pytest to 9.0.3
+- Update pytest-django to 4.12.0
+- Update pytest-cov to 7.1.0
+- Update coverage to 7.13.5
+- Update ruff to 0.15.12
 
 4.3.0
 =====
