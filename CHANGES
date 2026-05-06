@@ -5,10 +5,13 @@ Unreleased
 =====
 - Add dev docs for StreamField factories
 - Add user docs
-- Add support for Wagtail 7.2, 7.3
+- Add support for Wagtail 7.3 and 7.4 (LTS)
+- Add support for Django 6.0
 - Add support for Python 3.14
-- Drop support for Python 3.9
-- Drop support for Django 5.1
+- Drop support for Wagtail 6.3, 7.1, and 7.2 (end of life)
+- Drop support for Django 5.0 and 5.1 (end of life)
+- Drop support for Python 3.9 (end of life)
+- Replace ``setup.py sdist bdist_wheel`` with ``python -m build`` in the release workflow
 
 4.3.0
 =====
