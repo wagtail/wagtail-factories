@@ -204,7 +204,7 @@ def test_custom_page_streamfield_default_blocks():
     assert page.body[1].value == image2
 
     content = str(page.body)
-    assert content.count("w-block-image") == 2
+    assert content.count("<img") == 2
 
 
 @pytest.mark.django_db
