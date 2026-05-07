@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 install_requires = [
     "factory-boy>=3.2,<4",
-    "wagtail>=6.3",
+    "wagtail>=7.0",
 ]
 
 docs_require = [
@@ -13,10 +13,10 @@ docs_require = [
 
 tests_require = [
     "pytest==9.0.3",
-    "pytest-django==4.11.1",
-    "pytest-cov==7.0.0",
-    "coverage==7.11.3",
-    "ruff==0.14.4",
+    "pytest-django==4.12.0",
+    "pytest-cov==7.1.0",
+    "coverage==7.13.5",
+    "ruff==0.15.12",
     "tox==4.32.0",
 ]
 
@@ -45,6 +45,7 @@ setup(
     packages=find_packages("src"),
     include_package_data=True,
     license="MIT",
+    python_requires=">=3.10",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
@@ -60,10 +61,9 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Django",
         "Framework :: Django :: 4.2",
-        "Framework :: Django :: 5.1",
         "Framework :: Django :: 5.2",
+        "Framework :: Django :: 6.0",
         "Framework :: Wagtail",
-        "Framework :: Wagtail :: 6",
         "Framework :: Wagtail :: 7",
     ],
     zip_safe=False,
