@@ -1,13 +1,10 @@
 Unreleased
 ==========
 
-4.4.0
+4.5.0
 =====
-- Add dev docs for StreamField factories
-- Add user docs
 - Add support for Wagtail 7.3 and 7.4 (LTS)
 - Add support for Django 6.0
-- Add support for Python 3.14
 - Drop support for Wagtail 6.3, 7.1, and 7.2 (end of life)
 - Drop support for Django 5.0 and 5.1 (end of life)
 - Drop support for Python 3.9 (end of life)
@@ -17,6 +14,18 @@ Unreleased
 - Update pytest-cov to 7.1.0
 - Update coverage to 7.13.5
 - Update ruff to 0.15.12
+
+4.4.0
+=====
+- Add dev docs for StreamField factories
+- Add user docs
+- Add tests for Wagtail 7.2, 7.3
+- Add tests for Python 3.14
+- Drop tests for Python 3.9
+- Drop tests for Django 5.1
+- Add dev docs for StreamField factories
+- Add user docs
+- Add tests for Python 3.14
 
 4.3.0
 =====
